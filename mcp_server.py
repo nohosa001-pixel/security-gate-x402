@@ -184,9 +184,13 @@ async def run_server():
 
 
 def main():
-    asyncio.run(run_server())
+    try:
+        asyncio.run(run_server())
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        pass
 
 
 if __name__ == "__main__":
     main()
+
 
