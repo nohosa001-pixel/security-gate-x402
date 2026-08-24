@@ -33,6 +33,21 @@ PRICE_USDC = os.getenv("PRICE_USDC", "0.002")
 NETWORK = os.getenv("NETWORK", "base")
 
 
+@app.get("/")
+async def root():
+    return {
+        "service": "Agent Output Security & Hallucination Gate (x402)",
+        "status": "online",
+        "protocol": "x402",
+        "network": NETWORK,
+        "pricing_usdc": PRICE_USDC,
+        "docs_url": "/docs",
+        "discovery_manifest": "/.well-known/ap2",
+        "terms_of_service": "/terms",
+        "privacy_policy": "/privacy"
+    }
+
+
 @app.get("/health")
 @app.get("/v1/health")
 async def health_check():
