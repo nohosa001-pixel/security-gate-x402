@@ -12,7 +12,7 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 | **Display Title** | `Agent Output Security & Hallucination Gate (x402)` |
 | **Short Description** | Deterministic, ultra-low latency (<10ms) security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191 cryptographic attestation. |
 | **Category / Tags** | `Security`, `AI Agents`, `Guardrails`, `Web3`, `x402`, `Attestation`, `Base` |
-| **Repository URL** | `https://github.com/your-username/agent-security-gate-x402` |
+| **Repository URL** | `https://github.com/nohosa001-pixel/security-gate-x402` |
 | **License** | `MIT` |
 | **Runtime** | `Python (>=3.9)` |
 | **Execution Command** | `python mcp_server.py` |
