@@ -71,7 +71,7 @@ Install the client SDK in your agent project and wrap your LLM calls:
 from sdk.agent_gate_sdk import SecurityGateClient, gate_inspect
 
 client = SecurityGateClient(
-    gate_url="https://your-gate-service-url.run.app",
+    gate_url="https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
     private_key="0xYourAgentEVMKey..."
 )
 

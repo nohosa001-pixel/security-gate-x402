@@ -2,7 +2,7 @@
 > Deterministic, ultra-low latency (<10ms) security and factual hallucination inspection micro-oracle for autonomous AI agents. Monetized via HTTP 402 + x402 on Base ($0.002 USDC).
 
 ## Overview
-- **Base URL**: `https://<service-url>`
+- **Base URL**: `https://agent-security-gate-x402-7qxtp3324q-du.a.run.app`
 - **Protocol**: HTTP 402 / x402 on Base network (Chain ID: 8453)
 - **Settlement Token**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - **Cost**: $0.002 USDC per inspection
