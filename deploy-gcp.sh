@@ -52,7 +52,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 100 \
-  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=8453" \
+  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=${BASE_CHAIN_ID:-8453},FACILITATOR_URL=${FACILITATOR_URL:-https://facilitator.x402.org/v2/verify}" \
   --project "$PROJECT_ID"
 
 # 4. Fetch service URL

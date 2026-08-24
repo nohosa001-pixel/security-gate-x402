@@ -45,6 +45,9 @@ Write-Host "🌐 Target Environment: $SERVER_ENV" -ForegroundColor Yellow
 Write-Host "⚙️ Enabling Cloud Run, Cloud Build, and Artifact Registry APIs..." -ForegroundColor Cyan
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com --project $PROJECT_ID
 
+$FACILITATOR = if ($env:FACILITATOR_URL) { $env:FACILITATOR_URL } else { "https://facilitator.x402.org/v2/verify" }
+$CHAIN_ID = if ($env:BASE_CHAIN_ID) { $env:BASE_CHAIN_ID } else { "8453" }
+
 # 3. Build & Deploy to Cloud Run
 Write-Host "🏗️ Building and deploying container to Google Cloud Run..." -ForegroundColor Cyan
 gcloud run deploy $SERVICE_NAME `
@@ -57,7 +60,7 @@ gcloud run deploy $SERVICE_NAME `
   --cpu 1 `
   --min-instances 0 `
   --max-instances 100 `
-  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=8453" `
+  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=$CHAIN_ID,FACILITATOR_URL=$FACILITATOR" `
   --project $PROJECT_ID
 
 # 4. Fetch service URL
