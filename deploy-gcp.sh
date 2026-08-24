@@ -48,6 +48,8 @@ gcloud run deploy "$SERVICE_NAME" \
   --platform managed \
   --allow-unauthenticated \
   --port 8080 \
+  --command uvicorn \
+  --args app.main:app,--host,0.0.0.0,--port,8080 \
   --memory 512Mi \
   --cpu 1 \
   --min-instances 0 \

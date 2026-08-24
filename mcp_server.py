@@ -150,30 +150,26 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
-async def main():
-    loop = asyncio.get_event_loop()
+async def run_server():
+    loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-    w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)
-    writer = asyncio.StreamWriter(w_transport, w_protocol, reader, loop)
-
+    
+    # Process standard input line-by-line
     while True:
-        line = await reader.readline()
-        if not line:
+        line_bytes = await loop.run_in_executor(None, sys.stdin.readline)
+        if not line_bytes:
             break
-
-        line_str = line.decode("utf-8").strip()
+        
+        line_str = line_bytes.strip()
         if not line_str:
             continue
-
+        
         try:
             req_data = json.loads(line_str)
             response = await handle_rpc_request(req_data)
             if response is not None:
-                resp_bytes = (json.dumps(response) + "\n").encode("utf-8")
-                writer.write(resp_bytes)
-                await writer.drain()
+                sys.stdout.write(json.dumps(response) + "\n")
+                sys.stdout.flush()
         except Exception as e:
             err_resp = {
                 "jsonrpc": "2.0",
@@ -183,9 +179,14 @@ async def main():
                     "message": f"Parse error: {str(e)}"
                 }
             }
-            writer.write((json.dumps(err_resp) + "\n").encode("utf-8"))
-            await writer.drain()
+            sys.stdout.write(json.dumps(err_resp) + "\n")
+            sys.stdout.flush()
+
+
+def main():
+    asyncio.run(run_server())
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
+
