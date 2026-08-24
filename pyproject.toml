@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Ultra-low latency (<10ms) deterministic security, secret leak, dangerous AST, and factual hallucination inspection micro-oracle for autonomous agents."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "Security Gate Team" }
 ]
@@ -40,3 +40,11 @@ dev = [
 
 [project.scripts]
 agent-security-gate = "mcp_server:main"
+
+[tool.setuptools]
+py-modules = ["mcp_server"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*", "sdk*"]
+
