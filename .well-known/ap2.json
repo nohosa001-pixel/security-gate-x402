@@ -1,0 +1,30 @@
+{
+  "protocol": "AP2/1.0",
+  "service": "Agent Output Security & Hallucination Gate",
+  "version": "1.0.0",
+  "description": "Deterministic, ultra-low latency (<10ms) security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle for autonomous agents.",
+  "supported_rails": [
+    "x402-base-usdc"
+  ],
+  "pricing": {
+    "amount": "0.002",
+    "currency": "USDC",
+    "network": "base",
+    "chain_id": 8453,
+    "asset_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+  },
+  "capabilities": [
+    {
+      "action": "inspect_agent_output",
+      "endpoint": "/api/v1/inspect",
+      "method": "POST",
+      "description": "Ultra-low latency security, key leak, and factual hallucination validator for 0.002 USDC on Base."
+    }
+  ],
+  "security_checks": [
+    "prompt_injection_guard",
+    "secret_private_key_leak_scanner",
+    "dangerous_ast_execution_guard",
+    "numerical_and_entity_faithfulness_nli"
+  ]
+}

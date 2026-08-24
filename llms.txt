@@ -1,0 +1,30 @@
+# Agent Output Security & Hallucination Gate (x402)
+> Deterministic, ultra-low latency (<10ms) security and factual hallucination inspection micro-oracle for autonomous AI agents. Monetized via HTTP 402 + x402 on Base ($0.002 USDC).
+
+## Overview
+- **Base URL**: `https://<service-url>`
+- **Protocol**: HTTP 402 / x402 on Base network (Chain ID: 8453)
+- **Settlement Token**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
+- **Cost**: $0.002 USDC per inspection
+- **Latency**: <10ms (Deterministic AST + NLI heuristic, no heavy LLM latency)
+- **Zero-Retention**: In-memory inspection only, zero logs/storage of agent outputs
+
+## Key Endpoints
+- `POST /api/v1/inspect`: Inspect text or code output before executing tools or returning to users.
+- `GET /.well-known/ap2`: Google AP2 protocol agent discovery manifest.
+- `GET /terms`: Terms of service, AS-IS disclaimer, $0.002 liability cap.
+- `GET /privacy`: Zero-retention and in-memory processing guarantee.
+
+## Autonomous Agent Integration (Python)
+```python
+from sdk.agent_gate_sdk import SecurityGateClient, gate_inspect
+
+client = SecurityGateClient(gate_url="https://<service-url>", private_key="0x...")
+result = client.inspect("The net revenue was $1.2M.", context_ground_truth="Revenue: $1.2M")
+# Returns cryptographic attestation receipt with EIP-191 signature
+print(result["attestation"]["signature"])
+```
+
+## Machine Discovery
+- AP2 Manifest: `/.well-known/ap2.json`
+- OpenAPI Specification: `/openapi.json`

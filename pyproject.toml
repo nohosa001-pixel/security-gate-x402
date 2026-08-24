@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-security-gate-x402"
+version = "1.0.0"
+description = "Ultra-low latency (<10ms) deterministic security, secret leak, dangerous AST, and factual hallucination inspection micro-oracle for autonomous agents."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Security Gate Team" }
+]
+keywords = [
+  "mcp",
+  "glama",
+  "ai-agents",
+  "security",
+  "guardrails",
+  "hallucination",
+  "x402",
+  "attestation",
+  "base"
+]
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn>=0.30.0",
+  "httpx>=0.27.0",
+  "pydantic>=2.8.0",
+  "eth-account>=0.13.0",
+  "python-dotenv>=1.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.23.0"
+]
+
+[project.scripts]
+agent-security-gate = "mcp_server:main"
