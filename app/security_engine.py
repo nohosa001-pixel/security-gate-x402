@@ -25,14 +25,23 @@ INJECTION_PATTERNS = [
 ]
 
 SECRET_PATTERNS = [
-    r"0x[a-fA-F0-9]{64}",            # EVM 32-Byte Private Key
-    r"sk-[a-zA-Z0-9]{32,}",          # OpenAI / LLM API Key
-    r"sk-proj-[a-zA-Z0-9_-]{40,}",   # OpenAI Project Key
-    r"sk-ant-[a-zA-Z0-9_-]{32,}",    # Anthropic API Key
-    r"ghp_[a-zA-Z0-9]{36}",          # GitHub Personal Access Token
-    r"AKIA[0-9A-Z]{16}",             # AWS Access Key ID
+    r"0x[a-fA-F0-9]{64}",                                      # EVM 32-Byte Private Key
+    r"sk-[a-zA-Z0-9]{32,}",                                    # OpenAI / LLM API Key
+    r"sk-proj-[a-zA-Z0-9_-]{40,}",                             # OpenAI Project Key
+    r"sk-ant-[a-zA-Z0-9_-]{32,}",                              # Anthropic API Key
+    r"AIzaSy[a-zA-Z0-9_-]{30,40}",                             # Google Gemini / Cloud API Key
+    r"hf_[a-zA-Z0-9]{30,}",                                    # HuggingFace Access Token
+    r"ghp_[a-zA-Z0-9]{36}",                                    # GitHub Personal Access Token (Classic)
+    r"github_pat_[a-zA-Z0-9_]{82}",                            # GitHub Fine-grained PAT
+    r"AKIA[0-9A-Z]{16}",                                       # AWS Access Key ID
+    r"gsk_[a-zA-Z0-9]{30,}",                                   # Groq API Key
+    r"ds-[a-zA-Z0-9]{30,}",                                    # DeepSeek API Key
+    r"xox[baprs]-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24,}", # Slack OAuth Token
+    r"https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,}\/B[a-zA-Z0-9_]{8,}\/[a-zA-Z0-9_]{24}", # Slack Webhook
+    r"[MNO][a-zA-Z0-9_-]{23,25}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27}", # Discord Bot Token
     r"-----BEGIN (?:RSA|EC|DSA|OPENSSH|PGP|PRIVATE) KEY-----"  # Private Key Block
 ]
+
 
 
 def extract_numbers_and_units(text: str) -> Set[str]:

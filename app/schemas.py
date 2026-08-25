@@ -64,3 +64,14 @@ class PaymentDemand402(BaseModel):
     expires_at: int = Field(..., description="Unix timestamp expiration of payment quote")
     payment_header: str = Field(default="X-402-Signature", description="Header to pass the signed x402 payment authorization")
     description: str = Field(default="Agent Security & Hallucination Inspection Micro-Oracle Fee ($0.002 USDC on Base)", description="Invoice description")
+
+
+class MCPToolCallRequest(BaseModel):
+    name: str = Field(..., description="MCP Tool name to invoke")
+    arguments: Dict[str, Any] = Field(default_factory=dict, description="Arguments dictionary for the tool")
+
+
+class MCPToolCallResponse(BaseModel):
+    content: List[Dict[str, Any]] = Field(default_factory=list, description="MCP content array")
+    isError: bool = Field(default=False, description="Whether execution resulted in an error")
+

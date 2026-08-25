@@ -170,6 +170,59 @@ def test_mcp_server_rpc_tools():
     assert "attestation" in content_obj
 
 
+def test_extended_ai_secret_detection():
+    from app.security_engine import analyze_payload_security
+    
+    # 1. Google Gemini Key leak
+    gemini_leak = "My Gemini API Key is AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"
+    res1 = analyze_payload_security(gemini_leak)
+    assert not res1["is_safe"]
+    assert any("Secret/Private Key Leak" in t for t in res1["threats"])
+
+    # 2. HuggingFace Token leak
+    hf_leak = "Access model using token hf_abc1234567890def1234567890abcdef1234"
+    res2 = analyze_payload_security(hf_leak)
+    assert not res2["is_safe"]
+
+    # 3. Slack Webhook leak
+    slack_prefix = "https://" + "hooks." + "slack.com/services/"
+    slack_leak = f"Webhook URL: {slack_prefix}T00000000/B00000000/000000000000000000000000"
+    res3 = analyze_payload_security(slack_leak)
+    assert not res3["is_safe"]
+
+
+
+def test_http_mcp_endpoints():
+    client = TestClient(app)
+    
+    # 1. GET /mcp/tools
+    res_tools = client.get("/mcp/tools")
+    assert res_tools.status_code == 200
+    tools_data = res_tools.json()
+    assert "tools" in tools_data
+    assert any(t["name"] == "inspect_agent_output" for t in tools_data["tools"])
+
+    # 2. POST /mcp/invoke without x402 header (should return 402)
+    res_402 = client.post("/mcp/invoke", json={"name": "inspect_agent_output", "arguments": {"agent_output": "Safe text"}})
+    assert res_402.status_code == 402
+    assert res_402.headers.get("X-Payment-Protocol") == "x402"
+
+    # 3. POST /mcp/invoke in dev mode
+    os.environ["ENV"] = "development"
+    res_invoke = client.post(
+        "/mcp/invoke",
+        json={"name": "inspect_agent_output", "arguments": {"agent_output": "Secure output verified"}},
+        headers={
+            "Authorization-x402": "dev_bypass_signature",
+            "X-Client-Address": "0x1111111111111111111111111111111111111111"
+        }
+    )
+    assert res_invoke.status_code == 200
+    inv_data = res_invoke.json()
+    assert "content" in inv_data
+    assert not inv_data.get("isError")
+
+
 def run_tests():
     print("🧪 1. Testing 402 Payment Required...")
     test_402_payment_challenge()
@@ -195,20 +248,29 @@ def run_tests():
     test_secret_key_and_injection_detection()
     print("   ✅ Malicious threats blocked.")
 
-    print("\n🧪 7. Testing Python Agent SDK & @gate_inspect Decorator...")
+    print("\n🧪 7. Testing Extended AI Ecosystem Secret Detection...")
+    test_extended_ai_secret_detection()
+    print("   ✅ Gemini, HuggingFace, Slack secrets blocked.")
+
+    print("\n🧪 8. Testing HTTP MCP Routes (/mcp/tools & /mcp/invoke)...")
+    test_http_mcp_endpoints()
+    print("   ✅ HTTP MCP Tool list & dispatcher verified.")
+
+    print("\n🧪 9. Testing Python Agent SDK & @gate_inspect Decorator...")
     test_python_sdk_and_decorator()
     print("   ✅ SDK client and decorator middleware fully verified.")
 
-    print("\n🧪 8. Testing Cryptographic Audit Attestation & Verification...")
+    print("\n🧪 10. Testing Cryptographic Audit Attestation & Verification...")
     test_attestation_issuance_and_verification()
     print("   ✅ Attestation issuance & tamper-proof cryptographic verification verified.")
 
-    print("\n🧪 9. Testing Model Context Protocol (MCP) Server for Glama.ai...")
+    print("\n🧪 11. Testing Model Context Protocol (MCP) Server for Glama.ai...")
     test_mcp_server_rpc_tools()
     print("   ✅ Glama.ai MCP stdio JSON-RPC server verified.")
 
-    print("\n🎉 ALL 9 TESTS & NEW CAPABILITIES PASSED SUCCESSFULLY!")
+    print("\n🎉 ALL 11 TESTS & CAPABILITIES PASSED SUCCESSFULLY!")
 
 
 if __name__ == "__main__":
     run_tests()
+

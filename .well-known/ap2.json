@@ -19,8 +19,15 @@
       "endpoint": "/api/v1/inspect",
       "method": "POST",
       "description": "Ultra-low latency security, key leak, and factual hallucination validator for 0.002 USDC on Base."
+    },
+    {
+      "action": "mcp_tool_invoke",
+      "endpoint": "/mcp/invoke",
+      "method": "POST",
+      "description": "Direct JSON-RPC standard MCP tool dispatcher with x402 payment validation."
     }
   ],
+
   "security_checks": [
     "prompt_injection_guard",
     "secret_private_key_leak_scanner",
