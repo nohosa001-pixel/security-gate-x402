@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -126,35 +127,63 @@ async def ap2_manifest():
     }
 
 
+FREE_TRIAL_LIMIT = int(os.getenv("FREE_TRIAL_LIMIT", "3"))
+_free_trial_tracker: Dict[str, int] = {}
+
+
+def get_client_id(request: Request, client_address: Optional[str] = None) -> str:
+    if client_address:
+        return client_address.lower().strip()
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client and request.client.host:
+        return request.client.host
+    return "anonymous-guest"
+
+
 @app.post("/api/v1/inspect", response_model=InspectionResponse)
 @app.post("/v1/inspect", response_model=InspectionResponse)
+@app.post("/inspect", response_model=InspectionResponse)
 async def inspect_payload(
     req: InspectionRequest,
-    authorization_x402: str = Header(None, alias="Authorization-x402"),
-    client_address: str = Header(None, alias="X-Client-Address")
+    request: Request,
+    authorization_x402: Optional[str] = Header(None, alias="Authorization-x402"),
+    client_address: Optional[str] = Header(None, alias="X-Client-Address"),
+    x_trial: Optional[str] = Header(None, alias="X-Trial")
 ):
-    if not authorization_x402 or not client_address:
-        return Response(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            headers={
-                "X-Payment-Protocol": "x402",
-                "X-Payment-Network": NETWORK,
-                "X-Payment-Token": "USDC",
-                "X-Payment-Amount": PRICE_USDC,
-                "X-Payment-Recipient": SERVER_WALLET,
-                "X-Payment-Resource": "/api/v1/inspect"
-            },
-            content="HTTP 402: Payment of 0.002 USDC required via x402 protocol."
-        )
+    client_id = get_client_id(request, client_address)
+    used_trials = _free_trial_tracker.get(client_id, 0)
+    is_free_trial = False
 
-    is_valid = await verify_x402_payment(
-        authorization_header=authorization_x402,
-        client_address=client_address,
-        expected_amount=PRICE_USDC,
-        recipient=SERVER_WALLET
-    )
-    if not is_valid:
-        return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
+    # Check if request qualifies for Free Trial
+    if not authorization_x402 or not client_address:
+        if used_trials < FREE_TRIAL_LIMIT or x_trial == "true":
+            is_free_trial = True
+            _free_trial_tracker[client_id] = used_trials + 1
+        else:
+            return Response(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                headers={
+                    "X-Payment-Protocol": "x402",
+                    "X-Payment-Network": NETWORK,
+                    "X-Payment-Token": "USDC",
+                    "X-Payment-Amount": PRICE_USDC,
+                    "X-Payment-Recipient": SERVER_WALLET,
+                    "X-Payment-Resource": "/api/v1/inspect",
+                    "X-Free-Trials-Exhausted": "true"
+                },
+                content="HTTP 402: Free trial limit (3 queries) exhausted. Payment of 0.002 USDC required via x402 protocol."
+            )
+    else:
+        is_valid = await verify_x402_payment(
+            authorization_header=authorization_x402,
+            client_address=client_address,
+            expected_amount=PRICE_USDC,
+            recipient=SERVER_WALLET
+        )
+        if not is_valid:
+            return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
 
     audit_result = analyze_payload_security(
         content=req.agent_output,
@@ -173,17 +202,22 @@ async def inspect_payload(
         issued_at=now_iso
     )
 
+    remaining_trials = max(0, FREE_TRIAL_LIMIT - _free_trial_tracker.get(client_id, 0))
+    payment_info = {
+        "tier": "FREE_TRIAL" if is_free_trial else "PAID_X402",
+        "amount": "0.0000" if is_free_trial else PRICE_USDC,
+        "currency": "USDC",
+        "network": NETWORK,
+        "recipient": SERVER_WALLET,
+        "remaining_free_trials": remaining_trials if is_free_trial else "unlimited"
+    }
+
     return InspectionResponse(
         status="success",
         timestamp=now_iso,
         audit=audit_obj,
         attestation=AuditAttestation(**attestation_data),
-        payment_receipt={
-            "amount": PRICE_USDC,
-            "currency": "USDC",
-            "network": NETWORK,
-            "recipient": SERVER_WALLET
-        }
+        payment_receipt=payment_info
     )
 
 
@@ -198,13 +232,25 @@ async def list_mcp_tools():
         "tools": [
             {
                 "name": "inspect_agent_output",
-                "description": "Inspects an AI agent's text or code output for prompt injections, private key/secret leaks, dangerous AST executions, and factual/numerical hallucinations against ground truth. Issues a cryptographic EIP-191 Proof-of-Safety attestation.",
+                "description": "Inspects an AI agent's text or code output for prompt injections, private key/secret leaks, dangerous AST executions, and factual/numerical hallucinations against ground truth. Issues a cryptographic EIP-191 Proof-of-Safety attestation. Free trial tier enabled.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "agent_output": {"type": "string", "description": "The textual or code output generated by an LLM / agent to inspect"},
-                        "is_code": {"type": "boolean", "default": False, "description": "Set to true if agent_output is executable Python / shell code"},
-                        "context_ground_truth": {"type": "string", "description": "Original factual reference / context to verify numerical accuracy"}
+                        "agent_output": {
+                            "type": "string", 
+                            "description": "The textual or code output generated by an LLM / agent to inspect",
+                            "default": "Quarterly net revenue reached $1.2M with zero infrastructure failures."
+                        },
+                        "is_code": {
+                            "type": "boolean", 
+                            "default": False, 
+                            "description": "Set to true if agent_output is executable Python / shell code"
+                        },
+                        "context_ground_truth": {
+                            "type": "string", 
+                            "description": "Original factual reference / context to verify numerical accuracy",
+                            "default": "Revenue report: Q3 net revenue is $1.2M."
+                        }
                     },
                     "required": ["agent_output"]
                 }
@@ -216,40 +262,51 @@ async def list_mcp_tools():
 @app.post("/mcp/invoke", response_model=MCPToolCallResponse, tags=["MCP Tools"])
 async def invoke_mcp_tool(
     tool_call: MCPToolCallRequest,
-    authorization_x402: str = Header(None, alias="Authorization-x402"),
-    client_address: str = Header(None, alias="X-Client-Address")
+    request: Request,
+    authorization_x402: Optional[str] = Header(None, alias="Authorization-x402"),
+    client_address: Optional[str] = Header(None, alias="X-Client-Address"),
+    x_trial: Optional[str] = Header(None, alias="X-Trial")
 ):
     """
-    Direct MCP tool dispatcher for LLM agents. Protected with x402 payment validation.
+    Direct MCP tool dispatcher for LLM agents with Free Trial and x402 payment validation.
     """
-    if not authorization_x402 or not client_address:
-        return Response(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            headers={
-                "X-Payment-Protocol": "x402",
-                "X-Payment-Network": NETWORK,
-                "X-Payment-Token": "USDC",
-                "X-Payment-Amount": PRICE_USDC,
-                "X-Payment-Recipient": SERVER_WALLET,
-                "X-Payment-Resource": "/mcp/invoke"
-            },
-            content="HTTP 402: Payment of 0.002 USDC required via x402 protocol."
-        )
+    client_id = get_client_id(request, client_address)
+    used_trials = _free_trial_tracker.get(client_id, 0)
+    is_free_trial = False
 
-    is_valid = await verify_x402_payment(
-        authorization_header=authorization_x402,
-        client_address=client_address,
-        expected_amount=PRICE_USDC,
-        recipient=SERVER_WALLET
-    )
-    if not is_valid:
-        return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
+    if not authorization_x402 or not client_address:
+        if used_trials < FREE_TRIAL_LIMIT or x_trial == "true":
+            is_free_trial = True
+            _free_trial_tracker[client_id] = used_trials + 1
+        else:
+            return Response(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                headers={
+                    "X-Payment-Protocol": "x402",
+                    "X-Payment-Network": NETWORK,
+                    "X-Payment-Token": "USDC",
+                    "X-Payment-Amount": PRICE_USDC,
+                    "X-Payment-Recipient": SERVER_WALLET,
+                    "X-Payment-Resource": "/mcp/invoke",
+                    "X-Free-Trials-Exhausted": "true"
+                },
+                content="HTTP 402: Free trial limit (3 queries) exhausted. Payment of 0.002 USDC required via x402 protocol."
+            )
+    else:
+        is_valid = await verify_x402_payment(
+            authorization_header=authorization_x402,
+            client_address=client_address,
+            expected_amount=PRICE_USDC,
+            recipient=SERVER_WALLET
+        )
+        if not is_valid:
+            return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
 
     name = tool_call.name
     args = tool_call.arguments
 
     if name == "inspect_agent_output":
-        agent_output = args.get("agent_output", "")
+        agent_output = args.get("agent_output", "Quarterly net revenue reached $1.2M with zero infrastructure failures.")
         is_code = bool(args.get("is_code", False))
         context = args.get("context_ground_truth")
 
@@ -267,13 +324,16 @@ async def invoke_mcp_tool(
             issued_at=now_iso
         )
 
+        remaining_trials = max(0, FREE_TRIAL_LIMIT - _free_trial_tracker.get(client_id, 0))
         result_payload = {
             "status": "success",
             "timestamp": now_iso,
             "audit": audit_result,
             "attestation": attestation_data,
             "pricing": {
-                "rate": f"{PRICE_USDC} USDC",
+                "tier": "FREE_TRIAL" if is_free_trial else "PAID_X402",
+                "rate": "0.0000 USDC (Free Trial)" if is_free_trial else f"{PRICE_USDC} USDC",
+                "remaining_free_trials": remaining_trials if is_free_trial else "unlimited",
                 "network": NETWORK,
                 "status": "settled"
             }

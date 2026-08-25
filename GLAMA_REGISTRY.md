@@ -36,14 +36,28 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 
 ## 💻 3. Claude Desktop & Cursor MCP 연동 설정
 
-### Claude Desktop (`claude_desktop_config.json`)
+### 🚀 원클릭 설치 (via `uvx` - 추천)
 ```json
 {
   "mcpServers": {
-    "agent-security-gate": {
+    "security-gate-x402": {
+      "command": "uvx",
+      "args": [
+        "security-gate-x402"
+      ]
+    }
+  }
+}
+```
+
+### Claude Desktop 로컬 연동 (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "security-gate-x402": {
       "command": "python",
       "args": [
-        "C:\\Users\\nohos\\OneDrive\\바탕 화면\\security-gate-x402\\mcp_server.py"
+        "mcp_server.py"
       ]
     }
   }
@@ -54,7 +68,7 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 ```json
 {
   "mcpServers": {
-    "agent-security-gate": {
+    "security-gate-x402": {
       "command": "python",
       "args": [
         "mcp_server.py"

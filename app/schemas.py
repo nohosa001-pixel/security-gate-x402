@@ -12,9 +12,35 @@ class VerdictEnum(str, Enum):
 
 
 class InspectionRequest(BaseModel):
-    agent_output: str = Field(..., description="The LLM or agent output payload to inspect")
-    is_code: bool = Field(default=False, description="Set to True if payload contains executable code")
-    context_ground_truth: Optional[str] = Field(default=None, description="Original reference context to check for factual accuracy and numerical hallucinations")
+    agent_output: str = Field(
+        default="System status: All operational. Quarterly net profit reached $1.2M with zero critical vulnerabilities.",
+        description="The LLM or agent output payload to inspect"
+    )
+    is_code: bool = Field(
+        default=False, 
+        description="Set to True if payload contains executable Python/shell code"
+    )
+    context_ground_truth: Optional[str] = Field(
+        default=None, 
+        description="Original reference context to check for factual accuracy and numerical hallucinations (optional)"
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "agent_output": "Our Q3 cloud expenses reached $45,000 across 12 clusters.",
+                    "is_code": False,
+                    "context_ground_truth": "Financial ledger: Q3 cloud expenses $45,000 for 12 clusters."
+                },
+                {
+                    "agent_output": "import os\nos.system('rm -rf /')",
+                    "is_code": True,
+                    "context_ground_truth": None
+                }
+            ]
+        }
+    }
 
 
 class NLIReport(BaseModel):

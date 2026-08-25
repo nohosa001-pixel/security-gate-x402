@@ -20,8 +20,19 @@ os.environ["ENV"] = "development"
 client = TestClient(app)
 
 
-def test_402_payment_challenge():
-    resp_402 = client.post("/api/v1/inspect", json={"agent_output": "Hello safe world!"})
+def test_free_trial_and_402_payment_challenge():
+    # 1. First calls should succeed under Free Trial
+    resp_trial = client.post("/api/v1/inspect", json={"agent_output": "Hello free trial world!"}, headers={"X-Client-Address": "0xTrialTester1"})
+    assert resp_trial.status_code == 200
+    assert resp_trial.json()["payment_receipt"]["tier"] == "FREE_TRIAL"
+
+    # Exhaust free trials for client 0xExhaustedUser
+    client_id = "0xExhaustedUser"
+    for i in range(3):
+        client.post("/api/v1/inspect", json={"agent_output": f"Trial query {i}"}, headers={"X-Client-Address": client_id})
+
+    # 4th call without payment header must return 402 Payment Required
+    resp_402 = client.post("/api/v1/inspect", json={"agent_output": "Paid query"}, headers={"X-Client-Address": client_id})
     assert resp_402.status_code == 402
     assert resp_402.headers.get("x-payment-protocol") == "x402"
     assert resp_402.headers.get("x-payment-amount") == "0.002"
@@ -202,12 +213,25 @@ def test_http_mcp_endpoints():
     assert "tools" in tools_data
     assert any(t["name"] == "inspect_agent_output" for t in tools_data["tools"])
 
-    # 2. POST /mcp/invoke without x402 header (should return 402)
-    res_402 = client.post("/mcp/invoke", json={"name": "inspect_agent_output", "arguments": {"agent_output": "Safe text"}})
+    # 2. POST /mcp/invoke under Free Trial
+    res_trial = client.post(
+        "/mcp/invoke", 
+        json={"name": "inspect_agent_output", "arguments": {"agent_output": "Safe text"}},
+        headers={"X-Client-Address": "0xMcpTrialTester"}
+    )
+    assert res_trial.status_code == 200
+
+    # Exhaust MCP free trials
+    mcp_user = "0xExhaustedMcpUser"
+    for _ in range(3):
+        client.post("/mcp/invoke", json={"name": "inspect_agent_output", "arguments": {"agent_output": "Safe"}}, headers={"X-Client-Address": mcp_user})
+
+    # 4th call without x402 header must return 402
+    res_402 = client.post("/mcp/invoke", json={"name": "inspect_agent_output", "arguments": {"agent_output": "Safe text"}}, headers={"X-Client-Address": mcp_user})
     assert res_402.status_code == 402
     assert res_402.headers.get("X-Payment-Protocol") == "x402"
 
-    # 3. POST /mcp/invoke in dev mode
+    # 3. POST /mcp/invoke with payment in dev mode
     os.environ["ENV"] = "development"
     res_invoke = client.post(
         "/mcp/invoke",
@@ -224,9 +248,9 @@ def test_http_mcp_endpoints():
 
 
 def run_tests():
-    print("🧪 1. Testing 402 Payment Required...")
-    test_402_payment_challenge()
-    print("   ✅ 402 Challenge verified successfully.")
+    print("🧪 1. Testing Free Trial & 402 Payment Challenge...")
+    test_free_trial_and_402_payment_challenge()
+    print("   ✅ Free Trial & 402 Challenge verified successfully.")
 
     print("\n🧪 2. Testing Legal Terms & Privacy Endpoints...")
     test_terms_and_privacy_endpoints()
@@ -254,7 +278,7 @@ def run_tests():
 
     print("\n🧪 8. Testing HTTP MCP Routes (/mcp/tools & /mcp/invoke)...")
     test_http_mcp_endpoints()
-    print("   ✅ HTTP MCP Tool list & dispatcher verified.")
+    print("   ✅ HTTP MCP Tool list, Free Trial & dispatcher verified.")
 
     print("\n🧪 9. Testing Python Agent SDK & @gate_inspect Decorator...")
     test_python_sdk_and_decorator()
@@ -273,4 +297,5 @@ def run_tests():
 
 if __name__ == "__main__":
     run_tests()
+
 
