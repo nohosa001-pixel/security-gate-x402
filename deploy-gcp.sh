@@ -47,15 +47,18 @@ gcloud run deploy "$SERVICE_NAME" \
   --region "$REGION" \
   --platform managed \
   --allow-unauthenticated \
+  --command="" \
+  --args="" \
   --port 8080 \
-  --command uvicorn \
-  --args app.main:app,--host,0.0.0.0,--port,8080 \
   --memory 512Mi \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 100 \
   --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=${BASE_CHAIN_ID:-8453},FACILITATOR_URL=${FACILITATOR_URL:-https://facilitator.x402.org/v2/verify}" \
   --project "$PROJECT_ID"
+
+
+
 
 # 4. Fetch service URL
 SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --platform managed --region "$REGION" --format 'value(status.url)' --project "$PROJECT_ID")
