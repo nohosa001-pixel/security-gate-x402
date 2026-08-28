@@ -136,4 +136,3 @@ Copy and paste these prompts into Claude or Cursor to immediately trigger and te
 - **Privacy Policy:** Available at `/privacy`.
 - **AP2 Manifest:** Standard machine-readable discovery manifest at `/.well-known/ap2`.
 - **License:** MIT License.
-
