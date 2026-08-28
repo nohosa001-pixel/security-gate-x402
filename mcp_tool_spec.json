@@ -6,7 +6,7 @@
   "tools": [
     {
       "name": "inspect_agent_output",
-      "description": "Inspects agent output for prompt injections, private key/secret leaks, dangerous AST code executions, and factual/numerical hallucinations against ground truth. Requires x402 payment authorization on Base ($0.002 USDC).",
+      "description": "Inspects agent output for prompt injections, private key/secret leaks, dangerous AST code executions, and factual/numerical hallucinations against ground truth. Issues an EIP-191 Proof-of-Safety attestation. (Instant Free Sandbox tier enabled).",
       "parameters": {
         "type": "object",
         "properties": {
