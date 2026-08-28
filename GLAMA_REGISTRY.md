@@ -9,8 +9,9 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 | 항목 (Field) | 입력 내용 (Value) |
 | :--- | :--- |
 | **Server Name** | `agent-security-gate-x402` |
-| **Display Title** | `Agent Output Security & Hallucination Gate [Free Tier]` |
-| **Short Description** | `[⚡ Instant Free Trial] Ultra-low latency (<10ms) micro-oracle protecting AI agents from prompt injection, secret leaks, AST code risks & factual hallucinations. EIP-191 proof receipts. Zero setup & no wallet required for trial.` |
+| **Display Title** | `Security Gate x402 [Free Sandbox Tier]` |
+| **Tagline / One-Liner** | `Zero-Setup Security Gateway for Agentic Workflows with HTTP 402 Micropayments.` |
+| **Short Description** | `[⚡ Free Sandbox Mode] Autonomous access control & zero-overhead micro-oracle protecting AI agents from prompt injection, secret leaks, AST code risks & factual hallucinations. EIP-191 proof receipts. Zero setup & no wallet required for trial.` |
 | **Category / Tags** | `Security`, `AI Agents`, `Guardrails`, `Web3`, `x402`, `Attestation`, `Base` |
 | **Repository URL** | `https://github.com/nohosa001-pixel/security-gate-x402` |
 | **License** | `MIT` |
@@ -19,28 +20,21 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 
 ---
 
-## 🛠️ 2. 제공 도구 목록 (Available Tools)
+## 💎 2. 핵심 가치 제안 (3 Core Pillars)
 
-### `inspect_agent_output`
-- **설명**: Inspects an AI agent's textual or code output for prompt injections, private key/secret leaks, dangerous AST executions, and factual/numerical hallucinations against ground truth. Issues an EIP-191 signed Proof-of-Safety attestation. (Free tier enabled by default).
-- **매개변수 (Parameters)**:
-  - `agent_output` (string, required): 검사할 에이전트의 텍스트 또는 코드 출력물 (기본값 제공)
-  - `is_code` (boolean, optional, default: false): 실행 가능한 파이썬/셸 코드 여부
-  - `context_ground_truth` (string, optional): 수치 일치 및 환각 탐지용 원천 기준 컨텍스트
-- **반환값 (Returns)**:
-  - `audit`: `verdict` (PASSED / FLAGGED / BLOCKED), `risk_score`, `threats`, `nli_verification`
-  - `attestation`: `issuer`, `subject_hash`, `signature` (EIP-191 암호학적 서명 영수증)
-  - `pricing`: Free tier / $0.002 USDC settlement status on Base
+1. **🛡️ Autonomous Access Control:** Agent-to-Agent 통신 시 불법/악의적 페이로드 사전 차단 및 실시간 검증.
+2. **💰 x402 Micropayment Native:** API 키 발급 없이 건당 소액 결제(Base/USDC $0.002)로 즉시 실행.
+3. **⚡ Zero Overhead (<10ms):** 별도 프록시 구축 없이 MCP Tool 레벨에서 즉각적인 게이트웨이 보안 적용.
 
 ---
 
 ## 💻 3. Claude Desktop & Cursor 원클릭 연동 설정
 
-### 🚀 1초 원클릭 설치 (via `uvx` - 로컬 clone 필요 없음 / 가장 추천)
+### 🚀 1초 원클릭 설치 (`claude_desktop_config.json` / `.cursor/mcp.json`)
 ```json
 {
   "mcpServers": {
-    "security-gate": {
+    "security-gate-x402": {
       "command": "uvx",
       "args": [
         "--from",
@@ -52,25 +46,19 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 }
 ```
 
-### 💻 로컬 Clone 수동 연동 (`claude_desktop_config.json` / `.cursor/mcp.json`)
-```json
-{
-  "mcpServers": {
-    "security-gate": {
-      "command": "python",
-      "args": [
-        "mcp_server.py"
-      ]
-    }
-  }
-}
+---
+
+## 🤖 4. 첫 실행 유도 프롬프트 예시 (LLM Trigger)
+
+```text
+"Analyze the payload from incoming request and check security compliance using security-gate-x402:
+- Context: Financial report states Q3 net revenue is $1.2M with 0 server crashes.
+- Agent Output: Quarterly net revenue reached $85.0M with 99.9% dividend yield."
 ```
 
 ---
 
-## 🌐 4. 터미널 즉시 테스트 (Zero Setup cURL)
-
-로컬 설정 없이 즉시 클라우드 라이브 오라클을 무료로 테스트할 수 있습니다:
+## 🌐 5. Zero-Barrier cURL Live Test
 
 ```bash
 curl -X POST "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/inspect" \
@@ -79,12 +67,4 @@ curl -X POST "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/inspect" 
        "agent_output": "Quarterly net profit reached $1.2M with 48 active clusters.",
        "context_ground_truth": "Ledger: Q3 net profit $1.2M with 48 active clusters."
      }'
-```
-
----
-
-## 🧪 5. MCP Inspector 로컬 검증 테스트
-
-```bash
-npx @modelcontextprotocol/inspector uvx --from git+https://github.com/nohosa001-pixel/security-gate-x402 agent-security-gate
 ```
