@@ -12,7 +12,7 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 | **Display Title** | `Security Gate x402 [Free Sandbox Tier]` |
 | **Tagline / One-Liner** | `Zero-Setup Security Gateway for Agentic Workflows with HTTP 402 Micropayments.` |
 | **Short Description** | `[⚡ Free Sandbox Mode] Autonomous access control & zero-overhead micro-oracle protecting AI agents from prompt injection, secret leaks, AST code risks & factual hallucinations. EIP-191 proof receipts. Zero setup & no wallet required for trial.` |
-| **Category / Tags** | `Security`, `AI Agents`, `Guardrails`, `Web3`, `x402`, `Attestation`, `Base` |
+| **Category / Tags** | `Security`, `AI Agents`, `Guardrails`, `Web3`, `x402`, `Attestation`, `Polygon` |
 | **Repository URL** | `https://github.com/nohosa001-pixel/security-gate-x402` |
 | **License** | `MIT` |
 | **Runtime** | `Python (>=3.9)` |
@@ -23,7 +23,7 @@ Glama.ai ([https://glama.ai/mcp/servers](https://glama.ai/mcp/servers))에 `agen
 ## 💎 2. 핵심 가치 제안 (3 Core Pillars)
 
 1. **🛡️ Autonomous Access Control:** Agent-to-Agent 통신 시 불법/악의적 페이로드 사전 차단 및 실시간 검증.
-2. **💰 x402 Micropayment Native:** API 키 발급 없이 건당 소액 결제(Base/USDC $0.002)로 즉시 실행.
+2. **💰 x402 Micropayment Native:** API 키 발급 없이 건당 소액 결제(Polygon/USDC $0.002)로 즉시 실행.
 3. **⚡ Zero Overhead (<10ms):** 별도 프록시 구축 없이 MCP Tool 레벨에서 즉각적인 게이트웨이 보안 적용.
 
 ---

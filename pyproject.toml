@@ -21,7 +21,7 @@ keywords = [
   "hallucination",
   "x402",
   "attestation",
-  "base"
+  "polygon"
 ]
 dependencies = [
   "fastapi>=0.115.0",

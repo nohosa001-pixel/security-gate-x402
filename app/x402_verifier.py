@@ -1,4 +1,4 @@
-"""x402 Protocol Payment Challenge & Verification Engine for Base Network."""
+"""x402 Protocol Payment Challenge & Verification Engine for Polygon Network."""
 
 import hashlib
 import json
@@ -15,16 +15,16 @@ from app.schemas import PaymentDemand402
 
 load_dotenv()
 
-# Base Mainnet USDC Contract
-BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+# Polygon Mainnet Native USDC Contract (Circle Native)
+POLYGON_USDC_CONTRACT = os.getenv("USDC_CONTRACT_ADDRESS", "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359")
 DEFAULT_PAY_TO = os.getenv("GATE_PAY_TO_ADDRESS", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
-BASE_CHAIN_ID = int(os.getenv("BASE_CHAIN_ID", "8453"))
+POLYGON_CHAIN_ID = int(os.getenv("POLYGON_CHAIN_ID", os.getenv("CHAIN_ID", "137")))
 MICRO_USDC_AMOUNT = 2000  # $0.002 USDC (6 decimals: 0.002 * 10^6 = 2000)
 EXPECTED_AMOUNT_USD = "0.002"
 QUOTE_TTL_SECONDS = 300   # 5 minutes quote validity
 FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://facilitator.x402.org/v2/verify")
 
-# Known OFAC Sanctioned & Malicious Mixer Addresses (EVM / Base)
+# Known OFAC Sanctioned & Malicious Mixer Addresses (EVM / Polygon)
 SANCTIONED_ADDRESSES: Set[str] = {
     addr.lower() for addr in [
         # Tornado Cash Routers & Core Contracts
@@ -85,7 +85,7 @@ async def verify_x402_payment(
                     "client": client_address,
                     "amount": expected_amount,
                     "recipient": recipient,
-                    "network": "base"
+                    "network": "polygon"
                 }
             )
             return resp.status_code == 200 and resp.json().get("valid") is True
@@ -115,16 +115,16 @@ class X402Verifier:
         return PaymentDemand402(
             error="Payment Required",
             protocol="x402",
-            network="base",
-            chain_id=BASE_CHAIN_ID,
-            asset=BASE_USDC_CONTRACT,
+            network="polygon",
+            chain_id=POLYGON_CHAIN_ID,
+            asset=POLYGON_USDC_CONTRACT,
             amount_usdc=amt,
             amount_micro_units=micro_units,
             pay_to=recipient,
             quote_id=q_id,
             expires_at=now + QUOTE_TTL_SECONDS,
             payment_header="Authorization-x402",
-            description=f"Agent Output Security & Hallucination Gate Inspection Fee (${amt} USDC on Base)"
+            description=f"Agent Output Security & Hallucination Gate Inspection Fee (${amt} USDC on Polygon)"
         )
 
 

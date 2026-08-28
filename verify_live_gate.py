@@ -114,7 +114,7 @@ def test_5_http_402_structured_json_challenge():
         print(f"   💰 HTTP 402 Payment Demand Received:")
         print(f"      - Protocol: {challenge['protocol']}")
         print(f"      - Amount: ${challenge['amount_usdc']} USDC ({challenge['amount_micro_units']} micro-units)")
-        print(f"      - Chain ID: {challenge['chain_id']} (Base)")
+        print(f"      - Chain ID: {challenge['chain_id']} (Polygon)")
         print(f"      - Recipient Wallet: {challenge['pay_to']}")
         print(f"      - Quote ID: {challenge['quote_id']}")
         print(f"      - Auth Header: {challenge['payment_header']}")

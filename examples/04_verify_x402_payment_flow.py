@@ -2,7 +2,7 @@
 
 Demonstrates the complete Agent-to-Agent (A2A) micro-settlement lifecycle:
 1. Agent sends request without payment -> Receives HTTP 402 JSON demand.
-2. Agent parses payment parameters (Base network, $0.002 USDC, Recipient Wallet).
+2. Agent parses payment parameters (Polygon network, $0.002 USDC, Recipient Wallet).
 3. Agent signs cryptographic payment challenge using EVM wallet.
 4. Agent retries with 'Authorization-x402' header -> Receives HTTP 200 OK + Attestation.
 """
@@ -68,7 +68,7 @@ def run_x402_payment_verification():
         amount = challenge["amount_usdc"]
         
         # Construct EIP-191 payment authorization message
-        auth_message = f"x402-payment:base:8453:{recipient}:{amount}:{quote_id}"
+        auth_message = f"x402-payment:polygon:137:{recipient}:{amount}:{quote_id}"
         msg_hash = encode_defunct(text=auth_message)
         signed_auth = Account.sign_message(msg_hash, private_key=AGENT_PRIVATE_KEY)
         auth_signature = signed_auth.signature.hex()
@@ -93,7 +93,7 @@ def run_x402_payment_verification():
         print(f"   - Audit Verdict: {data['audit']['verdict']} (Risk Score: {data['audit']['risk_score']})")
         print(f"   - Factual Accuracy: {data['audit']['nli_verification']['is_faithful']}")
         print(f"   - Attestation Issuer: {data['attestation']['issuer']}")
-        print(f"   - Payment Status: Settled via Base Network (0.002 USDC)")
+        print(f"   - Payment Status: Settled via Polygon Network (0.002 USDC)")
 
 
 if __name__ == "__main__":

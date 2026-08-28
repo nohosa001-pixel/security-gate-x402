@@ -1,10 +1,10 @@
 # Agent Output Security & Hallucination Gate (x402)
-> Deterministic, ultra-low latency (<10ms) security and factual hallucination inspection micro-oracle for autonomous AI agents. Monetized via HTTP 402 + x402 on Base ($0.002 USDC).
+> Deterministic, ultra-low latency (<10ms) security and factual hallucination inspection micro-oracle for autonomous AI agents. Monetized via HTTP 402 + x402 on Polygon ($0.002 USDC).
 
 ## Overview
 - **Base URL**: `https://agent-security-gate-x402-7qxtp3324q-du.a.run.app`
-- **Protocol**: HTTP 402 / x402 on Base network (Chain ID: 8453)
-- **Settlement Token**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
+- **Protocol**: HTTP 402 / x402 on Polygon network (Chain ID: 137)
+- **Settlement Token**: USDC (`0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`)
 - **Cost**: $0.002 USDC per inspection
 - **Latency**: <10ms (Deterministic AST + NLI heuristic, no heavy LLM latency)
 - **Zero-Retention**: In-memory inspection only, zero logs/storage of agent outputs

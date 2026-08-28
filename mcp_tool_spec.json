@@ -31,7 +31,7 @@
           },
           "client_address": {
             "type": "string",
-            "description": "Optional: Payer wallet address on Base network"
+            "description": "Optional: Payer wallet address on Polygon network"
           }
         },
         "required": [

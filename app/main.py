@@ -31,7 +31,7 @@ logger = logging.getLogger("security_gate")
 
 app = FastAPI(
     title="Agent Output Security & Hallucination Gate (x402)",
-    description="Deterministic, ultra-low latency security and hallucination inspection micro-oracle for autonomous agents. Monetized via HTTP 402 on Base ($0.002 USDC).",
+    description="Deterministic, ultra-low latency security and hallucination inspection micro-oracle for autonomous agents. Monetized via HTTP 402 on Polygon ($0.002 USDC).",
     version="1.0.0"
 )
 
@@ -91,7 +91,7 @@ async def rate_limit_and_log_middleware(request: Request, call_next):
 raw_wallet = os.getenv("SERVER_WALLET_ADDRESS", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
 SERVER_WALLET = raw_wallet.strip().split()[0]
 PRICE_USDC = os.getenv("PRICE_USDC", "0.002")
-NETWORK = os.getenv("NETWORK", "base")
+NETWORK = os.getenv("NETWORK", "polygon")
 
 
 
@@ -159,7 +159,7 @@ async def ap2_manifest():
     return {
         "protocol": "AP2/1.0",
         "service": "Agent Output Security & Hallucination Gate",
-        "supported_rails": ["x402-base-usdc"],
+        "supported_rails": ["x402-polygon-usdc"],
         "pricing": {"amount": PRICE_USDC, "currency": "USDC", "network": NETWORK},
         "capabilities": [
             {

@@ -120,7 +120,7 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "attestation": attestation,
                 "pricing": {
                     "rate": "0.002 USDC",
-                    "network": "base",
+                    "network": "polygon",
                     "status": "settled"
                 }
             }

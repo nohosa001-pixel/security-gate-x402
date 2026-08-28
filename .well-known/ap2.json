@@ -4,21 +4,21 @@
   "version": "1.0.0",
   "description": "Deterministic, ultra-low latency (<10ms) security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle for autonomous agents.",
   "supported_rails": [
-    "x402-base-usdc"
+    "x402-polygon-usdc"
   ],
   "pricing": {
     "amount": "0.002",
     "currency": "USDC",
-    "network": "base",
-    "chain_id": 8453,
-    "asset_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    "network": "polygon",
+    "chain_id": 137,
+    "asset_contract": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
   },
   "capabilities": [
     {
       "action": "inspect_agent_output",
       "endpoint": "/api/v1/inspect",
       "method": "POST",
-      "description": "Ultra-low latency security, key leak, and factual hallucination validator for 0.002 USDC on Base."
+      "description": "Ultra-low latency security, key leak, and factual hallucination validator for 0.002 USDC on Polygon."
     },
     {
       "action": "mcp_tool_invoke",

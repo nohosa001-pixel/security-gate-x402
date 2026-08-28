@@ -46,7 +46,8 @@ Write-Host "⚙️ Enabling Cloud Run, Cloud Build, and Artifact Registry APIs..
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com --project $PROJECT_ID
 
 $FACILITATOR = if ($env:FACILITATOR_URL) { $env:FACILITATOR_URL } else { "https://facilitator.x402.org/v2/verify" }
-$CHAIN_ID = if ($env:BASE_CHAIN_ID) { $env:BASE_CHAIN_ID } else { "8453" }
+$CHAIN_ID = if ($env:POLYGON_CHAIN_ID) { $env:POLYGON_CHAIN_ID } elseif ($env:CHAIN_ID) { $env:CHAIN_ID } else { "137" }
+$USDC_CONTRACT = if ($env:USDC_CONTRACT_ADDRESS) { $env:USDC_CONTRACT_ADDRESS } else { "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" }
 
 # 3. Build & Deploy to Cloud Run
 Write-Host "🏗️ Building and deploying container to Google Cloud Run..." -ForegroundColor Cyan
@@ -62,7 +63,7 @@ gcloud run deploy $SERVICE_NAME `
   --cpu 1 `
   --min-instances 0 `
   --max-instances 100 `
-  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,BASE_CHAIN_ID=$CHAIN_ID,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
+  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
   --project $PROJECT_ID
 
 

@@ -46,7 +46,7 @@ class SecurityGateClient:
         if self.is_dev or not self.private_key:
             return "x402_test_sig_agent_client"
 
-        msg = "x402-agent-security-gate:0.002-usdc:base:8453"
+        msg = "x402-agent-security-gate:0.002-usdc:polygon:137"
         msg_hash = encode_defunct(text=msg)
         signed = Account.sign_message(msg_hash, private_key=self.private_key)
         return signed.signature.hex()
@@ -76,14 +76,14 @@ class SecurityGateClient:
             tc = TestClient(self.app)
             resp = tc.post("/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
-                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Base.")
+                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
             resp.raise_for_status()
             data = resp.json()
         else:
             with httpx.Client(timeout=10.0) as client:
                 resp = client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
                 if resp.status_code == 402:
-                    raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Base.")
+                    raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
                 resp.raise_for_status()
                 data = resp.json()
 
@@ -118,7 +118,7 @@ class SecurityGateClient:
         async with httpx.AsyncClient(transport=transport, timeout=10.0) as client:
             resp = await client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
-                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Base.")
+                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
             resp.raise_for_status()
             data = resp.json()
 

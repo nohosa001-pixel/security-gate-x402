@@ -74,22 +74,22 @@ class InspectionResponse(BaseModel):
     timestamp: str = Field(..., description="ISO 8601 UTC timestamp of inspection")
     audit: AuditReport = Field(..., description="Comprehensive security and hallucination audit report")
     attestation: Optional[AuditAttestation] = Field(default=None, description="Cryptographic Proof-of-Safety attestation for downstream agents and smart contracts")
-    payment_receipt: Dict[str, Any] = Field(default_factory=dict, description="x402 payment settlement receipt on Base")
+    payment_receipt: Dict[str, Any] = Field(default_factory=dict, description="x402 payment settlement receipt on Polygon")
 
 
 class PaymentDemand402(BaseModel):
     error: str = Field(default="Payment Required", description="HTTP 402 status description")
     protocol: str = Field(default="x402", description="Payment protocol identifier")
-    network: str = Field(default="base", description="Settlement blockchain network")
-    chain_id: int = Field(default=8453, description="Base mainnet chain ID (8453) or testnet (84532)")
-    asset: str = Field(default="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", description="USDC contract address on Base")
+    network: str = Field(default="polygon", description="Settlement blockchain network")
+    chain_id: int = Field(default=137, description="Polygon mainnet chain ID (137) or testnet (80002)")
+    asset: str = Field(default="0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", description="USDC contract address on Polygon")
     amount_usdc: str = Field(default="0.002", description="Required payment amount in USD")
     amount_micro_units: int = Field(default=2000, description="Amount in 6-decimal micro USDC units")
     pay_to: str = Field(..., description="Recipient wallet address")
     quote_id: str = Field(..., description="Unique quote/invoice ID")
     expires_at: int = Field(..., description="Unix timestamp expiration of payment quote")
     payment_header: str = Field(default="X-402-Signature", description="Header to pass the signed x402 payment authorization")
-    description: str = Field(default="Agent Security & Hallucination Inspection Micro-Oracle Fee ($0.002 USDC on Base)", description="Invoice description")
+    description: str = Field(default="Agent Security & Hallucination Inspection Micro-Oracle Fee ($0.002 USDC on Polygon)", description="Invoice description")
 
 
 class MCPToolCallRequest(BaseModel):

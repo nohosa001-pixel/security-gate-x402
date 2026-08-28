@@ -35,9 +35,13 @@ def test_free_trial_and_402_payment_challenge():
     resp_402 = client.post("/api/v1/inspect", json={"agent_output": "Paid query"}, headers={"X-Client-Address": client_id})
     assert resp_402.status_code == 402
     assert resp_402.headers.get("x-payment-protocol") == "x402"
+    assert resp_402.headers.get("x-payment-network") == "polygon"
     assert resp_402.headers.get("x-payment-amount") == "0.002"
     challenge_data = resp_402.json()
     assert challenge_data["protocol"] == "x402"
+    assert challenge_data["network"] == "polygon"
+    assert challenge_data["chain_id"] == 137
+    assert challenge_data["asset"] == "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
     assert challenge_data["amount_usdc"] == "0.002"
     assert "pay_to" in challenge_data
     assert "quote_id" in challenge_data
