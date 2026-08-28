@@ -97,9 +97,20 @@ class X402Verifier:
     """Handles x402 HTTP 402 payment challenge creation and cryptographic settlement verification."""
 
     @classmethod
-    def generate_challenge(cls, quote_id: Optional[str] = None) -> PaymentDemand402:
+    def generate_challenge(
+        cls, 
+        quote_id: Optional[str] = None,
+        pay_to: Optional[str] = None,
+        amount_usdc: Optional[str] = None
+    ) -> PaymentDemand402:
         now = int(time.time())
         q_id = quote_id or f"quote_{uuid.uuid4().hex[:12]}"
+        recipient = pay_to or os.getenv("SERVER_WALLET_ADDRESS", DEFAULT_PAY_TO)
+        amt = amount_usdc or EXPECTED_AMOUNT_USD
+        try:
+            micro_units = int(float(amt) * 1_000_000)
+        except ValueError:
+            micro_units = MICRO_USDC_AMOUNT
         
         return PaymentDemand402(
             error="Payment Required",
@@ -107,13 +118,13 @@ class X402Verifier:
             network="base",
             chain_id=BASE_CHAIN_ID,
             asset=BASE_USDC_CONTRACT,
-            amount_usdc=EXPECTED_AMOUNT_USD,
-            amount_micro_units=MICRO_USDC_AMOUNT,
-            pay_to=DEFAULT_PAY_TO,
+            amount_usdc=amt,
+            amount_micro_units=micro_units,
+            pay_to=recipient,
             quote_id=q_id,
             expires_at=now + QUOTE_TTL_SECONDS,
-            payment_header="X-402-Signature",
-            description="Agent Output Security & Hallucination Gate Inspection Fee ($0.002 USDC on Base)"
+            payment_header="Authorization-x402",
+            description=f"Agent Output Security & Hallucination Gate Inspection Fee (${amt} USDC on Base)"
         )
 
 

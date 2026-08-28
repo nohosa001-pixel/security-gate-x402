@@ -23,13 +23,17 @@ A deterministic, ultra-low latency (<10ms) security and hallucination inspection
 
 Paste this into your MCP configuration (`claude_desktop_config.json` or `.cursor/mcp.json`) to immediately equip your AI agent with deterministic security & hallucination inspection:
 
-### 🚀 Standard Quick Install (via `uvx` - Zero Local Clone Needed)
+### 🚀 Standard Quick Install (via `uvx` - Zero Local Clone / 100% Instant)
 ```json
 {
   "mcpServers": {
-    "security-gate-x402": {
+    "security-gate": {
       "command": "uvx",
-      "args": ["security-gate-x402"]
+      "args": [
+        "--from",
+        "git+https://github.com/nohosa001-pixel/security-gate-x402",
+        "agent-security-gate"
+      ]
     }
   }
 }
@@ -39,7 +43,7 @@ Paste this into your MCP configuration (`claude_desktop_config.json` or `.cursor
 ```json
 {
   "mcpServers": {
-    "security-gate-x402": {
+    "security-gate": {
       "command": "python",
       "args": ["mcp_server.py"]
     }
@@ -236,12 +240,22 @@ Once deployed, your Cloud Run service URL will be printed (e.g. `https://agent-s
 
 ---
 
-## 🛠️ Local Development & Testing
+## 🛠️ Local Development, Live Verification & Examples
 
 ```bash
 # 1. Start local server
 uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 
-# 2. Run test suite
-pytest tests/test_client.py -v
+# 2. Run unit & integration test suite
+python -m pytest tests/test_client.py -v
+
+# 3. Run interactive Live Cloud Run verification suite (100% End-to-End)
+python verify_live_gate.py
 ```
+
+### 📂 Ready-to-Run Example Scripts
+Explore full integration scripts in the [`examples/`](file:///c:/Users/nohos/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/security-gate-x402/examples) directory:
+- [`examples/01_guardrail_decorator_demo.py`](file:///c:/Users/nohos/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/security-gate-x402/examples/01_guardrail_decorator_demo.py): Python SDK & `@gate_inspect` decorator with real-time payload quarantine.
+- [`examples/02_fastmcp_agent_client.py`](file:///c:/Users/nohos/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/security-gate-x402/examples/02_fastmcp_agent_client.py): Model Context Protocol (MCP) JSON-RPC client integration.
+- [`examples/03_rest_api_client.py`](file:///c:/Users/nohos/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/security-gate-x402/examples/03_rest_api_client.py): REST API caller with cryptographic Proof-of-Safety EIP-191 attestation verification.
+

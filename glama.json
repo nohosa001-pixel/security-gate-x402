@@ -1,7 +1,7 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "agent-security-gate-x402",
-  "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191 cryptographic attestation.",
+  "description": "[Free Tier Enabled] Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191 cryptographic attestation.",
   "maintainers": [
     "nohosa001-pixel"
   ],

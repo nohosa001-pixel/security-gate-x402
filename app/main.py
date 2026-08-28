@@ -1,24 +1,33 @@
 import json
+import logging
 import os
+import time
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, Response, status, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import (
     InspectionRequest, 
     InspectionResponse, 
     AuditReport, 
     AuditAttestation,
+    PaymentDemand402,
     MCPToolCallRequest,
     MCPToolCallResponse,
 )
 from app.security_engine import analyze_payload_security
-from app.x402_verifier import verify_x402_payment, create_attestation
+from app.x402_verifier import verify_x402_payment, create_attestation, X402Verifier
 
 # Load environment variables from .env if present
 load_dotenv()
+
+# Structured JSON Logger Setup
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger("security_gate")
 
 app = FastAPI(
     title="Agent Output Security & Hallucination Gate (x402)",
@@ -35,10 +44,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
+_rate_limit_tracker: Dict[str, List[float]] = defaultdict(list)
+
+
+@app.middleware("http")
+async def rate_limit_and_log_middleware(request: Request, call_next):
+    start_time = time.perf_counter()
+    client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client.host if request.client else "unknown")
+    now = time.time()
+
+    # Rate Limiting (Sliding 60s Window)
+    if client_ip != "127.0.0.1" and client_ip != "unknown":
+        window = _rate_limit_tracker[client_ip]
+        # Purge timestamps older than 60s
+        _rate_limit_tracker[client_ip] = [ts for ts in window if now - ts < 60.0]
+        if len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
+            return JSONResponse(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                content={"error": "Rate limit exceeded", "message": f"Maximum {RATE_LIMIT_PER_MINUTE} requests per minute allowed."},
+                headers={"Retry-After": "60"}
+            )
+        _rate_limit_tracker[client_ip].append(now)
+
+    response = await call_next(request)
+    duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
+
+    # Security Headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Processing-Time-Ms"] = str(duration_ms)
+
+    # Structured JSON log for GCP Cloud Logging
+    log_entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "duration_ms": duration_ms,
+        "client_ip": client_ip
+    }
+    logger.info(json.dumps(log_entry))
+
+    return response
+
 raw_wallet = os.getenv("SERVER_WALLET_ADDRESS", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
 SERVER_WALLET = raw_wallet.strip().split()[0]
 PRICE_USDC = os.getenv("PRICE_USDC", "0.002")
 NETWORK = os.getenv("NETWORK", "base")
+
 
 
 @app.get("/")
@@ -162,7 +216,11 @@ async def inspect_payload(
             is_free_trial = True
             _free_trial_tracker[client_id] = used_trials + 1
         else:
-            return Response(
+            challenge = X402Verifier.generate_challenge(
+                pay_to=SERVER_WALLET,
+                amount_usdc=PRICE_USDC
+            )
+            return JSONResponse(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 headers={
                     "X-Payment-Protocol": "x402",
@@ -173,7 +231,7 @@ async def inspect_payload(
                     "X-Payment-Resource": "/api/v1/inspect",
                     "X-Free-Trials-Exhausted": "true"
                 },
-                content="HTTP 402: Free trial limit (3 queries) exhausted. Payment of 0.002 USDC required via x402 protocol."
+                content=challenge.model_dump()
             )
     else:
         is_valid = await verify_x402_payment(
@@ -279,7 +337,11 @@ async def invoke_mcp_tool(
             is_free_trial = True
             _free_trial_tracker[client_id] = used_trials + 1
         else:
-            return Response(
+            challenge = X402Verifier.generate_challenge(
+                pay_to=SERVER_WALLET,
+                amount_usdc=PRICE_USDC
+            )
+            return JSONResponse(
                 status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 headers={
                     "X-Payment-Protocol": "x402",
@@ -290,7 +352,7 @@ async def invoke_mcp_tool(
                     "X-Payment-Resource": "/mcp/invoke",
                     "X-Free-Trials-Exhausted": "true"
                 },
-                content="HTTP 402: Free trial limit (3 queries) exhausted. Payment of 0.002 USDC required via x402 protocol."
+                content=challenge.model_dump()
             )
     else:
         is_valid = await verify_x402_payment(

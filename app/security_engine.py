@@ -14,14 +14,19 @@ from app.schemas import (
 )
 
 INJECTION_PATTERNS = [
-    r"ignore\s+all\s+previous\s+instructions",
+    r"ignore\s+(?:all\s+)?(?:previous|above)\s+instructions?",
+    r"disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions?",
     r"system\s*:\s*override",
     r"as\s+an\s+unfiltered\s+ai",
     r"base64\.b64decode\(",
     r"__import__\(['\"]os['\"]\)",
     r"eval\(|exec\(|subprocess\.Popen",
     r"you\s+are\s+now\s+DAN",
-    r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]"
+    r"jailbreak|DAN\s+mode",
+    r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]",
+    r"<\/?(?:system|instruction|prompt)>",
+    r"\[\/?(?:SYSTEM|INSTRUCTION)\]",
+    r"!\[(?:.*?)]\((?:https?:\/\/[^\s\)]+)\)"   # Markdown data exfiltration via image rendering
 ]
 
 SECRET_PATTERNS = [
@@ -36,6 +41,9 @@ SECRET_PATTERNS = [
     r"AKIA[0-9A-Z]{16}",                                       # AWS Access Key ID
     r"gsk_[a-zA-Z0-9]{30,}",                                   # Groq API Key
     r"ds-[a-zA-Z0-9]{30,}",                                    # DeepSeek API Key
+    r"pplx-[a-zA-Z0-9]{48}",                                   # Perplexity API Key
+    r"mis_[a-zA-Z0-9]{32,}",                                   # Mistral API Key
+    r"eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}", # JWT Secret Token
     r"xox[baprs]-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24,}", # Slack OAuth Token
     r"https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,}\/B[a-zA-Z0-9_]{8,}\/[a-zA-Z0-9_]{24}", # Slack Webhook
     r"[MNO][a-zA-Z0-9_-]{23,25}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27}", # Discord Bot Token
@@ -44,52 +52,108 @@ SECRET_PATTERNS = [
 
 
 
+WORD_TO_NUMBER = {
+    "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4",
+    "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9",
+    "ten": "10", "none": "0", "nil": "0"
+}
+
+STOPWORDS = {
+    "the", "a", "an", "in", "on", "at", "to", "for", "of", "with", "by", "from",
+    "and", "or", "but", "is", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "do", "does", "did", "this", "that", "these", "those"
+}
+
+
 def extract_numbers_and_units(text: str) -> Set[str]:
+    """Extracts numbers, currency amounts, percentages, and scale suffixes (M, K, B). Standardizes words to digits."""
     normalized = re.sub(r'(?<=\d),(?=\d)', '', text)
-    pattern = r'[\$€₩¥]?\s*-?\d+(?:\.\d+)?%?'
+    pattern = r'[\$€₩¥£]?\s*-?\d+(?:\.\d+)?\s*(?:%|[kKmMbBtT]\b)?'
     matches = re.findall(pattern, normalized)
-    return {m.strip() for m in matches if any(c.isdigit() for c in m)}
+    
+    extracted = set()
+    for m in matches:
+        clean = m.strip()
+        if any(c.isdigit() for c in clean):
+            extracted.add(clean)
+            bare_num = re.sub(r'[\$€₩¥£\s]', '', clean)
+            if bare_num:
+                extracted.add(bare_num)
+
+    # Standardize word-based numbers to canonical digits only
+    words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+    for w in words:
+        if w in WORD_TO_NUMBER:
+            extracted.add(WORD_TO_NUMBER[w])
+
+    return extracted
 
 
 def extract_entities_and_keywords(text: str) -> Set[str]:
-    words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b|[가-힣]{2,}', text)
-    return {w.lower() for w in words}
+    """Extracts capitalized named entities (excluding sentence starters), acronyms, and Korean nouns."""
+    # Find words with capital letters that are not merely sentence starters
+    # Match mid-sentence capitalized words or all-caps acronyms
+    words = re.findall(r'(?<!\.\s)(?<!\A)\b[A-Z][a-zA-Z0-9_-]+\b|\b[A-Z]{2,}\b|[가-힣]{2,}', text)
+    return {w.lower() for w in words if w.lower() not in STOPWORDS}
+
 
 
 def compute_lightweight_nli_faithfulness(agent_output: str, context_ground_truth: str) -> Dict[str, Any]:
     gt_numbers = extract_numbers_and_units(context_ground_truth)
     out_numbers = extract_numbers_and_units(agent_output)
 
-    fabricated_numbers = list(out_numbers - gt_numbers)
-    num_hallucination_penalty = len(fabricated_numbers) * 25.0
+    # Filter out bare/normalized duplicates if the primary representation exists in GT
+    fabricated_numbers = []
+    for num in out_numbers:
+        if num not in gt_numbers:
+            # Check if normalized equivalent exists
+            bare = re.sub(r'[\$€₩¥£\s]', '', num)
+            if bare not in gt_numbers:
+                fabricated_numbers.append(num)
+
+    # Deduplicate representation forms in fabricated list
+    unique_fabricated = []
+    seen_bare = set()
+    for f in fabricated_numbers:
+        bare = re.sub(r'[\$€₩¥£\s]', '', f)
+        if bare not in seen_bare:
+            seen_bare.add(bare)
+            unique_fabricated.append(f)
+
+    num_hallucination_penalty = len(unique_fabricated) * 35.0
+
+    gt_tokens = {w.strip(".,;:!?()[]{}\"'") for w in context_ground_truth.lower().split() if w not in STOPWORDS}
+    out_tokens = {w.strip(".,;:!?()[]{}\"'") for w in agent_output.lower().split() if w not in STOPWORDS}
+    overlap_count = len(out_tokens.intersection(gt_tokens))
+    faithfulness_ratio = overlap_count / max(len(out_tokens), 1)
 
     gt_entities = extract_entities_and_keywords(context_ground_truth)
     out_entities = extract_entities_and_keywords(agent_output)
     
+    # Check if entity exists in GT entities OR in GT vocabulary tokens
+    ungrounded_entities = [
+        e for e in out_entities 
+        if e not in gt_entities and e not in gt_tokens and not any(e in tok or tok in e for tok in gt_tokens)
+    ]
+    
     if out_entities:
-        ungrounded_entities = list(out_entities - gt_entities)
         entity_precision = (len(out_entities) - len(ungrounded_entities)) / len(out_entities)
     else:
-        ungrounded_entities = []
         entity_precision = 1.0
 
-    gt_tokens = set(context_ground_truth.lower().split())
-    out_tokens = set(agent_output.lower().split())
-    overlap_count = len(out_tokens.intersection(gt_tokens))
-    faithfulness_ratio = overlap_count / max(len(out_tokens), 1)
-
-    hallucination_score = num_hallucination_penalty + ((1.0 - entity_precision) * 35.0)
+    entity_penalty = (1.0 - entity_precision) * 30.0
+    hallucination_score = num_hallucination_penalty + entity_penalty
     if faithfulness_ratio < 0.2:
-        hallucination_score += 25.0
+        hallucination_score += 20.0
 
     hallucination_score = min(max(hallucination_score, 0.0), 100.0)
-    is_faithful = hallucination_score < 30.0 and len(fabricated_numbers) == 0
+    is_faithful = hallucination_score < 25.0 and len(unique_fabricated) == 0
 
     return {
         "is_faithful": is_faithful,
         "hallucination_score": round(hallucination_score, 2),
         "faithfulness_ratio": round(faithfulness_ratio, 3),
-        "fabricated_numbers": fabricated_numbers,
+        "fabricated_numbers": unique_fabricated,
         "ungrounded_entities": ungrounded_entities[:5],
         "details": {
             "ground_truth_numbers_found": len(gt_numbers),

@@ -149,9 +149,15 @@ def gate_inspect(
         if inspect.iscoroutinefunction(func):
             @functools.wraps(func)
             async def async_wrapper(*args, **kwargs):
+                # Safely extract verification ground truth if present
+                sig_params = inspect.signature(func).parameters
+                if "ground_truth" not in sig_params and "context" not in sig_params:
+                    context = kwargs.pop("context", None) or kwargs.pop("ground_truth", None) or kwargs.pop("context_ground_truth", None)
+                else:
+                    context = kwargs.get("context") or kwargs.get("ground_truth") or kwargs.get("context_ground_truth")
+                
                 output = await func(*args, **kwargs)
                 text_to_check = str(output)
-                context = kwargs.get("context") or kwargs.get("ground_truth")
                 await gate_client.inspect_async(
                     agent_output=text_to_check,
                     context_ground_truth=context,
@@ -163,9 +169,15 @@ def gate_inspect(
         else:
             @functools.wraps(func)
             def sync_wrapper(*args, **kwargs):
+                # Safely extract verification ground truth if present
+                sig_params = inspect.signature(func).parameters
+                if "ground_truth" not in sig_params and "context" not in sig_params:
+                    context = kwargs.pop("context", None) or kwargs.pop("ground_truth", None) or kwargs.pop("context_ground_truth", None)
+                else:
+                    context = kwargs.get("context") or kwargs.get("ground_truth") or kwargs.get("context_ground_truth")
+
                 output = func(*args, **kwargs)
                 text_to_check = str(output)
-                context = kwargs.get("context") or kwargs.get("ground_truth")
                 gate_client.inspect(
                     agent_output=text_to_check,
                     context_ground_truth=context,
