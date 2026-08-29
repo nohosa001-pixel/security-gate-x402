@@ -10,9 +10,12 @@ import time
 import httpx
 from dotenv import load_dotenv
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 load_dotenv()
 
-BASE_URL = os.getenv("GATE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"))
 
 
 def run_benchmark():
