@@ -7,6 +7,7 @@ Tests:
 4. OFAC Blacklist Enforcement
 """
 
+import os
 import sys
 import json
 import httpx
@@ -16,7 +17,7 @@ from eth_account.messages import encode_defunct
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-BASE_URL = "http://127.0.0.1:8080"
+BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"))
 
 
 def test_payment_systems():

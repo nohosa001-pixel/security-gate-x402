@@ -29,7 +29,8 @@ def test_1_health_and_manifest():
         r_health = client.get("/health")
         assert r_health.status_code == 200, f"Health check failed: {r_health.status_code}"
         health_data = r_health.json()
-        print(f"   ✅ /health 200 OK -> Service: {health_data['service']}, Version: {health_data['version']}")
+        svc_name = health_data.get("service") or health_data.get("oracle", "Agent Security Gate x402")
+        print(f"   ✅ /health 200 OK -> Service: {svc_name}, Version: {health_data['version']}")
 
         r_ap2 = client.get("/.well-known/ap2")
         assert r_ap2.status_code == 200, f"AP2 manifest failed: {r_ap2.status_code}"
@@ -56,7 +57,7 @@ def test_2_free_trial_safe_inspection():
         print(f"   ✅ Status: {data['status']}")
         print(f"   🎯 Verdict: {audit['verdict']} (Risk Score: {audit['risk_score']})")
         print(f"   🔍 NLI Faithfulness: {audit['nli_verification']['is_faithful']} (Hallucination Score: {audit['nli_verification']['hallucination_score']})")
-        print(f"   💳 Payment Tier: {payment['tier']} (Remaining Free Trials: {payment['remaining_free_trials']})")
+        print(f"   💳 Payment Tier: {payment['tier']} (Payer: {payment['payer']}, Network: {payment['network']})")
         print(f"   🔏 Proof-of-Safety Attestation Signature: {attestation['signature'][:20]}...{attestation['signature'][-10:]}")
 
 
@@ -142,9 +143,10 @@ def test_6_mcp_tool_invocation():
         invoke_data = r_invoke.json()
         mcp_text = json.loads(invoke_data["content"][0]["text"])
         print(f"   ⚡ MCP Execution Result:")
-        print(f"      - Status: {mcp_text['status']}")
-        print(f"      - Verdict: {mcp_text['audit']['verdict']}")
-        print(f"      - Rate: {mcp_text['pricing']['rate']}")
+        print(f"      - Verdict: {mcp_text.get('verdict')}")
+        print(f"      - Is Safe: {mcp_text.get('is_safe')}")
+        print(f"      - Risk Score: {mcp_text.get('risk_score')}")
+        print(f"      - Attestation Signer: {mcp_text.get('attestation', {}).get('signer')}")
 
 
 def main():
