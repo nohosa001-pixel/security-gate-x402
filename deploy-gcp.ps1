@@ -49,6 +49,8 @@ $FACILITATOR = if ($env:FACILITATOR_URL) { $env:FACILITATOR_URL } else { "https:
 $CHAIN_ID = if ($env:POLYGON_CHAIN_ID) { $env:POLYGON_CHAIN_ID } elseif ($env:CHAIN_ID) { $env:CHAIN_ID } else { "137" }
 $USDC_CONTRACT = if ($env:USDC_CONTRACT_ADDRESS) { $env:USDC_CONTRACT_ADDRESS } else { "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" }
 
+$GATE_KEY = if ($env:GATE_PRIVATE_KEY) { $env:GATE_PRIVATE_KEY } else { "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d" }
+
 # 3. Build & Deploy to Cloud Run
 Write-Host "🏗️ Building and deploying container to Google Cloud Run..." -ForegroundColor Cyan
 gcloud run deploy $SERVICE_NAME `
@@ -56,14 +58,12 @@ gcloud run deploy $SERVICE_NAME `
   --region $REGION `
   --platform managed `
   --allow-unauthenticated `
-  --command="" `
-  --args="" `
   --port 8080 `
   --memory 512Mi `
   --cpu 1 `
   --min-instances 0 `
   --max-instances 100 `
-  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
+  --set-env-vars "ENV=$SERVER_ENV,SERVER_WALLET_ADDRESS=$SERVER_WALLET,GATE_PAY_TO_ADDRESS=$SERVER_WALLET,GATE_PRIVATE_KEY=$GATE_KEY,NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
   --project $PROJECT_ID
 
 
