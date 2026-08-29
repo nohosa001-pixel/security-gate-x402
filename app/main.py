@@ -89,8 +89,10 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
         client_ip = client_ip.split(",")[0].strip()
 
     now = time.time()
-    if client_ip not in _rate_limit_tracker:
-        _rate_limit_tracker[client_ip] = []
+    window_start = now - 60.0
+
+    # Filter timestamps within sliding 60s window
+    _rate_limit_tracker[client_ip] = [t for t in _rate_limit_tracker.get(client_ip, []) if t > window_start]
 
     # Periodic cleanup to prevent unbounded memory growth
     if len(_rate_limit_tracker) > 5000:
@@ -101,7 +103,7 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
     if len(_free_trial_usage) > 10000:
         _free_trial_usage.clear()
 
-    if len(_rate_limit_tracker.get(client_ip, [])) >= RATE_LIMIT_PER_MINUTE:
+    if len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
         return JSONResponse(
             status_code=429,
             content={"error": "Rate limit exceeded (120 requests/minute). Please slow down."},

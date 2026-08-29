@@ -56,6 +56,10 @@ dev = [
   "pytest-asyncio>=0.23.0"
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
 [project.urls]
 Homepage = "https://github.com/nohosa001-pixel/security-gate-x402"
 Repository = "https://github.com/nohosa001-pixel/security-gate-x402"
