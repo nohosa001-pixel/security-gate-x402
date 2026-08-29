@@ -24,12 +24,16 @@ class SecurityGateClient:
         self,
         gate_url: str = "http://localhost:8080",
         private_key: Optional[str] = None,
+        vault_key: Optional[str] = None,
+        api_key: Optional[str] = None,
         client_address: Optional[str] = None,
         is_dev: bool = False,
         app: Optional[Any] = None
     ):
         self.gate_url = gate_url.rstrip("/")
         self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
+        self.vault_key = vault_key or os.getenv("AGENT_VAULT_KEY")
+        self.api_key = api_key or os.getenv("AGENT_API_KEY")
         self.is_dev = is_dev or (os.getenv("ENV") == "development")
         self.app = app
 
@@ -51,6 +55,19 @@ class SecurityGateClient:
         signed = Account.sign_message(msg_hash, private_key=self.private_key)
         return signed.signature.hex()
 
+    def _build_headers(self) -> Dict[str, str]:
+        headers = {
+            "Content-Type": "application/json",
+            "X-Client-Address": self.client_address
+        }
+        if self.api_key:
+            headers["X-API-Key"] = self.api_key
+        elif self.vault_key:
+            headers["X-Vault-Key"] = self.vault_key
+        else:
+            headers["Authorization-x402"] = self._generate_auth_signature()
+        return headers
+
     def inspect(
         self,
         agent_output: str,
@@ -59,12 +76,7 @@ class SecurityGateClient:
         raise_on_block: bool = True
     ) -> Dict[str, Any]:
         """Synchronously inspects agent output against the security gate."""
-        sig = self._generate_auth_signature()
-        headers = {
-            "Authorization-x402": sig,
-            "X-Client-Address": self.client_address,
-            "Content-Type": "application/json"
-        }
+        headers = self._build_headers()
         payload = {
             "agent_output": agent_output,
             "is_code": is_code,
@@ -102,12 +114,7 @@ class SecurityGateClient:
         raise_on_block: bool = True
     ) -> Dict[str, Any]:
         """Asynchronously inspects agent output against the security gate."""
-        sig = self._generate_auth_signature()
-        headers = {
-            "Authorization-x402": sig,
-            "X-Client-Address": self.client_address,
-            "Content-Type": "application/json"
-        }
+        headers = self._build_headers()
         payload = {
             "agent_output": agent_output,
             "is_code": is_code,

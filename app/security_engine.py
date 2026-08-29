@@ -162,11 +162,18 @@ def compute_lightweight_nli_faithfulness(agent_output: str, context_ground_truth
     }
 
 
+MAX_CONTENT_LENGTH = 100_000  # 100KB payload limit for ultra-low latency DoS defense
+
+
 def analyze_payload_security(
     content: str, 
     is_code: bool = False,
     context_ground_truth: Optional[str] = None
 ) -> Dict[str, Any]:
+    content = (content or "")[:MAX_CONTENT_LENGTH]
+    if context_ground_truth:
+        context_ground_truth = context_ground_truth[:MAX_CONTENT_LENGTH]
+
     risk_score = 0.0
     threats_detected = []
 
@@ -272,3 +279,59 @@ class SecurityEngine:
             audit=audit,
             payment_receipt=payment_receipt
         )
+
+
+def audit_payload(text: str, is_code: bool = False, ground_truth: Optional[str] = None) -> AuditReport:
+    """Convenience functional wrapper returning an AuditReport model."""
+    analysis = analyze_payload_security(content=text, is_code=is_code, context_ground_truth=ground_truth)
+    nli_model = None
+    if analysis["nli_verification"]:
+        nli_dict = analysis["nli_verification"]
+        nli_model = NLIReport(
+            is_faithful=nli_dict["is_faithful"],
+            hallucination_score=nli_dict["hallucination_score"],
+            faithfulness_ratio=nli_dict["faithfulness_ratio"],
+            fabricated_numbers=nli_dict["fabricated_numbers"],
+            ungrounded_entities=nli_dict["ungrounded_entities"],
+            details=nli_dict["details"]
+        )
+
+    return AuditReport(
+        verdict=analysis["verdict"],
+        risk_score=analysis["risk_score"] / 100.0,  # 0.0 to 1.0 scale
+        is_safe=analysis["is_safe"],
+        threats=analysis["threats"],
+        nli_verification=nli_model
+    )
+
+
+def parse_code_ast(code: str) -> Dict[str, Any]:
+    """Sub-millisecond AST parser scanning Python code for execution hazards."""
+    hazards = []
+    try:
+        tree = ast.parse(code)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                for n in node.names:
+                    if n.name in ["os", "sys", "subprocess", "socket", "requests", "shutil", "pty", "ctypes"]:
+                        hazards.append({"type": "SUBPROCESS_EXECUTION" if n.name == "subprocess" else "DANGEROUS_SYSTEM_CALL", "detail": f"Import of high-risk module '{n.name}'"})
+            elif isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id in ["eval", "exec", "__import__", "compile"]:
+                    hazards.append({"type": "ARBITRARY_CODE_EXECUTION", "detail": f"Prohibited builtin function call '{node.func.id}()'"})
+                elif isinstance(node.func, ast.Attribute) and node.func.attr in ["system", "popen", "spawn", "Popen", "run"]:
+                    hazards.append({"type": "DANGEROUS_SYSTEM_CALL", "detail": f"Execution method call '{node.func.attr}()'"})
+        
+        return {
+            "status": "success",
+            "is_safe": len(hazards) == 0,
+            "hazards": hazards,
+            "parsed_ast_nodes": len(list(ast.walk(tree)))
+        }
+    except SyntaxError as e:
+        return {
+            "status": "error",
+            "is_safe": False,
+            "hazards": [{"type": "SYNTAX_ERROR", "detail": str(e)}],
+            "parsed_ast_nodes": 0
+        }
+

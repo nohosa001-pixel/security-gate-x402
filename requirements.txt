@@ -1,6 +1,11 @@
-fastapi>=0.115.0
-uvicorn>=0.30.0
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
 httpx>=0.27.0
-pydantic>=2.8.0
-eth-account>=0.13.0
-python-dotenv>=1.0.0
+eth-account>=0.11.0
+eth-abi>=5.0.0
+eth-utils>=4.0.0
+cryptography>=42.0.0
+python-dotenv>=1.0.1
+mcp>=1.0.0

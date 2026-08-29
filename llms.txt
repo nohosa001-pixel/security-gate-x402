@@ -1,30 +1,39 @@
-# Agent Output Security & Hallucination Gate (x402)
-> Deterministic, ultra-low latency (<10ms) security and factual hallucination inspection micro-oracle for autonomous AI agents. Monetized via HTTP 402 + x402 on Polygon ($0.002 USDC).
+# Agent Security & Hallucination Gate (x402) - LLM Reference Guide
 
-## Overview
-- **Base URL**: `https://agent-security-gate-x402-7qxtp3324q-du.a.run.app`
-- **Protocol**: HTTP 402 / x402 on Polygon network (Chain ID: 137)
-- **Settlement Token**: USDC (`0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`)
-- **Cost**: $0.002 USDC per inspection
-- **Latency**: <10ms (Deterministic AST + NLI heuristic, no heavy LLM latency)
-- **Zero-Retention**: In-memory inspection only, zero logs/storage of agent outputs
+> **Deterministic Security & Hallucination Inspection Micro-Oracle for Autonomous AI Agents**
+> **Protocol:** HTTP 402 (x402) & EIP-191 / EIP-712 Attestation
+> **Networks:** Polygon (137), Base (8453), Arbitrum (42161)
+> **Latency:** <10ms (In-Memory Deterministic AST & NLI Parsing)
 
-## Key Endpoints
-- `POST /api/v1/inspect`: Inspect text or code output before executing tools or returning to users.
-- `GET /.well-known/ap2`: Google AP2 protocol agent discovery manifest.
-- `GET /terms`: Terms of service, AS-IS disclaimer, $0.002 liability cap.
-- `GET /privacy`: Zero-retention and in-memory processing guarantee.
+---
 
-## Autonomous Agent Integration (Python)
-```python
-from sdk.agent_gate_sdk import SecurityGateClient, gate_inspect
+## 🛡️ Available Endpoints & Capabilities
 
-client = SecurityGateClient(gate_url="https://<service-url>", private_key="0x...")
-result = client.inspect("The net revenue was $1.2M.", context_ground_truth="Revenue: $1.2M")
-# Returns cryptographic attestation receipt with EIP-191 signature
-print(result["attestation"]["signature"])
-```
+### 1. Security & Hallucination Inspection
+- **POST `/inspect`** or **POST `/api/v1/gate/inspect`**
+  - Evaluates agent outputs against ground truth facts.
+  - Detects prompt injection, jailbreak attempts, API token / private key leakage, and numerical/factual hallucinations.
+  - Returns `verdict` (`PASSED` / `BLOCKED`), `risk_score` (0.0 to 1.0), and cryptographic `attestation`.
 
-## Machine Discovery
-- AP2 Manifest: `/.well-known/ap2.json`
-- OpenAPI Specification: `/openapi.json`
+### 2. Fast AST Code Audit
+- **POST `/inspect/ast`** or **POST `/api/v1/gate/inspect/ast`**
+  - Parses raw Python code into an AST to detect `os.system`, `subprocess`, `eval`, `exec`, reverse shells, and malicious socket interactions.
+
+### 3. On-Chain Attestation & Calldata
+- **POST `/api/v1/gate/attestation/onchain`**
+  - Generates EIP-712 structured data and raw ABI calldata (`v, r, s`, `payloadHash`) for Solidity smart contracts.
+
+### 4. Agent Vault & Pre-Funded Accounts
+- **POST `/api/v1/vault/deposit`**: Pre-fund agent balance with USDC.
+- **GET `/api/v1/vault/balance/{agent_address}`**: Retrieve real-time available USDC balance.
+
+### 5. Multi-Chain Network Config
+- **GET `/api/v1/gate/chains`**: List supported chain IDs, RPC endpoints, and vault contract addresses.
+
+---
+
+## ⚡ MCP Tool Names for Autonomous Agents
+- `inspect_security_and_hallucinations`: Full audit + NLI fact check + signature.
+- `verify_agent_output`: Sub-5ms fast prompt & secret filter.
+- `inspect_code_ast_safety`: AST code safety verification.
+- `get_onchain_security_attestation`: Cryptographic calldata for on-chain execution.

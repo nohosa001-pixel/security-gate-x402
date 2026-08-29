@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include glama.json
+include mcp_tool_spec.json
+include llms.txt
+recursive-include .well-known *
+recursive-include app/static *
+recursive-include contracts *
+recursive-include sdk *

@@ -1,7 +1,8 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "agent-security-gate-x402",
-  "description": "[Free Tier Enabled] Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191 cryptographic attestation.",
+  "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191/EIP-712 cryptographic attestation.",
+  "homepage": "https://github.com/nohosa001-pixel/security-gate-x402",
   "maintainers": [
     "nohosa001-pixel"
   ],
@@ -12,7 +13,27 @@
     "x402",
     "attestation",
     "polygon",
-    "ai-agents"
+    "ai-agents",
+    "mcp",
+    "fastapi"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "tools": [
+    {
+      "name": "inspect_security_and_hallucinations",
+      "description": "Comprehensive security and NLI hallucination inspection for agent outputs against ground truth context with EIP-191 cryptographic attestation."
+    },
+    {
+      "name": "verify_agent_output",
+      "description": "High-speed (<5ms) deterministic prompt injection, jailbreak, and secret leak scanner for autonomous agent actions."
+    },
+    {
+      "name": "inspect_code_ast_safety",
+      "description": "Deterministic Python AST parser scanning for hazardous calls (subprocess, os.system, eval, exec, socket, token leakage)."
+    },
+    {
+      "name": "get_onchain_security_attestation",
+      "description": "Generate EIP-712 cryptographic signatures and Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails."
+    }
+  ]
 }

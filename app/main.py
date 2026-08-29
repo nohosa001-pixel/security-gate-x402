@@ -1,41 +1,60 @@
+"""
+FastAPI Micro-Oracle Server for Agent Security Gate x402.
+Provides ultra-low latency (<10ms) deterministic security, prompt injection filtering,
+dangerous AST parsing, NLI hallucination verification, Vault management, and EIP-712/191 attestations.
+"""
+
 import json
-import logging
 import os
 import time
-from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from dotenv import load_dotenv
-from fastapi import FastAPI, Header, Response, status, Request
-from fastapi.responses import JSONResponse
+from typing import Dict, Any, Optional, List
+
+from fastapi import FastAPI, Request, Depends, HTTPException, status, Query, Path as FPath
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 from app.schemas import (
-    InspectionRequest, 
-    InspectionResponse, 
-    AuditReport, 
+    InspectionRequest,
+    InspectionResponse,
+    AuditReport,
     AuditAttestation,
-    PaymentDemand402,
+    NLIReport,
+    PricingTier,
+    VaultDepositRequest,
+    VaultDepositResponse,
+    VaultBalanceResponse,
+    EnterpriseKeyCreateRequest,
+    EnterpriseKeyResponse,
+    OnChainAttestationRequest,
+    OnChainAttestationResponse,
+    MultiChainInfo,
     MCPToolCallRequest,
     MCPToolCallResponse,
 )
-from app.security_engine import analyze_payload_security
-from app.x402_verifier import verify_x402_payment, create_attestation, X402Verifier
-
-# Load environment variables from .env if present
-load_dotenv()
-
-# Structured JSON Logger Setup
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger("security_gate")
+from app.security_engine import audit_payload, parse_code_ast
+from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
+from app.vault_manager import vault_manager
+from app.enterprise_manager import enterprise_manager
+from app.onchain_signer import onchain_signer
+from app.multi_chain import list_all_chains, get_chain_info
 
 app = FastAPI(
-    title="Agent Output Security & Hallucination Gate (x402)",
-    description="Deterministic, ultra-low latency security and hallucination inspection micro-oracle for autonomous agents. Monetized via HTTP 402 on Polygon ($0.002 USDC).",
-    version="1.0.0"
+    title="Agent Security & Hallucination Gate (x402)",
+    description=(
+        "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, "
+        "dangerous AST code, and factual hallucination inspection micro-oracle with EIP-191 / EIP-712 "
+        "cryptographic attestation on Polygon, Base, and Arbitrum. "
+        "Explore the interactive Web Dashboard at /dashboard."
+    ),
+    version="1.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
 )
 
-# Enable CORS for agent runtimes and web callers
+# Enable CORS for all agent clients & web dashboards
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,366 +63,489 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
-_rate_limit_tracker: Dict[str, List[float]] = defaultdict(list)
+STATIC_DIR = Path(__file__).parent / "static"
+INDEX_HTML_PATH = STATIC_DIR / "index.html"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
+MCP_SPEC_FILE_PATH = Path(__file__).parent.parent / "mcp_tool_spec.json"
+LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
+
+# Rate limit and free trial usage tracker for backward compatibility
+_rate_limit_tracker: Dict[str, list[float]] = {}
+_free_trial_usage: Dict[str, int] = {}
+_recent_audit_events: List[Dict[str, Any]] = []
+MAX_RECENT_EVENTS = 20
+FREE_TRIAL_LIMIT = 3
+RATE_LIMIT_PER_MINUTE = 120
 
 
 @app.middleware("http")
-async def rate_limit_and_log_middleware(request: Request, call_next):
+async def security_and_rate_limit_middleware(request: Request, call_next):
     start_time = time.perf_counter()
-    client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client.host if request.client else "unknown")
+    client_ip = request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+
     now = time.time()
+    if client_ip not in _rate_limit_tracker:
+        _rate_limit_tracker[client_ip] = []
 
-    # Rate Limiting (Sliding 60s Window)
-    if client_ip != "127.0.0.1" and client_ip != "unknown":
-        window = _rate_limit_tracker[client_ip]
-        # Purge timestamps older than 60s
-        _rate_limit_tracker[client_ip] = [ts for ts in window if now - ts < 60.0]
-        if len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
-            return JSONResponse(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                content={"error": "Rate limit exceeded", "message": f"Maximum {RATE_LIMIT_PER_MINUTE} requests per minute allowed."},
-                headers={"Retry-After": "60"}
-            )
-        _rate_limit_tracker[client_ip].append(now)
+    # Periodic cleanup to prevent unbounded memory growth
+    if len(_rate_limit_tracker) > 5000:
+        dead_ips = [ip for ip, times in _rate_limit_tracker.items() if not times or max(times) < window_start]
+        for ip in dead_ips:
+            _rate_limit_tracker.pop(ip, None)
 
-    response = await call_next(request)
-    duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
+    if len(_free_trial_usage) > 10000:
+        _free_trial_usage.clear()
 
-    # Security Headers
+    if len(_rate_limit_tracker.get(client_ip, [])) >= RATE_LIMIT_PER_MINUTE:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Rate limit exceeded (120 requests/minute). Please slow down."},
+            headers={
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+                "Retry-After": "60"
+            }
+        )
+
+    _rate_limit_tracker[client_ip].append(now)
+
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "error": "Internal Server Error", "detail": str(exc)},
+            headers={
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY"
+            }
+        )
+
+    elapsed_ms = (time.perf_counter() - start_time) * 1000.0
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-Processing-Time-Ms"] = str(duration_ms)
-
-    # Structured JSON log for GCP Cloud Logging
-    log_entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "method": request.method,
-        "path": request.url.path,
-        "status_code": response.status_code,
-        "duration_ms": duration_ms,
-        "client_ip": client_ip
-    }
-    logger.info(json.dumps(log_entry))
-
+    response.headers["X-Processing-Time-Ms"] = f"{elapsed_ms:.2f}"
     return response
 
-raw_wallet = os.getenv("SERVER_WALLET_ADDRESS", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
-SERVER_WALLET = raw_wallet.strip().split()[0]
-PRICE_USDC = os.getenv("PRICE_USDC", "0.002")
-NETWORK = os.getenv("NETWORK", "polygon")
+
+# Dependency for 402 Payment verification with Tiered Pricing & Vault support
+async def require_x402_payment(request: Request, tier: PricingTier = PricingTier.STANDARD):
+    """Enforces x402 payment authorization, pre-funded vault balance, or Sandbox Free Tier."""
+    client_addr = request.headers.get("x-client-address") or request.headers.get("X-Client-Address") or "anonymous"
+    
+    # 1. Sanctions OFAC check
+    if is_sanctioned_address(client_addr):
+        raise HTTPException(status_code=403, detail="Forbidden: Sanctioned address.")
+
+    auth_header = request.headers.get("authorization-x402") or request.headers.get("x-402-signature") or request.headers.get("X-402-Signature")
+    api_key = request.headers.get("x-api-key") or request.headers.get("X-API-Key")
+    vault_key = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+
+    # If payment/auth is provided, verify it
+    if auth_header or api_key or vault_key:
+        is_authorized, reason, extra_headers = x402_verifier.verify_request_payment(request, tier=tier)
+        if not is_authorized:
+            return x402_verifier.build_402_response(tier=tier, custom_detail=reason if "Insufficient" in str(reason) else None)
+        request.state.authorized_payer = reason
+        request.state.extra_headers = extra_headers or {}
+        return None
+
+    # If client address provided and exhausted free trial limit
+    if client_addr != "anonymous":
+        usage = _free_trial_usage.get(client_addr.lower(), 0)
+        if usage >= FREE_TRIAL_LIMIT and os.getenv("ENV") != "development_unlimited":
+            return x402_verifier.build_402_response(tier=tier, custom_detail="Free trials exhausted for this address. Payment required.")
+        _free_trial_usage[client_addr.lower()] = usage + 1
+        rem = max(0, FREE_TRIAL_LIMIT - (usage + 1))
+        request.state.authorized_payer = f"sandbox:{client_addr}"
+        request.state.extra_headers = {"X-Tier": "FREE_TRIAL", "X-Sandbox-Trials-Remaining": str(rem)}
+        return None
+
+    # Default sandbox trial
+    is_authorized, reason, extra_headers = x402_verifier.verify_request_payment(request, tier=tier)
+    request.state.authorized_payer = reason
+    request.state.extra_headers = extra_headers or {}
+    return None
 
 
+@app.get("/", tags=["System"])
+async def root(request: Request):
+    """Serves Interactive Web UI Dashboard to browsers or JSON metadata to API clients."""
+    accept_header = request.headers.get("accept", "")
+    if "text/html" in accept_header and INDEX_HTML_PATH.exists():
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html")
 
-@app.get("/")
-async def root():
     return {
-        "service": "Agent Output Security & Hallucination Gate (x402)",
-        "status": "online",
-        "protocol": "x402",
-        "network": NETWORK,
-        "pricing_usdc": PRICE_USDC,
-        "docs_url": "/docs",
-        "discovery_manifest": "/.well-known/ap2",
-        "terms_of_service": "/terms",
-        "privacy_policy": "/privacy"
+        "service": "agent-security-gate-x402",
+        "description": "Deterministic Security & Hallucination Inspection Micro-Oracle",
+        "version": "1.1.0",
+        "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
+        "network": "Polygon, Base, Arbitrum (Multi-chain)",
+        "price_per_query": "0.002 USDC",
+        "interactive_dashboard": "/dashboard",
+        "endpoints": {
+            "inspect_security": "/inspect",
+            "inspect_ast_code": "/inspect/ast",
+            "onchain_attestation": "/api/v1/gate/attestation/onchain",
+            "multichain_configs": "/api/v1/gate/chains",
+            "vault_deposit": "/api/v1/vault/deposit",
+            "vault_balance": "/api/v1/vault/balance/{agent_address}",
+            "enterprise_keys": "/api/v1/enterprise/keys",
+            "recent_audit_events": "/api/v1/gate/events/recent",
+            "ap2_manifest": "/.well-known/ap2",
+            "mcp_tools": "/mcp/tools",
+            "llms_manifest": "/llms.txt"
+        }
     }
 
 
-@app.get("/health")
-@app.get("/v1/health")
-async def health_check():
+@app.get("/dashboard", tags=["System"])
+async def get_dashboard():
+    if INDEX_HTML_PATH.exists():
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html")
+    return HTMLResponse("<h2>Dashboard is loading...</h2>")
+
+
+@app.get("/playground", tags=["System"])
+async def get_playground():
+    if INDEX_HTML_PATH.exists():
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html")
+    return HTMLResponse("<h2>Playground is loading...</h2>")
+
+
+@app.get("/health", tags=["System"])
+async def health():
     return {
-        "status": "ok",
-        "service": "agent-security-gate-x402",
-        "version": "1.0.0",
-        "protocol": "x402",
-        "network": NETWORK,
-        "pricing_usdc": PRICE_USDC
+        "status": "healthy",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "oracle": "Agent Security Gate x402",
+        "version": "1.1.0"
     }
 
 
 @app.get("/terms", tags=["Legal"])
-async def terms_of_service():
-    """Legal Terms of Service and Disclaimers."""
+async def get_terms():
     return {
-        "service_name": "Agent Output Security & Hallucination Gate (x402)",
-        "effective_date": "2026-01-01",
+        "service": "Agent Security Gate x402",
         "terms": {
-            "license": "Permission is granted to autonomous agents and human developers to invoke this micro-oracle for verification purposes upon payment of the required x402 protocol fee.",
-            "as_is_disclaimer": "THE SERVICE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.",
-            "limitation_of_liability": f"IN NO EVENT SHALL THE OPERATORS OR SERVICE PROVIDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE USE OR INABILITY TO USE THE SERVICE. LIABILITY SHALL IN ALL CIRCUMSTANCES BE LIMITED EXCLUSIVELY TO THE AGGREGATE FEES PAID FOR THE DISPUTED REQUEST (${PRICE_USDC} USDC).",
-            "sanctions_compliance": "Interaction with this service from OFAC-sanctioned addresses or jurisdictions is strictly prohibited and subject to automatic algorithmic refusal."
+            "as_is_disclaimer": "The service is provided 'as is' without warranty of any kind.",
+            "limitation_of_liability": "In no event shall the authors or copyright holders be liable for any claim or damages."
         }
     }
 
 
 @app.get("/privacy", tags=["Legal"])
-async def privacy_policy():
-    """Privacy Policy & Zero-Data-Retention Declaration."""
+async def get_privacy():
     return {
-        "service_name": "Agent Output Security & Hallucination Gate (x402)",
-        "policy_version": "1.0.0",
-        "zero_retention_policy": {
-            "data_storage": "Zero-Retention. Payloads submitted for inspection (agent outputs, code, and context) are processed strictly in-memory and immediately discarded upon response delivery.",
-            "database_logging": "No persistent storage, database, or disk logging of customer inputs or outputs is maintained.",
-            "secret_redaction": "Detected secrets, private keys, or API tokens are masked and redacted in-memory prior to inclusion in the diagnostic audit report.",
-            "telemetry": "Only aggregate, non-identifying telemetry (e.g., latency ms, threat category counters) and on-chain blockchain receipts are preserved."
-        }
+        "service": "Agent Security Gate x402",
+        "zero_retention_policy": "Zero data retention: payload data is never logged or stored to disk.",
+        "data_processing": "Ephemeral in-memory deterministic inspection only."
     }
 
 
-@app.get("/.well-known/ap2")
-@app.get("/.well-known/ap2.json")
-async def ap2_manifest():
-    return {
-        "protocol": "AP2/1.0",
-        "service": "Agent Output Security & Hallucination Gate",
-        "supported_rails": ["x402-polygon-usdc"],
-        "pricing": {"amount": PRICE_USDC, "currency": "USDC", "network": NETWORK},
-        "capabilities": [
-            {
-                "action": "inspect_agent_output",
-                "endpoint": "/api/v1/inspect",
-                "description": "Ultra-low latency security, key leak, and factual hallucination validator for 0.002 USDC."
-            },
-            {
-                "action": "mcp_tool_invoke",
-                "endpoint": "/mcp/invoke",
-                "description": "Direct JSON-RPC standard MCP tool dispatcher with x402 payment validation."
-            }
-        ],
-
-        "legal": {
-            "terms": "/terms",
-            "privacy": "/privacy"
-        }
-    }
+@app.get("/llms.txt", tags=["System"])
+async def get_llms_txt():
+    if LLMS_FILE_PATH.exists():
+        return PlainTextResponse(LLMS_FILE_PATH.read_text(encoding="utf-8"))
+    return PlainTextResponse("Agent Security Gate x402 - Micro-Oracle")
 
 
-FREE_TRIAL_LIMIT = int(os.getenv("FREE_TRIAL_LIMIT", "3"))
-_free_trial_tracker: Dict[str, int] = {}
+@app.get("/.well-known/ap2", tags=["System"])
+@app.get("/.well-known/ap2.json", tags=["System"])
+async def get_ap2_manifest():
+    if AP2_FILE_PATH.exists():
+        with open(AP2_FILE_PATH, "r", encoding="utf-8") as f:
+            return JSONResponse(content=json.load(f))
+    return JSONResponse({"error": "AP2 manifest not configured"}, status_code=404)
 
 
-def get_client_id(request: Request, client_address: Optional[str] = None) -> str:
-    if client_address:
-        return client_address.lower().strip()
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    if request.client and request.client.host:
-        return request.client.host
-    return "anonymous-guest"
+# --- Core Inspection Endpoints ---
 
-
-@app.post("/api/v1/inspect", response_model=InspectionResponse)
-@app.post("/v1/inspect", response_model=InspectionResponse)
-@app.post("/inspect", response_model=InspectionResponse)
+@app.post("/inspect", response_model=InspectionResponse, tags=["Security Gate"])
+@app.post("/api/v1/inspect", response_model=InspectionResponse, tags=["Security Gate"])
+@app.post("/api/v1/gate/inspect", response_model=InspectionResponse, tags=["Security Gate"])
 async def inspect_payload(
     req: InspectionRequest,
     request: Request,
-    authorization_x402: Optional[str] = Header(None, alias="Authorization-x402"),
-    client_address: Optional[str] = Header(None, alias="X-Client-Address"),
-    x_trial: Optional[str] = Header(None, alias="X-Trial")
+    auth_check = Depends(require_x402_payment)
 ):
-    client_id = get_client_id(request, client_address)
-    used_trials = _free_trial_tracker.get(client_id, 0)
-    is_free_trial = False
+    if auth_check is not None:
+        return auth_check
 
-    # Check if request qualifies for Free Trial
-    if not authorization_x402 or not client_address:
-        if used_trials < FREE_TRIAL_LIMIT or x_trial == "true":
-            is_free_trial = True
-            _free_trial_tracker[client_id] = used_trials + 1
-        else:
-            challenge = X402Verifier.generate_challenge(
-                pay_to=SERVER_WALLET,
-                amount_usdc=PRICE_USDC
-            )
-            return JSONResponse(
-                status_code=status.HTTP_402_PAYMENT_REQUIRED,
-                headers={
-                    "X-Payment-Protocol": "x402",
-                    "X-Payment-Network": NETWORK,
-                    "X-Payment-Token": "USDC",
-                    "X-Payment-Amount": PRICE_USDC,
-                    "X-Payment-Recipient": SERVER_WALLET,
-                    "X-Payment-Resource": "/api/v1/inspect",
-                    "X-Free-Trials-Exhausted": "true"
-                },
-                content=challenge.model_dump()
-            )
-    else:
-        is_valid = await verify_x402_payment(
-            authorization_header=authorization_x402,
-            client_address=client_address,
-            expected_amount=PRICE_USDC,
-            recipient=SERVER_WALLET
-        )
-        if not is_valid:
-            return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
+    start_t = time.perf_counter()
+    issued_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
-    audit_result = analyze_payload_security(
-        content=req.agent_output,
+    # 1. Deterministic Security & NLI Audit
+    audit = audit_payload(
+        text=req.agent_output,
         is_code=req.is_code,
-        context_ground_truth=req.context_ground_truth
+        ground_truth=req.context_ground_truth
     )
 
-    now_iso = datetime.now(timezone.utc).isoformat()
-    audit_obj = AuditReport(**audit_result)
-    
-    # Generate cryptographic attestation receipt
-    attestation_data = create_attestation(
+    # 2. Cryptographic Proof-of-Safety Attestation
+    attestation_dict = create_attestation(
         agent_output=req.agent_output,
-        verdict=audit_obj.verdict,
-        risk_score=audit_obj.risk_score,
-        issued_at=now_iso
+        verdict=audit.verdict,
+        risk_score=audit.risk_score,
+        issued_at=issued_at
     )
+    attestation = AuditAttestation(**attestation_dict)
 
-    remaining_trials = max(0, FREE_TRIAL_LIMIT - _free_trial_tracker.get(client_id, 0))
-    payment_info = {
-        "tier": "FREE_TRIAL" if is_free_trial else "PAID_X402",
-        "amount": "0.0000" if is_free_trial else PRICE_USDC,
-        "currency": "USDC",
-        "network": NETWORK,
-        "recipient": SERVER_WALLET,
-        "remaining_free_trials": remaining_trials if is_free_trial else "unlimited"
+    elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+
+    # 3. Formulate payment receipt & metadata
+    payer_info = getattr(request.state, "authorized_payer", "sandbox:free_trial")
+    extra_headers = getattr(request.state, "extra_headers", {})
+    payment_receipt = {
+        "payer": payer_info,
+        "protocol": "x402",
+        "network": "Polygon Mainnet (137)",
+        "cost_settled_usdc": "0.002",
+        "latency_ms": round(elapsed_ms, 2),
+        "tier": extra_headers.get("X-Tier", "STANDARD")
     }
 
-    return InspectionResponse(
+    # 4. Record recent audit event in rolling buffer
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    masked_ip = ".".join(client_ip.split(".")[:2]) + ".*.*" if "." in client_ip else "masked"
+    _recent_audit_events.append({
+        "event_type": "INSPECTION_AUDIT",
+        "timestamp": issued_at,
+        "verdict": audit.verdict,
+        "risk_score": audit.risk_score,
+        "threats_count": len(audit.threats),
+        "is_hallucinated": audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False,
+        "caller_ip_masked": masked_ip,
+        "latency_ms": round(elapsed_ms, 2)
+    })
+    if len(_recent_audit_events) > MAX_RECENT_EVENTS:
+        _recent_audit_events.pop(0)
+
+    response_data = InspectionResponse(
         status="success",
-        timestamp=now_iso,
-        audit=audit_obj,
-        attestation=AuditAttestation(**attestation_data),
-        payment_receipt=payment_info
+        timestamp=issued_at,
+        audit=audit,
+        attestation=attestation,
+        payment_receipt=payment_receipt
     )
 
+    resp = JSONResponse(content=response_data.model_dump())
+    for k, v in extra_headers.items():
+        resp.headers[k] = v
+    resp.headers["X-Audit-Verdict"] = audit.verdict
+    resp.headers["X-Audit-Risk-Score"] = str(audit.risk_score)
+    resp.headers["X-Execution-Latency-MS"] = f"{elapsed_ms:.2f}"
+    return resp
 
-@app.get("/mcp/tools", tags=["MCP Tools"])
-async def list_mcp_tools():
-    """Returns available MCP Tools metadata in standard format."""
-    tool_spec_path = Path(__file__).resolve().parent.parent / "mcp_tool_spec.json"
-    if tool_spec_path.exists():
-        with open(tool_spec_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+
+@app.post("/inspect/ast", tags=["Security Gate"])
+@app.post("/api/v1/gate/inspect/ast", tags=["Security Gate"])
+async def inspect_code_ast(
+    req: Dict[str, Any],
+    request: Request,
+    auth_check = Depends(require_x402_payment)
+):
+    if auth_check is not None:
+        return auth_check
+
+    code = req.get("code", "")
+    if not code:
+        raise HTTPException(status_code=400, detail="Missing 'code' parameter in request body.")
+
+    start_t = time.perf_counter()
+    ast_result = parse_code_ast(code)
+    elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+
     return {
-        "tools": [
-            {
-                "name": "inspect_agent_output",
-                "description": "Inspects an AI agent's text or code output for prompt injections, private key/secret leaks, dangerous AST executions, and factual/numerical hallucinations against ground truth. Issues a cryptographic EIP-191 Proof-of-Safety attestation. Free trial tier enabled.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "agent_output": {
-                            "type": "string", 
-                            "description": "The textual or code output generated by an LLM / agent to inspect",
-                            "default": "Quarterly net revenue reached $1.2M with zero infrastructure failures."
-                        },
-                        "is_code": {
-                            "type": "boolean", 
-                            "default": False, 
-                            "description": "Set to true if agent_output is executable Python / shell code"
-                        },
-                        "context_ground_truth": {
-                            "type": "string", 
-                            "description": "Original factual reference / context to verify numerical accuracy",
-                            "default": "Revenue report: Q3 net revenue is $1.2M."
-                        }
-                    },
-                    "required": ["agent_output"]
-                }
-            }
-        ]
+        "status": "success",
+        "ast_analysis": ast_result,
+        "is_safe": ast_result.get("is_safe", True),
+        "latency_ms": round(elapsed_ms, 2)
     }
 
 
-@app.post("/mcp/invoke", response_model=MCPToolCallResponse, tags=["MCP Tools"])
-async def invoke_mcp_tool(
-    tool_call: MCPToolCallRequest,
+# --- On-Chain Attestation & Solidity Calldata ---
+
+@app.post("/api/v1/gate/attestation/onchain", response_model=OnChainAttestationResponse, tags=["On-Chain Guardrails"])
+async def get_onchain_security_attestation(
+    req: OnChainAttestationRequest,
     request: Request,
-    authorization_x402: Optional[str] = Header(None, alias="Authorization-x402"),
-    client_address: Optional[str] = Header(None, alias="X-Client-Address"),
-    x_trial: Optional[str] = Header(None, alias="X-Trial")
+    auth_check = Depends(require_x402_payment)
 ):
-    """
-    Direct MCP tool dispatcher for LLM agents with Free Trial and x402 payment validation.
-    """
-    client_id = get_client_id(request, client_address)
-    used_trials = _free_trial_tracker.get(client_id, 0)
-    is_free_trial = False
+    if auth_check is not None:
+        return auth_check
 
-    if not authorization_x402 or not client_address:
-        if used_trials < FREE_TRIAL_LIMIT or x_trial == "true":
-            is_free_trial = True
-            _free_trial_tracker[client_id] = used_trials + 1
-        else:
-            challenge = X402Verifier.generate_challenge(
-                pay_to=SERVER_WALLET,
-                amount_usdc=PRICE_USDC
-            )
-            return JSONResponse(
-                status_code=status.HTTP_402_PAYMENT_REQUIRED,
-                headers={
-                    "X-Payment-Protocol": "x402",
-                    "X-Payment-Network": NETWORK,
-                    "X-Payment-Token": "USDC",
-                    "X-Payment-Amount": PRICE_USDC,
-                    "X-Payment-Recipient": SERVER_WALLET,
-                    "X-Payment-Resource": "/mcp/invoke",
-                    "X-Free-Trials-Exhausted": "true"
+    audit = audit_payload(text=req.action_payload, is_code=False, ground_truth=None)
+    signed_payload = onchain_signer.generate_eip712_signature(
+        action_payload=req.action_payload,
+        risk_score=audit.risk_score,
+        verdict=audit.verdict,
+        chain_id=req.chain_id
+    )
+
+    return OnChainAttestationResponse(**signed_payload)
+
+
+# --- Vault Endpoints ---
+
+@app.post("/api/v1/vault/deposit", response_model=VaultDepositResponse, tags=["Agent Vault"])
+async def deposit_vault(req: VaultDepositRequest):
+    try:
+        acc = vault_manager.deposit(req.agent_address, req.amount_usdc)
+        return VaultDepositResponse(
+            status="success",
+            agent_address=acc.agent_address,
+            balance_usdc=acc.balance_usdc,
+            session_key=acc.session_key,
+            message=f"Successfully deposited ${req.amount_usdc:.2f} USDC. Pass header 'X-Vault-Key: {acc.session_key}' for instant authentication."
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/v1/vault/balance/{agent_address}", response_model=VaultBalanceResponse, tags=["Agent Vault"])
+async def get_vault_balance(agent_address: str):
+    acc = vault_manager.get_account(agent_address)
+    if not acc:
+        raise HTTPException(status_code=404, detail="Agent vault account not found.")
+    return VaultBalanceResponse(
+        agent_address=acc.agent_address,
+        balance_usdc=acc.balance_usdc,
+        total_deposited_usdc=acc.total_deposited_usdc,
+        total_consumed_usdc=acc.total_consumed_usdc,
+        query_count=acc.query_count,
+        session_key=acc.session_key,
+        last_active_utc=acc.last_active_utc
+    )
+
+
+# --- Enterprise API Key Endpoints ---
+
+@app.post("/api/v1/enterprise/keys", response_model=EnterpriseKeyResponse, tags=["Enterprise"])
+async def create_enterprise_key(req: EnterpriseKeyCreateRequest):
+    record = enterprise_manager.create_key(
+        org_name=req.organization_name,
+        email=req.contact_email,
+        tier=req.tier
+    )
+    return EnterpriseKeyResponse(
+        organization_name=record.organization_name,
+        api_key=record.api_key,
+        tier=record.tier.value,
+        rate_limit_rpm=record.rate_limit_rpm,
+        is_active=record.is_active,
+        created_at_utc=record.created_at_utc
+    )
+
+
+# --- Multi-Chain Endpoints ---
+
+@app.get("/api/v1/gate/chains", tags=["Multi-Chain"])
+async def get_supported_chains():
+    return {"status": "success", "chains": list_all_chains()}
+
+
+@app.get("/api/v1/gate/chains/{chain_id}", tags=["Multi-Chain"])
+async def get_chain_details(chain_id: int):
+    return {"status": "success", "chain": get_chain_info(chain_id)}
+
+
+# --- Recent Events REST Endpoint ---
+
+@app.get("/api/v1/gate/events/recent", tags=["System"])
+async def get_recent_events():
+    """Returns recent inspection audit events for monitoring dashboards."""
+    return {"status": "success", "events": list(_recent_audit_events)}
+
+
+# --- MCP Tool Call Endpoints ---
+
+@app.get("/mcp/tools", tags=["MCP"])
+async def get_mcp_tools():
+    tools_list = [
+        {
+            "name": "inspect_agent_output",
+            "description": "Comprehensive security and NLI hallucination inspection for agent outputs against ground truth context with EIP-191 cryptographic attestation.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "agent_output": {"type": "string", "description": "The textual or code output generated by an LLM to inspect"},
+                    "is_code": {"type": "boolean", "default": False},
+                    "context_ground_truth": {"type": "string", "description": "Reference context"}
                 },
-                content=challenge.model_dump()
-            )
-    else:
-        is_valid = await verify_x402_payment(
-            authorization_header=authorization_x402,
-            client_address=client_address,
-            expected_amount=PRICE_USDC,
-            recipient=SERVER_WALLET
-        )
-        if not is_valid:
-            return Response(status_code=status.HTTP_403_FORBIDDEN, content="Invalid x402 payment signature or sanctioned client address.")
-
-    name = tool_call.name
-    args = tool_call.arguments
-
-    if name == "inspect_agent_output":
-        agent_output = args.get("agent_output", "Quarterly net revenue reached $1.2M with zero infrastructure failures.")
-        is_code = bool(args.get("is_code", False))
-        context = args.get("context_ground_truth")
-
-        audit_result = analyze_payload_security(
-            content=agent_output,
-            is_code=is_code,
-            context_ground_truth=context
-        )
-
-        now_iso = datetime.now(timezone.utc).isoformat()
-        attestation_data = create_attestation(
-            agent_output=agent_output,
-            verdict=audit_result["verdict"],
-            risk_score=audit_result["risk_score"],
-            issued_at=now_iso
-        )
-
-        remaining_trials = max(0, FREE_TRIAL_LIMIT - _free_trial_tracker.get(client_id, 0))
-        result_payload = {
-            "status": "success",
-            "timestamp": now_iso,
-            "audit": audit_result,
-            "attestation": attestation_data,
-            "pricing": {
-                "tier": "FREE_TRIAL" if is_free_trial else "PAID_X402",
-                "rate": "0.0000 USDC (Free Trial)" if is_free_trial else f"{PRICE_USDC} USDC",
-                "remaining_free_trials": remaining_trials if is_free_trial else "unlimited",
-                "network": NETWORK,
-                "status": "settled"
+                "required": ["agent_output"]
             }
+        },
+        {
+            "name": "inspect_security_and_hallucinations",
+            "description": "Comprehensive security and NLI hallucination inspection for agent outputs against ground truth context with EIP-191 cryptographic attestation."
+        },
+        {
+            "name": "verify_agent_output",
+            "description": "High-speed (<5ms) deterministic prompt injection, jailbreak, and secret leak scanner."
+        },
+        {
+            "name": "inspect_code_ast_safety",
+            "description": "Deterministic Python AST parser scanning for hazardous calls (subprocess, os.system, eval, exec)."
+        },
+        {
+            "name": "get_onchain_security_attestation",
+            "description": "Generate EIP-712 cryptographic signatures and Solidity calldata (v, r, s) for smart contract guardrails."
         }
-        return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(result_payload, indent=2)}])
-    else:
-        return MCPToolCallResponse(
-            content=[{"type": "text", "text": f"Unknown tool name: {name}"}],
-            isError=True
-        )
+    ]
+    return JSONResponse(content={"tools": tools_list})
 
+
+@app.post("/mcp/call", response_model=MCPToolCallResponse, tags=["MCP"])
+@app.post("/mcp/invoke", response_model=MCPToolCallResponse, tags=["MCP"])
+async def call_mcp_tool(
+    req: MCPToolCallRequest,
+    request: Request,
+    auth_check = Depends(require_x402_payment)
+):
+    if auth_check is not None:
+        return auth_check
+
+    tool_name = req.name
+    args = req.arguments
+
+    if tool_name in ["inspect_security_and_hallucinations", "inspect_agent_output", "verify_agent_output"]:
+        text = args.get("agent_output") or args.get("text", "")
+        ground_truth = args.get("context_ground_truth")
+        audit = audit_payload(text=text, is_code=False, ground_truth=ground_truth)
+        attestation = create_attestation(text, audit.verdict, audit.risk_score, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+        
+        result_text = json.dumps({
+            "verdict": audit.verdict,
+            "risk_score": audit.risk_score,
+            "is_safe": audit.is_safe,
+            "threats": audit.threats,
+            "nli_verification": audit.nli_verification.model_dump() if audit.nli_verification else None,
+            "attestation": attestation
+        }, indent=2)
+
+        return MCPToolCallResponse(content=[{"type": "text", "text": result_text}])
+
+    elif tool_name == "inspect_code_ast_safety":
+        code = args.get("code", "")
+        ast_result = parse_code_ast(code)
+        return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(ast_result, indent=2)}])
+
+    elif tool_name == "get_onchain_security_attestation":
+        payload = args.get("action_payload", "")
+        audit = audit_payload(text=payload, is_code=False, ground_truth=None)
+        sig = onchain_signer.generate_eip712_signature(payload, audit.risk_score, audit.verdict)
+        return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(sig, indent=2)}])
+
+    return MCPToolCallResponse(content=[{"type": "text", "text": f"Tool '{tool_name}' not found."}], isError=True)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

@@ -11,6 +11,13 @@ class VerdictEnum(str, Enum):
     BLOCKED = "BLOCKED"
 
 
+class PricingTier(str, Enum):
+    FREE_TRIAL = "FREE_TRIAL"
+    STANDARD = "STANDARD"
+    ENTERPRISE = "ENTERPRISE"
+    VAULT_PREFUNDED = "VAULT_PREFUNDED"
+
+
 class InspectionRequest(BaseModel):
     agent_output: str = Field(
         default="System status: All operational. Quarterly net profit reached $1.2M with zero critical vulnerabilities.",
@@ -92,6 +99,94 @@ class PaymentDemand402(BaseModel):
     description: str = Field(default="Agent Security & Hallucination Inspection Micro-Oracle Fee ($0.002 USDC on Polygon)", description="Invoice description")
 
 
+# --- Vault & Enterprise Schemas ---
+
+class VaultDepositRequest(BaseModel):
+    agent_address: str = Field(..., description="Ethereum/Polygon checksummed wallet address of the agent")
+    amount_usdc: float = Field(..., ge=0.01, description="Amount in USDC to deposit (minimum $0.01)")
+    tx_hash: Optional[str] = Field(default=None, description="Optional on-chain USDC transfer transaction hash")
+
+
+class VaultDepositResponse(BaseModel):
+    status: str = Field(default="success")
+    agent_address: str
+    balance_usdc: float
+    session_key: str = Field(..., description="Zero-latency session key for agent HTTP authorization header 'X-Vault-Key'")
+    message: str
+
+
+class VaultBalanceResponse(BaseModel):
+    agent_address: str
+    balance_usdc: float
+    total_deposited_usdc: float
+    total_consumed_usdc: float
+    query_count: int
+    session_key: str
+    last_active_utc: str
+
+
+class EnterpriseKeyCreateRequest(BaseModel):
+    organization_name: str = Field(..., description="Company or Agent DAO Organization Name")
+    contact_email: str = Field(..., description="Contact email address")
+    tier: PricingTier = Field(default=PricingTier.ENTERPRISE, description="Subscription tier")
+
+
+class EnterpriseKeyResponse(BaseModel):
+    organization_name: str
+    api_key: str
+    tier: str
+    rate_limit_rpm: int
+    is_active: bool
+    created_at_utc: str
+
+
+# --- On-Chain EIP-712 Attestation Schemas ---
+
+class OnChainAttestationRequest(BaseModel):
+    action_payload: str = Field(..., description="Raw transaction payload, command string, or prompt to attest on-chain")
+    risk_score_max: float = Field(default=0.2, ge=0.0, le=1.0, description="Max acceptable risk score threshold")
+    chain_id: int = Field(default=137, description="Target EVM Chain ID (137: Polygon, 8453: Base, 42161: Arbitrum)")
+
+
+class OnChainAttestationResponse(BaseModel):
+    status: str = "success"
+    action_payload_hash: str = Field(..., description="Keccak256 hash of the action payload (bytes32 hex)")
+    risk_score: float
+    verdict: str
+    is_safe: bool
+    chain_id: int
+    signer_address: str
+    v: int
+    r: str
+    s: str
+    abi_calldata: str = Field(..., description="Raw hex calldata ready to submit directly to SecurityGateConsumer.sol")
+    expires_at: int
+
+
+# --- Multi-Chain Schemas ---
+
+class MultiChainInfo(BaseModel):
+    name: str
+    chain_id: int
+    rpc_url: str
+    usdc_address: str
+    vault_contract_address: Optional[str] = None
+    consumer_contract_address: Optional[str] = None
+    is_active: bool = True
+
+
+# --- WebSocket & MCP Schemas ---
+
+class SecurityEventMessage(BaseModel):
+    event_type: str = "INSPECTION_AUDIT"
+    timestamp: str
+    verdict: str
+    risk_score: float
+    threats_count: int
+    is_hallucinated: bool
+    caller_ip_masked: str
+
+
 class MCPToolCallRequest(BaseModel):
     name: str = Field(..., description="MCP Tool name to invoke")
     arguments: Dict[str, Any] = Field(default_factory=dict, description="Arguments dictionary for the tool")
@@ -100,4 +195,3 @@ class MCPToolCallRequest(BaseModel):
 class MCPToolCallResponse(BaseModel):
     content: List[Dict[str, Any]] = Field(default_factory=list, description="MCP content array")
     isError: bool = Field(default=False, description="Whether execution resulted in an error")
-
