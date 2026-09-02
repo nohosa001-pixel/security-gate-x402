@@ -25,6 +25,8 @@ from app.schemas import (
     VaultDepositRequest,
     VaultDepositResponse,
     VaultBalanceResponse,
+    BatchInspectionRequest,
+    BatchInspectionResponse,
     EnterpriseKeyCreateRequest,
     EnterpriseKeyResponse,
     OnChainAttestationRequest,
@@ -103,10 +105,25 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
     if len(_free_trial_usage) > 10000:
         _free_trial_usage.clear()
 
-    if len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
+    # Check if request carries authenticated M2M credentials (Vault Key, Enterprise Key, or x402 Header)
+    has_auth_header = bool(
+        request.headers.get("x-vault-key") or 
+        request.headers.get("X-Vault-Key") or 
+        request.headers.get("x-enterprise-key") or 
+        request.headers.get("X-Enterprise-Key") or 
+        request.headers.get("authorization-x402") or 
+        request.headers.get("Authorization-x402") or 
+        request.headers.get("x-402-signature") or 
+        request.headers.get("X-402-Signature") or
+        request.headers.get("x-api-key") or
+        request.headers.get("X-API-Key")
+    )
+
+    # Only apply strict 120 RPM IP rate limiting to unauthenticated / public free-tier requests
+    if not has_auth_header and len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
         return JSONResponse(
             status_code=429,
-            content={"error": "Rate limit exceeded (120 requests/minute). Please slow down."},
+            content={"error": "Rate limit exceeded for unauthenticated IP (120 requests/minute). Pass X-Vault-Key or X-Enterprise-Key for unlimited/high-throughput M2M agent calls."},
             headers={
                 "X-Content-Type-Options": "nosniff",
                 "X-Frame-Options": "DENY",
@@ -114,7 +131,9 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
             }
         )
 
-    _rate_limit_tracker[client_ip].append(now)
+    # Only track rate limit usage for unauthenticated requests
+    if not has_auth_header:
+        _rate_limit_tracker[client_ip].append(now)
 
     try:
         response = await call_next(request)
@@ -226,6 +245,7 @@ async def health():
     return {
         "status": "healthy",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "service": "Agent Security Gate x402",
         "oracle": "Agent Security Gate x402",
         "version": "1.1.0"
     }
@@ -346,6 +366,84 @@ async def inspect_payload(
     return resp
 
 
+@app.post("/api/v1/inspect/batch", response_model=BatchInspectionResponse, tags=["Security Gate"])
+async def inspect_payload_batch(
+    req: BatchInspectionRequest,
+    request: Request,
+    auth_check = Depends(require_x402_payment)
+):
+    """
+    High-Throughput Batch Inspection for Autonomous Agent Clusters (M2M).
+    Processes multiple agent outputs in a single ultra-fast round trip.
+    """
+    if auth_check is not None:
+        return auth_check
+
+    start_t = time.perf_counter()
+    issued_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    results: List[InspectionResponse] = []
+    passed = 0
+    blocked = 0
+
+    payer_info = getattr(request.state, "authorized_payer", "sandbox:free_trial")
+    extra_headers = getattr(request.state, "extra_headers", {})
+
+    for item in req.items:
+        audit = audit_payload(
+            text=item.agent_output,
+            is_code=item.is_code,
+            ground_truth=item.context_ground_truth
+        )
+        if audit.verdict == "PASSED":
+            passed += 1
+        else:
+            blocked += 1
+
+        attestation_dict = create_attestation(
+            agent_output=item.agent_output,
+            verdict=audit.verdict,
+            risk_score=audit.risk_score,
+            issued_at=issued_at
+        )
+        attestation = AuditAttestation(**attestation_dict)
+
+        results.append(InspectionResponse(
+            status="success",
+            timestamp=issued_at,
+            audit=audit,
+            attestation=attestation,
+            payment_receipt={
+                "payer": payer_info,
+                "protocol": "x402",
+                "tier": extra_headers.get("X-Tier", "STANDARD")
+            }
+        ))
+
+    elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+    total_cost = round(len(req.items) * 0.002, 6)
+
+    # If paying via vault, deduct the remaining batch cost
+    vault_key = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+    if vault_key and len(req.items) > 1:
+        # 1 query was already deducted in require_x402_payment, deduct remaining (n-1)
+        remaining_cost = round((len(req.items) - 1) * 0.002, 6)
+        vault_manager.deduct(vault_key, cost_usdc=remaining_cost)
+
+    return BatchInspectionResponse(
+        status="success",
+        total_count=len(req.items),
+        passed_count=passed,
+        blocked_count=blocked,
+        results=results,
+        payment_receipt={
+            "payer": payer_info,
+            "items_audited": len(req.items),
+            "total_cost_usdc": f"{total_cost:.4f}",
+            "latency_ms": round(elapsed_ms, 2)
+        }
+    )
+
+
 @app.post("/inspect/ast", tags=["Security Gate"])
 @app.post("/api/v1/gate/inspect/ast", tags=["Security Gate"])
 async def inspect_code_ast(
@@ -398,6 +496,10 @@ async def get_onchain_security_attestation(
 
 @app.post("/api/v1/vault/deposit", response_model=VaultDepositResponse, tags=["Agent Vault"])
 async def deposit_vault(req: VaultDepositRequest):
+    """
+    Deposits USDC into an agent's pre-funded vault balance.
+    Uncapped: Supports unlimited deposit amounts from micro-USDC to millions of USDC.
+    """
     try:
         acc = vault_manager.deposit(req.agent_address, req.amount_usdc)
         return VaultDepositResponse(
@@ -405,7 +507,7 @@ async def deposit_vault(req: VaultDepositRequest):
             agent_address=acc.agent_address,
             balance_usdc=acc.balance_usdc,
             session_key=acc.session_key,
-            message=f"Successfully deposited ${req.amount_usdc:.2f} USDC. Pass header 'X-Vault-Key: {acc.session_key}' for instant authentication."
+            message=f"Successfully deposited ${req.amount_usdc:.4f} USDC (No limit). Pass header 'X-Vault-Key: {acc.session_key}' for zero-latency M2M authentication."
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

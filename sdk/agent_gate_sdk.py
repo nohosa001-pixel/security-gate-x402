@@ -106,6 +106,64 @@ class SecurityGateClient:
 
         return data
 
+    def deposit_vault(self, amount_usdc: float = 50.0, agent_address: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Deposits funds into the Agent Vault (minimum $50.00 USDC for 25,000 queries)
+        and automatically configures this client's X-Vault-Key for unlimited high-throughput calls.
+        """
+        target_addr = agent_address or self.client_address
+        payload = {"agent_address": target_addr, "amount_usdc": amount_usdc}
+
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.post("/api/v1/vault/deposit", json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+        else:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.post(f"{self.gate_url}/api/v1/vault/deposit", json=payload)
+                resp.raise_for_status()
+                data = resp.json()
+
+        if "session_key" in data:
+            self.vault_key = data["session_key"]
+        return data
+
+    def get_vault_balance(self, agent_address: Optional[str] = None) -> Dict[str, Any]:
+        """Retrieves the current remaining vault balance and runway metrics for the agent."""
+        target_addr = agent_address or self.client_address
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.get(f"/api/v1/vault/balance/{target_addr}")
+            resp.raise_for_status()
+            return resp.json()
+        else:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(f"{self.gate_url}/api/v1/vault/balance/{target_addr}")
+                resp.raise_for_status()
+                return resp.json()
+
+    def inspect_batch(self, items: list[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Executes ultra-fast batch inspection for multiple agent outputs in a single M2M network roundtrip.
+        """
+        headers = self._build_headers()
+        payload = {"items": items}
+
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.post("/api/v1/inspect/batch", json=payload, headers=headers)
+            resp.raise_for_status()
+            return resp.json()
+        else:
+            with httpx.Client(timeout=15.0) as client:
+                resp = client.post(f"{self.gate_url}/api/v1/inspect/batch", json=payload, headers=headers)
+                resp.raise_for_status()
+                return resp.json()
+
     async def inspect_async(
         self,
         agent_output: str,

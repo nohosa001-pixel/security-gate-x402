@@ -171,6 +171,26 @@ python test_interactive.py
 
 ---
 
+## 📢 X (Twitter) Automated Promotion & Security Alert Bot
+
+Launch the automated promotion and status broadcast bot:
+
+```bash
+# Windows 1-Click launcher
+.\x_promo_bot.bat
+
+# Or run via Python directly
+python x_promo_bot.py
+```
+
+- 🇰🇷 **Korean Thread**: Comprehensive showcase of security radars, AST parser, and Web UI.
+- 🌐 **Global Launch Thread**: High-impact English launch announcement with 1-click test links.
+- 🛡️ **Real-Time Security Bulletins**: Automated micro-oracle status and guardrail alerts.
+- 🤖 **Dual Mode**: Direct X API v2 thread chaining (`requests_oauthlib`) or instant 1-click Web Intent browser launcher.
+
+---
+
 ## 📄 License
 
 MIT License &copy; 2026 Security Gate Team
+

@@ -1,0 +1,33 @@
+# 🌐 Agent Security Gate x402 - Official X (Twitter) Launch Thread
+
+=== [Tweet 1: The Problem & Solution] ===
+🛡️ Worried about prompt injections, malicious AST code execution, and hallucinations in your AI agents?
+
+Introducing Agent Security Gate x402 ⚡
+Ultra-low latency (<5ms) deterministic guardrails + EIP-712 cryptographic on-chain attestations on Polygon, Base & Arbitrum.
+
+Test it live in your browser without login 👇 (1/3)
+🌐 https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
+#AIAgents #CyberSecurity #Guardrails #Web3 #MCP
+
+
+=== [Tweet 2: Core Capabilities] ===
+⚡ Key Features available directly on the Web UI:
+
+🛡️ Injection & Jailbreak Radar: Neutralize prompt breakouts in <5ms
+⚡ Dangerous AST Analyzer: Detect eval, subprocess, os.system & socket leaks
+🔍 NLI Hallucination Check: Surface unanchored numbers & false claims
+📜 EIP-712 On-Chain Attestation: Instant ABI calldata for EVM smart contracts
+
+(2/3)
+
+
+=== [Tweet 3: Links & MCP Integration] ===
+🚀 Integrate in 1-Click with Claude Desktop, Cursor, and Python SDK!
+
+🖥️ Interactive Dashboard: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
+🎮 Live Playground: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground
+📦 PyPI: pip install agent-security-gate-x402
+🐙 GitHub: https://github.com/nohosa001-pixel/security-gate-x402
+
+Securing autonomous agent economies at $0.002 per micro-audit 💎 (3/3)

@@ -1,0 +1,44 @@
+# 🇰🇷 Agent Security Gate x402 - X(트위터) 공식 프로모션 스레드
+
+=== [1번 트윗: 문제 제기 & 솔루션 소개] ===
+🤖 AI 에이전트 개발할 때 프롬프트 주입(탈옥), 위험 코드 실행, 환각(Hallucination) 때문에 불안하셨나요? 🛡️
+
+AI 응답을 5ms 안에 정밀 검증하고 온체인 EIP-712 보증서까지 발급해주는 'Agent Security Gate x402'가 출시되었습니다! ⚡
+
+브라우저에서 로그인 없이 즉시 시뮬레이션해 보세요 👇 (1/3)
+#AI보안 #AIAgent #프롬프트인젝션 #FastAPI #Web3
+
+
+=== [2번 트윗: 4대 핵심 기능 & 기술 스택] ===
+✨ 웹 대시보드 & 플레이그라운드에서 바로 체험 가능한 4대 핵심 기능:
+
+🛡️ 탈옥·인젝션 레이더: 시스템 프롬프트 탈취 & DAN 공격 5ms 차단
+⚡ 위험 AST 코드 분석: os.system, eval, 소켓 탈취 즉시 검출
+🔍 NLI 환각 검증: 원문 대비 허위 수치 및 거짓 주장 완벽 판별
+📜 EIP-712 온체인 서명: Polygon/Base 스마트 컨트랙트 보증 calldata 발급
+
+(2/3)
+
+
+=== [3번 트윗: 무료 체험 링크 & MCP 연동] ===
+🚀 지금 바로 브라우저 UI에서 무료로 보안 테스트를 시작하세요!
+
+🖥️ 라이브 대시보드: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
+⚡ 인터랙티브 샌드박스: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground
+📦 PyPI 패키지: https://pypi.org/project/agent-security-gate-x402/
+
+Claude Desktop 및 Cursor MCP 1-클릭 연동도 완벽 지원합니다 🌐 (3/3)
+#개발자도구 #인공지능 #보안게이트웨이 #MCP
+
+
+=== [단일 트윗: 실시간 보안 알림] ===
+🛡️ [Agent Security Gate x402 실시간 보안 알림]
+
+자율 AI 에이전트의 프롬프트 탈옥, 악성 파이썬 코드, 수치 환각을 5ms 만에 차단하는 마이크로 보안 게이트!
+
+✅ EIP-712 온체인 암호화 보증서
+✅ Claude / Cursor MCP 1-클릭 연동
+✅ 0.002 USDC 초소액 온체인 정산
+
+👉 웹 대시보드 바로가기: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
+#AI에이전트 #보안게이트웨이 #AIGuardrails

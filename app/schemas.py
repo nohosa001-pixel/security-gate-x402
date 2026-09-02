@@ -103,8 +103,21 @@ class PaymentDemand402(BaseModel):
 
 class VaultDepositRequest(BaseModel):
     agent_address: str = Field(..., description="Ethereum/Polygon checksummed wallet address of the agent")
-    amount_usdc: float = Field(..., ge=0.01, description="Amount in USDC to deposit (minimum $0.01)")
+    amount_usdc: float = Field(..., ge=50.0, description="Amount in USDC to deposit (minimum $50.00 USDC, unlimited upper bound)")
     tx_hash: Optional[str] = Field(default=None, description="Optional on-chain USDC transfer transaction hash")
+
+
+class BatchInspectionRequest(BaseModel):
+    items: List[InspectionRequest] = Field(..., description="List of inspection requests for high-throughput batch audit")
+
+
+class BatchInspectionResponse(BaseModel):
+    status: str = Field(default="success")
+    total_count: int
+    passed_count: int
+    blocked_count: int
+    results: List[InspectionResponse]
+    payment_receipt: Dict[str, Any] = Field(default_factory=dict)
 
 
 class VaultDepositResponse(BaseModel):

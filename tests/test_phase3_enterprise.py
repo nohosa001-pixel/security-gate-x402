@@ -12,8 +12,8 @@ def test_vault_deposit_and_deduct():
     agent_addr = "0x9965507D1a55bcC2695C58ba16FB37d819B0A4df"
     
     # 1. Deposit
-    acc = vault_manager.deposit(agent_addr, 10.0)
-    assert acc.balance_usdc >= 10.0
+    acc = vault_manager.deposit(agent_addr, 50.0)
+    assert acc.balance_usdc >= 50.0
     assert acc.session_key.startswith("vault_key_")
 
     # 2. Deduct via Session Key
@@ -24,11 +24,12 @@ def test_vault_deposit_and_deduct():
 
 
 def test_vault_insufficient_balance():
-    agent_addr = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65"
-    acc = vault_manager.deposit(agent_addr, 0.001)
+    import uuid
+    agent_addr = f"0x{uuid.uuid4().hex[:40]}"
+    acc = vault_manager.deposit(agent_addr, 50.0)
     
-    # Try deducting 0.002 when only 0.001 is deposited
-    success, reason, _ = vault_manager.deduct(acc.session_key, cost_usdc=0.002)
+    # Try deducting more than current balance
+    success, reason, _ = vault_manager.deduct(acc.session_key, cost_usdc=acc.balance_usdc + 10.0)
     assert success is False
     assert "Insufficient balance" in reason
 

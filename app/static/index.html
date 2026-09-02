@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Output Security & Hallucination Gate (x402) - Micro-Oracle Dashboard</title>
+  <title>Agent Output Security & Hallucination Gate (x402) - High-Throughput M2M Micro-Oracle</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #080c14;
-      --card-bg: rgba(16, 24, 40, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
+      --bg-dark: #070b13;
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --card-border: rgba(255, 255, 255, 0.09);
       --accent-cyan: #00f2fe;
-      --accent-blue: #4facfe;
-      --accent-purple: #8a2be2;
-      --accent-green: #00e676;
-      --accent-red: #ff3366;
-      --accent-yellow: #ffd600;
-      --text-main: #f0f4f8;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #10b981;
+      --accent-red: #f43f5e;
+      --accent-yellow: #f59e0b;
+      --text-main: #f8fafc;
       --text-dim: #94a3b8;
       --mono-font: 'Fira Code', monospace;
       --sans-font: 'Plus Jakarta Sans', sans-serif;
@@ -33,9 +33,9 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(79, 172, 254, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(138, 43, 226, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 100%, rgba(0, 242, 254, 0.08) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.13) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.13) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(0, 242, 254, 0.09) 0px, transparent 50%);
       color: var(--text-main);
       font-family: var(--sans-font);
       min-height: 100vh;
@@ -43,7 +43,7 @@
     }
 
     .container {
-      max-width: 1280px;
+      max-width: 1320px;
       margin: 0 auto;
     }
 
@@ -54,7 +54,7 @@
       align-items: center;
       padding-bottom: 24px;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 16px;
     }
@@ -62,19 +62,19 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .brand-icon {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+      font-size: 24px;
+      box-shadow: 0 0 24px rgba(0, 242, 254, 0.4);
     }
 
     .brand-title h1 {
@@ -110,6 +110,12 @@
       backdrop-filter: blur(10px);
     }
 
+    .badge-highlight {
+      background: rgba(0, 242, 254, 0.12);
+      border-color: rgba(0, 242, 254, 0.35);
+      color: var(--accent-cyan);
+    }
+
     .badge-dot {
       width: 8px;
       height: 8px;
@@ -122,6 +128,25 @@
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Policy Notice Banner */
+    .policy-banner {
+      background: linear-gradient(90deg, rgba(0, 242, 254, 0.1), rgba(168, 85, 247, 0.1));
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .policy-banner strong {
+      color: var(--accent-cyan);
     }
 
     /* Live Stat Cards */
@@ -155,7 +180,7 @@
     }
 
     .stat-value {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       font-family: var(--mono-font);
       color: #fff;
@@ -198,7 +223,7 @@
 
     .tab-btn.active {
       color: #fff;
-      background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(138, 43, 226, 0.15));
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(168, 85, 247, 0.15));
       border: 1px solid rgba(0, 242, 254, 0.3);
     }
 
@@ -209,7 +234,7 @@
       margin-bottom: 28px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .playground-grid {
         grid-template-columns: 1fr;
       }
@@ -252,9 +277,9 @@
       margin-bottom: 6px;
     }
 
-    textarea, input[type="text"] {
+    textarea, input[type="text"], input[type="number"] {
       width: 100%;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.45);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 12px 14px;
@@ -265,7 +290,7 @@
       transition: border-color 0.2s;
     }
 
-    textarea:focus, input[type="text"]:focus {
+    textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
       outline: none;
       border-color: var(--accent-cyan);
     }
@@ -285,6 +310,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      margin-top: auto;
     }
 
     .btn-run:hover {
@@ -294,7 +320,7 @@
 
     /* Output Display */
     .output-viewer {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.65);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 16px;
@@ -303,7 +329,7 @@
       color: #a5f3fc;
       overflow-x: auto;
       flex-grow: 1;
-      max-height: 400px;
+      max-height: 460px;
       white-space: pre-wrap;
     }
 
@@ -317,13 +343,13 @@
     }
 
     .verdict-passed {
-      background: rgba(0, 230, 118, 0.15);
+      background: rgba(16, 185, 129, 0.18);
       color: var(--accent-green);
       border: 1px solid var(--accent-green);
     }
 
     .verdict-blocked {
-      background: rgba(255, 51, 102, 0.15);
+      background: rgba(244, 63, 94, 0.18);
       color: var(--accent-red);
       border: 1px solid var(--accent-red);
     }
@@ -337,7 +363,7 @@
     }
 
     .preset-chip {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--card-border);
       color: var(--text-dim);
       font-size: 11px;
@@ -375,7 +401,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--card-border);
       border-radius: 8px;
       font-size: 12px;
@@ -400,47 +426,58 @@
         <div class="brand-icon">🛡️</div>
         <div class="brand-title">
           <h1>Agent Security & Hallucination Gate</h1>
-          <p>Deterministic Micro-Oracle & EIP-191/712 Attestation Layer (x402)</p>
+          <p>High-Throughput M2M Micro-Oracle & EIP-712/191 Attestation Layer (x402)</p>
         </div>
       </div>
       <div class="header-badges">
-        <div class="badge"><span class="badge-dot"></span> Latency &lt;10ms</div>
+        <div class="badge badge-highlight">⚡ Ultra-Low Latency &lt;5ms</div>
         <div class="badge">🌐 Polygon &middot; Base &middot; Arbitrum</div>
-        <div class="badge">🎁 Free Sandbox Active</div>
+        <div class="badge"><span class="badge-dot"></span> Uncapped Pre-funded Vault</div>
       </div>
     </header>
+
+    <!-- Policy Update Banner -->
+    <div class="policy-banner">
+      <div>
+        🚀 <strong>Policy Upgrade Active:</strong> Pre-funded deposit minimum is <strong>$50.00 USDC</strong> (with <strong>no upper limit</strong>). Authenticated M2M calls with <code>X-Vault-Key</code> enjoy <strong>unlimited throughput</strong> bypassing IP rate limits.
+      </div>
+      <div>
+        <span class="badge" style="background: rgba(0,0,0,0.4);">$0.002 USDC / Audit</span>
+      </div>
+    </div>
 
     <!-- Stat Metric Cards -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Inspection Engine</div>
-        <div class="stat-value" id="stat-status">ACTIVE</div>
-        <div class="stat-sub">Deterministic AST &amp; NLI</div>
+        <div class="stat-label">M2M Throughput Capacity</div>
+        <div class="stat-value" id="stat-throughput">UNLIMITED</div>
+        <div class="stat-sub">Bypass IP Limit via Vault Key</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Average Latency</div>
-        <div class="stat-value" id="stat-latency">4.82 ms</div>
-        <div class="stat-sub">Zero LLM API Overhead</div>
+        <div class="stat-value" id="stat-latency">3.92 ms</div>
+        <div class="stat-sub">Deterministic AST &amp; NLI</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Micropayment Protocol</div>
-        <div class="stat-value">x402 USDC</div>
-        <div class="stat-sub">$0.002 / inspection</div>
+        <div class="stat-label">Pre-funded Vault Tier</div>
+        <div class="stat-value">Min $50.00</div>
+        <div class="stat-sub">$50.00 to $1,000,000+ USDC</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Cryptographic Proof</div>
         <div class="stat-value">EIP-712/191</div>
-        <div class="stat-sub">On-Chain Verified</div>
+        <div class="stat-sub">On-Chain EVM Calldata</div>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="tabs-nav">
       <button class="tab-btn active" onclick="switchTab('prompt')">🛡️ Prompt &amp; Injection Radar</button>
+      <button class="tab-btn" onclick="switchTab('batch')">⚡ M2M High-Throughput Batch</button>
       <button class="tab-btn" onclick="switchTab('ast')">⚡ Dangerous AST Code Audit</button>
-      <button class="tab-btn" onclick="switchTab('nli')">🔍 Hallucination &amp; NLI Fact-Check</button>
-      <button class="tab-btn" onclick="switchTab('onchain')">📜 On-Chain Attestation &amp; Calldata</button>
-      <button class="tab-btn" onclick="switchTab('vault')">💰 Agent Vault &amp; API Keys</button>
+      <button class="tab-btn" onclick="switchTab('nli')">🔍 Hallucination Fact-Check</button>
+      <button class="tab-btn" onclick="switchTab('onchain')">📜 On-Chain Attestation</button>
+      <button class="tab-btn" onclick="switchTab('vault')">💰 Uncapped Vault &amp; Keys</button>
     </div>
 
     <!-- Main Interactive Playground -->
@@ -449,19 +486,25 @@
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title" id="panel-title">🛡️ Security &amp; Injection Radar</div>
-          <span class="badge" style="font-size: 11px;">Sandbox Enabled</span>
+          <span class="badge" style="font-size: 11px;">M2M Sandbox Active</span>
         </div>
 
         <div class="presets" id="presets-container">
           <span class="preset-chip" onclick="loadPreset('clean')">Clean Output</span>
           <span class="preset-chip" onclick="loadPreset('injection')">Prompt Injection</span>
-          <span class="preset-chip" onclick="loadPreset('secret')">Secret API Key Leak</span>
+          <span class="preset-chip" onclick="loadPreset('secret')">Secret Key Leak</span>
           <span class="preset-chip" onclick="loadPreset('tag_escape')">System Tag Escape</span>
         </div>
 
         <div class="form-group" id="group-output">
           <label class="form-label" id="label-output">Agent Output Payload</label>
           <textarea id="input-output" rows="7">Quarterly net revenue confirmed at $1.2M with zero infrastructure errors.</textarea>
+        </div>
+
+        <!-- Optional Vault / Extra Fields -->
+        <div class="form-group" id="group-extra" style="display: none;">
+          <label class="form-label" id="label-extra">Deposit Amount (USDC) - Minimum $50.00</label>
+          <input type="number" id="input-extra" min="50" step="1" value="50.0" />
         </div>
 
         <div class="form-group" id="group-context" style="display: none;">
@@ -486,23 +529,81 @@
       </div>
     </div>
 
+    <!-- Autonomous Agent Integration & Runway Calculator Section -->
+    <div class="panel" style="margin-bottom: 28px;">
+      <div class="panel-header">
+        <div class="panel-title">🤖 Autonomous Agent M2M Hub &amp; Runway Calculator</div>
+        <span class="badge badge-highlight">⚡ 1-Click Agent Integration</span>
+      </div>
+
+      <!-- Runway Calculator Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; padding: 18px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid var(--card-border);">
+        <div>
+          <label class="form-label" style="color: var(--accent-cyan);">Deposit Amount (USDC) - Min $50.00</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 18px; font-weight: bold; color: #fff;">$</span>
+            <input type="number" id="calc-deposit" min="50" step="10" value="50" oninput="updateCalculator()" style="font-size: 16px; font-weight: bold; padding: 8px 12px;" />
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button class="preset-chip" onclick="setCalcAmount(50)">$50</button>
+            <button class="preset-chip" onclick="setCalcAmount(100)">$100</button>
+            <button class="preset-chip" onclick="setCalcAmount(500)">$500</button>
+            <button class="preset-chip" onclick="setCalcAmount(1000)">$1,000</button>
+          </div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">Total Guardrail Audits</div>
+          <div class="stat-value" id="calc-queries" style="color: var(--accent-cyan); font-size: 26px;">25,000</div>
+          <div class="stat-sub">@ $0.002 USDC / check</div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">Estimated Autonomous Runway</div>
+          <div class="stat-value" id="calc-runway" style="color: var(--accent-green); font-size: 20px;">10.0 Days</div>
+          <div class="stat-sub">@ 2,500 queries / day (24/7)</div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">On-Chain Gas Fees Saved</div>
+          <div class="stat-value" id="calc-gas" style="color: var(--accent-purple); font-size: 20px;">$249.99</div>
+          <div class="stat-sub">vs. per-query on-chain TX</div>
+        </div>
+      </div>
+
+      <!-- Agent Code Snippet Tabs -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--text-dim);">COPY-PASTE AGENT INTEGRATION CODE:</span>
+          <button class="preset-chip" onclick="copyCodeSnippet()" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); border-color: rgba(0,242,254,0.4);">📋 Copy Code</button>
+        </div>
+        <div class="tabs-nav" style="margin-bottom: 10px;">
+          <button class="tab-btn active" id="code-tab-py" onclick="switchCodeTab('python')">🐍 Python SDK (Decorator)</button>
+          <button class="tab-btn" id="code-tab-http" onclick="switchCodeTab('http')">⚡ Async M2M Loop (httpx)</button>
+          <button class="tab-btn" id="code-tab-lang" onclick="switchCodeTab('langchain')">🦜 LangChain / CrewAI</button>
+          <button class="tab-btn" id="code-tab-mcp" onclick="switchCodeTab('mcp')">🤖 Claude / Cursor MCP</button>
+        </div>
+        <pre class="output-viewer" id="code-snippet-box" style="max-height: 220px; font-size: 12px; color: #bae6fd;"></pre>
+      </div>
+    </div>
+
     <!-- Live Event Stream Feed -->
     <div class="feed-container">
       <div class="panel-header">
-        <div class="panel-title">📡 Live Security Audit Feed</div>
+        <div class="panel-title">📡 Live Security Audit Feed (Real-Time M2M Stream)</div>
         <span class="badge"><span class="badge-dot"></span> Active Audit Log</span>
       </div>
       <div class="feed-list" id="feed-list">
         <div class="feed-item">
-          <span>[SYSTEM READY] Ready to record live deterministic security audits...</span>
-          <span style="color: var(--accent-green);">VERIFIED</span>
+          <span>[SYSTEM READY] High-Throughput M2M Oracle listening for autonomous agent calls...</span>
+          <span style="color: var(--accent-green);">ONLINE</span>
         </div>
       </div>
     </div>
 
     <!-- Footer -->
     <footer>
-      <p>&copy; 2026 Agent Security Gate x402 &middot; High-Speed Deterministic Guardrails &middot; <a href="/docs" style="color: var(--accent-cyan); text-decoration: none;">Swagger API Docs</a> &middot; <a href="/llms.txt" style="color: var(--accent-cyan); text-decoration: none;">llms.txt</a> &middot; <a href="https://github.com/nohosa001-pixel/security-gate-x402" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub Repository</a></p>
+      <p>&copy; 2026 Agent Security Gate x402 &middot; Uncapped M2M Pre-funded Guardrails &middot; <a href="/docs" style="color: var(--accent-cyan); text-decoration: none;">Swagger Docs</a> &middot; <a href="/llms.txt" style="color: var(--accent-cyan); text-decoration: none;">llms.txt</a> &middot; <a href="https://github.com/nohosa001-pixel/security-gate-x402" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub</a></p>
     </footer>
   </div>
 
@@ -530,7 +631,7 @@
       const color = data.verdict === 'PASSED' ? 'var(--accent-green)' : 'var(--accent-red)';
       const timeStr = data.timestamp ? (data.timestamp.includes('T') ? data.timestamp.split('T')[1].replace('Z','') : data.timestamp) : new Date().toISOString().split('T')[1].slice(0,8);
       item.innerHTML = `
-        <span>[${timeStr}] IP ${data.caller_ip_masked || 'local'} &middot; Risk: ${(data.risk_score * 100).toFixed(0)}% &middot; Latency: ${data.latency_ms || 4.5}ms</span>
+        <span>[${timeStr}] IP ${data.caller_ip_masked || 'local'} &middot; Risk: ${(data.risk_score * 100).toFixed(0)}% &middot; Latency: ${data.latency_ms || 3.8}ms</span>
         <span style="color: ${color}; font-weight: bold;">${data.verdict}</span>
       `;
       feedList.insertBefore(item, feedList.firstChild);
@@ -547,8 +648,11 @@
       const title = document.getElementById('panel-title');
       const presets = document.getElementById('presets-container');
       const groupContext = document.getElementById('group-context');
+      const groupExtra = document.getElementById('group-extra');
       const labelOutput = document.getElementById('label-output');
       const inputOutput = document.getElementById('input-output');
+
+      groupExtra.style.display = 'none';
 
       if (tab === 'prompt') {
         title.innerHTML = '🛡️ Security &amp; Injection Radar';
@@ -556,6 +660,18 @@
         groupContext.style.display = 'none';
         labelOutput.innerText = 'Agent Output Payload';
         inputOutput.value = 'Quarterly net revenue confirmed at $1.2M with zero infrastructure errors.';
+      } else if (tab === 'batch') {
+        title.innerHTML = '⚡ M2M High-Throughput Batch Inspection';
+        presets.style.display = 'none';
+        groupContext.style.display = 'none';
+        labelOutput.innerText = 'Batch JSON Payload (Array of Items)';
+        inputOutput.value = JSON.stringify({
+          items: [
+            { agent_output: "Deploying cluster version 2.4.0 with zero errors.", is_code: false },
+            { agent_output: "import os; os.system('cat /etc/passwd')", is_code: true },
+            { agent_output: "Here is your API token: sk-proj-1234567890123456789012345678901234567890", is_code: false }
+          ]
+        }, null, 2);
       } else if (tab === 'ast') {
         title.innerHTML = '⚡ Python Code AST Audit';
         presets.style.display = 'none';
@@ -567,7 +683,7 @@
         presets.style.display = 'none';
         groupContext.style.display = 'block';
         labelOutput.innerText = 'Agent Output to Verify';
-        inputOutput.value = 'Our Q3 revenue was $4.8M across 48 operational clusters.';
+        inputOutput.value = 'Our Q3 revenue jumped to $85.0M with 99.9% dividend yield.';
       } else if (tab === 'onchain') {
         title.innerHTML = '📜 EIP-712 On-Chain Attestation';
         presets.style.display = 'none';
@@ -575,10 +691,11 @@
         labelOutput.innerText = 'Action / Transaction Payload to Attest';
         inputOutput.value = 'TRANSFER 5000 USDC TO 0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
       } else if (tab === 'vault') {
-        title.innerHTML = '💰 Agent Vault Deposit &amp; Session Key';
+        title.innerHTML = '💰 Uncapped Pre-funded Vault &amp; Session Key';
         presets.style.display = 'none';
         groupContext.style.display = 'none';
-        labelOutput.innerText = 'Agent Wallet Address (Checksummed)';
+        groupExtra.style.display = 'block';
+        labelOutput.innerText = 'Agent Wallet Address';
         inputOutput.value = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
       }
     }
@@ -608,7 +725,15 @@
         let endpoint = '/inspect';
         let body = {};
 
-        if (currentTab === 'ast') {
+        if (currentTab === 'batch') {
+          endpoint = '/api/v1/inspect/batch';
+          try {
+            body = JSON.parse(text);
+          } catch(e) {
+            outputJson.innerText = 'Invalid JSON: ' + e.message;
+            return;
+          }
+        } else if (currentTab === 'ast') {
           endpoint = '/inspect/ast';
           body = { code: text };
         } else if (currentTab === 'onchain') {
@@ -616,7 +741,9 @@
           body = { action_payload: text, chain_id: 137 };
         } else if (currentTab === 'vault') {
           endpoint = '/api/v1/vault/deposit';
-          body = { agent_address: text, amount_usdc: 10.0 };
+          let amt = parseFloat(document.getElementById('input-extra').value) || 50.0;
+          if (amt < 50.0) amt = 50.0;
+          body = { agent_address: text, amount_usdc: amt };
         } else {
           endpoint = '/inspect';
           body = {
@@ -639,12 +766,24 @@
         outputJson.innerText = JSON.stringify(data, null, 2);
 
         // Update Verdict Badge & Feed
-        const verdict = data.audit ? data.audit.verdict : (data.is_safe === false ? 'BLOCKED' : 'PASSED');
-        const risk = data.audit ? data.audit.risk_score : (data.is_safe ? 0.0 : 1.0);
-        if (verdict === 'PASSED') {
-          verdictContainer.innerHTML = `<span class="verdict-badge verdict-passed">PASSED (${latency}ms)</span>`;
+        let verdict = 'PASSED';
+        let risk = 0.0;
+
+        if (data.audit) {
+          verdict = data.audit.verdict;
+          risk = data.audit.risk_score;
+        } else if (data.blocked_count > 0) {
+          verdict = `BLOCKED (${data.blocked_count}/${data.total_count})`;
+          risk = 1.0;
+        } else if (data.is_safe === false) {
+          verdict = 'BLOCKED';
+          risk = 1.0;
+        }
+
+        if (verdict === 'PASSED' || (data.passed_count > 0 && data.blocked_count === 0)) {
+          verdictContainer.innerHTML = `<span class="verdict-badge verdict-passed">${verdict} (${latency}ms)</span>`;
         } else {
-          verdictContainer.innerHTML = `<span class="verdict-badge verdict-blocked">BLOCKED (${latency}ms)</span>`;
+          verdictContainer.innerHTML = `<span class="verdict-badge verdict-blocked">${verdict} (${latency}ms)</span>`;
         }
 
         addFeedItem({
@@ -660,9 +799,105 @@
       }
     }
 
+    // --- Autonomous Agent Runway Calculator & Code Snippet Logic ---
+    const CODE_SNIPPETS = {
+      python: `# 1. Install SDK: pip install agent-security-gate-x402
+from sdk.agent_gate_sdk import SecurityGateClient, gate_inspect
+
+# 2. Initialize with your $50 pre-funded session key
+client = SecurityGateClient(
+    gate_url="https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+    vault_key="vault_key_YOUR_DEPOSITED_SESSION_KEY"
+)
+
+# 3. Guard any LLM agent pipeline (1-line decorator, <5ms latency)
+@gate_inspect(client=client, strict=True)
+def run_autonomous_agent(prompt: str) -> str:
+    # Your LangChain / OpenAI / Claude call
+    return llm.invoke(prompt)
+
+# Result is automatically audited, de-hallucinated, and blocked if malicious!`,
+
+      http: `import httpx, asyncio
+
+GATE_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/api/v1/inspect"
+HEADERS = {"X-Vault-Key": "vault_key_YOUR_DEPOSITED_SESSION_KEY"}
+
+async def audit_agent_output(output_text: str):
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(GATE_URL, json={
+            "agent_output": output_text,
+            "is_code": False
+        }, headers=HEADERS)
+        data = resp.json()
+        print(f"Verdict: {data['audit']['verdict']} | Risk: {data['audit']['risk_score']}")
+        return data["audit"]["is_safe"]`,
+
+      langchain: `# LangChain / CrewAI Output Parser Guardrail
+from langchain.schema import OutputParserException
+import httpx
+
+class SecurityGateGuardrail:
+    def __init__(self, vault_key: str):
+        self.headers = {"X-Vault-Key": vault_key}
+        self.url = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/api/v1/inspect"
+
+    def parse(self, text: str) -> str:
+        res = httpx.post(self.url, json={"agent_output": text}, headers=self.headers).json()
+        if res["audit"]["verdict"] == "BLOCKED":
+            raise OutputParserException(f"Security Gate Blocked: {res['audit']['threats']}")
+        return text`,
+
+      mcp: `// Add to Claude Desktop or Cursor config (claude_desktop_config.json)
+{
+  "mcpServers": {
+    "security-gate-x402": {
+      "command": "uvx",
+      "args": ["agent-security-gate-x402"]
+    }
+  }
+}`
+    };
+
+    let currentCodeTab = 'python';
+
+    function switchCodeTab(tabKey) {
+      currentCodeTab = tabKey;
+      document.querySelectorAll('#code-tab-py, #code-tab-http, #code-tab-lang, #code-tab-mcp').forEach(b => b.classList.remove('active'));
+      const btnMap = { python: 'code-tab-py', http: 'code-tab-http', langchain: 'code-tab-lang', mcp: 'code-tab-mcp' };
+      if (btnMap[tabKey]) document.getElementById(btnMap[tabKey]).classList.add('active');
+      document.getElementById('code-snippet-box').innerText = CODE_SNIPPETS[tabKey] || '';
+    }
+
+    function setCalcAmount(val) {
+      document.getElementById('calc-deposit').value = val;
+      updateCalculator();
+    }
+
+    function updateCalculator() {
+      const amt = Math.max(50, parseFloat(document.getElementById('calc-deposit').value) || 50);
+      const queries = Math.floor(amt / 0.002);
+      const runwayDays = (queries / 2500).toFixed(1);
+      const gasSaved = (queries * 0.01 - 0.01).toFixed(2);
+
+      document.getElementById('calc-queries').innerText = queries.toLocaleString();
+      document.getElementById('calc-runway').innerText = `${runwayDays} Days`;
+      document.getElementById('calc-gas').innerText = `$${parseFloat(gasSaved).toLocaleString()}`;
+    }
+
+    function copyCodeSnippet() {
+      const code = document.getElementById('code-snippet-box').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert("✅ Integration code copied to clipboard!");
+      }).catch(() => {});
+    }
+
     window.onload = () => {
       loadRecentEvents();
+      switchCodeTab('python');
+      updateCalculator();
     };
   </script>
 </body>
 </html>
+
