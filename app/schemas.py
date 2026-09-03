@@ -185,6 +185,9 @@ class MultiChainInfo(BaseModel):
     usdc_address: str
     vault_contract_address: Optional[str] = None
     consumer_contract_address: Optional[str] = None
+    safe_guard_address: Optional[str] = None
+    credit_oracle_address: Optional[str] = None
+    compliance_registry_address: Optional[str] = None
     is_active: bool = True
 
 

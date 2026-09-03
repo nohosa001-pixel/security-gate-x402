@@ -1,0 +1,10 @@
+{
+  "network": "Polygon Mainnet (Chain ID 137)",
+  "deployer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+  "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+  "contracts": {
+    "SafeSecurityGateGuard": "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+    "AgentCreditOracle": "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
+    "AgentComplianceRegistry": "0x28292D76E07E5539F15F3b97935dE8E0432E76DD"
+  }
+}

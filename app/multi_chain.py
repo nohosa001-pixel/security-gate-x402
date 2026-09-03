@@ -16,6 +16,9 @@ SUPPORTED_CHAINS: Dict[int, MultiChainInfo] = {
         usdc_address="0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
         vault_contract_address="0x1111111254EEB25477B68fb85Ed929f73A960582",
         consumer_contract_address="0x2222222254EEB25477B68fb85Ed929f73A960582",
+        safe_guard_address="0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+        credit_oracle_address="0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
+        compliance_registry_address="0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
         is_active=True
     ),
     8453: MultiChainInfo(
