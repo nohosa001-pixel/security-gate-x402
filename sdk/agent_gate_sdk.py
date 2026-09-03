@@ -17,6 +17,18 @@ class SecurityGateBlockedError(Exception):
         self.audit_report = audit_report
 
 
+class PaymentRequired402Error(Exception):
+    """Raised when the security gate requires payment or pre-funded balance top-up."""
+    def __init__(self, message: str, challenge: Optional[Dict[str, Any]] = None):
+        super().__init__(message)
+        self.challenge = challenge or {}
+        self.pay_to = self.challenge.get("pay_to")
+        self.amount_usdc = self.challenge.get("amount_usdc")
+        self.asset = self.challenge.get("asset")
+        self.chain_id = self.challenge.get("chain_id")
+        self.quote_id = self.challenge.get("quote_id")
+
+
 class SecurityGateClient:
     """Client for interacting with the agent-security-gate-x402 micro-oracle."""
 
@@ -28,7 +40,9 @@ class SecurityGateClient:
         api_key: Optional[str] = None,
         client_address: Optional[str] = None,
         is_dev: bool = False,
-        app: Optional[Any] = None
+        app: Optional[Any] = None,
+        auto_deposit_on_402: bool = False,
+        auto_deposit_amount: float = 50.0
     ):
         self.gate_url = gate_url.rstrip("/")
         self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
@@ -36,6 +50,8 @@ class SecurityGateClient:
         self.api_key = api_key or os.getenv("AGENT_API_KEY")
         self.is_dev = is_dev or (os.getenv("ENV") == "development")
         self.app = app
+        self.auto_deposit_on_402 = auto_deposit_on_402
+        self.auto_deposit_amount = auto_deposit_amount
 
         if self.private_key and not self.private_key.startswith("0x"):
             self.private_key = "0x" + self.private_key
@@ -46,9 +62,11 @@ class SecurityGateClient:
         else:
             self.client_address = client_address or os.getenv("AGENT_WALLET_ADDRESS", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
 
-    def _generate_auth_signature(self) -> str:
-        if self.is_dev or not self.private_key:
-            return "x402_test_sig_agent_client"
+    def _generate_auth_signature(self) -> Optional[str]:
+        if not self.private_key:
+            if self.is_dev:
+                return "x402_test_sig_agent_client"
+            return None
 
         msg = "x402-agent-security-gate:0.002-usdc:polygon:137"
         msg_hash = encode_defunct(text=msg)
@@ -65,7 +83,9 @@ class SecurityGateClient:
         elif self.vault_key:
             headers["X-Vault-Key"] = self.vault_key
         else:
-            headers["Authorization-x402"] = self._generate_auth_signature()
+            sig = self._generate_auth_signature()
+            if sig:
+                headers["Authorization-x402"] = sig
         return headers
 
     def inspect(
@@ -88,14 +108,32 @@ class SecurityGateClient:
             tc = TestClient(self.app)
             resp = tc.post("/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
-                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
+                challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                if self.auto_deposit_on_402:
+                    self.deposit_vault(amount_usdc=self.auto_deposit_amount)
+                    headers = self._build_headers()
+                    resp = tc.post("/api/v1/inspect", json=payload, headers=headers)
+                if resp.status_code == 402:
+                    raise PaymentRequired402Error(
+                        "HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.",
+                        challenge=challenge
+                    )
             resp.raise_for_status()
             data = resp.json()
         else:
             with httpx.Client(timeout=10.0) as client:
                 resp = client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
                 if resp.status_code == 402:
-                    raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
+                    challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                    if self.auto_deposit_on_402:
+                        self.deposit_vault(amount_usdc=self.auto_deposit_amount)
+                        headers = self._build_headers()
+                        resp = client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
+                    if resp.status_code == 402:
+                        raise PaymentRequired402Error(
+                            "HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.",
+                            challenge=challenge
+                        )
                 resp.raise_for_status()
                 data = resp.json()
 
@@ -183,7 +221,16 @@ class SecurityGateClient:
         async with httpx.AsyncClient(transport=transport, timeout=10.0) as client:
             resp = await client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
-                raise PermissionError("HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.")
+                challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                if self.auto_deposit_on_402:
+                    self.deposit_vault(amount_usdc=self.auto_deposit_amount)
+                    headers = self._build_headers()
+                    resp = await client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
+                if resp.status_code == 402:
+                    raise PaymentRequired402Error(
+                        "HTTP 402: Payment Required. Ensure your wallet has sufficient USDC on Polygon.",
+                        challenge=challenge
+                    )
             resp.raise_for_status()
             data = resp.json()
 

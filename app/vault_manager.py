@@ -183,6 +183,8 @@ class VaultManager:
                 return self._accounts.get(agent_addr)
             if session_or_addr in self._accounts:
                 return self._accounts[session_or_addr]
+            if session_or_addr.lower() in self._accounts:
+                return self._accounts[session_or_addr.lower()]
             try:
                 c_addr = to_checksum_address(session_or_addr)
                 return self._accounts.get(c_addr)

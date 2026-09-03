@@ -12,7 +12,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from fastapi.testclient import TestClient
 from app.main import app
-from sdk.agent_gate_sdk import SecurityGateClient, SecurityGateBlockedError, gate_inspect, verify_attestation
+from sdk.agent_gate_sdk import (
+    SecurityGateClient,
+    SecurityGateBlockedError,
+    PaymentRequired402Error,
+    gate_inspect,
+    verify_attestation
+)
 
 # Ensure development environment for local mock verification
 os.environ["ENV"] = "development"
@@ -133,6 +139,53 @@ def test_python_sdk_and_decorator():
         assert False, "Should have raised SecurityGateBlockedError"
     except SecurityGateBlockedError as e:
         assert "BLOCKED" in str(e) or "FLAGGED" in str(e)
+
+
+def test_sdk_payment_required_402_and_self_healing():
+    import uuid
+    new_addr = f"0x{uuid.uuid4().hex[:40]}"
+
+    # Exhaust free trials for new_addr
+    for _ in range(3):
+        client.post(
+            "/api/v1/inspect",
+            json={"agent_output": "Trial warmup text"},
+            headers={"X-Client-Address": new_addr}
+        )
+
+    # 1. Standard client without auto-deposit should raise PaymentRequired402Error
+    client_no_auto = SecurityGateClient(
+        client_address=new_addr,
+        app=app,
+        auto_deposit_on_402=False
+    )
+    client_no_auto.private_key = None
+    client_no_auto.is_dev = False
+
+    try:
+        client_no_auto.inspect("Test text requiring payment")
+        assert False, "Should have raised PaymentRequired402Error"
+    except PaymentRequired402Error as e:
+        assert e.amount_usdc == "0.002"
+        assert e.pay_to is not None
+        assert e.chain_id == 137
+        assert e.quote_id is not None
+
+    # 2. Self-healing client with auto_deposit_on_402=True
+    client_auto = SecurityGateClient(
+        client_address=new_addr,
+        app=app,
+        auto_deposit_on_402=True,
+        auto_deposit_amount=50.0
+    )
+    client_auto.private_key = None
+    client_auto.is_dev = False
+
+    # Calling inspect should catch 402, auto-deposit $50 USDC into vault, and pass
+    result = client_auto.inspect("Autonomous agent output after auto-deposit self-healing.")
+    assert result["status"] == "success"
+    assert result["audit"]["verdict"] == "PASSED"
+    assert client_auto.vault_key is not None
 
 
 def test_attestation_issuance_and_verification():
@@ -349,15 +402,19 @@ def run_tests():
     test_python_sdk_and_decorator()
     print("   ✅ SDK client and decorator middleware fully verified.")
 
-    print("\n🧪 10. Testing Cryptographic Audit Attestation & Verification...")
+    print("\n🧪 10. Testing SDK 402 Structured Error & Self-Healing Auto-Deposit...")
+    test_sdk_payment_required_402_and_self_healing()
+    print("   ✅ Self-healing autonomous auto-deposit recovery verified.")
+
+    print("\n🧪 11. Testing Cryptographic Audit Attestation & Verification...")
     test_attestation_issuance_and_verification()
     print("   ✅ Attestation issuance & tamper-proof cryptographic verification verified.")
 
-    print("\n🧪 11. Testing Model Context Protocol (MCP) Server for Glama.ai...")
+    print("\n🧪 12. Testing Model Context Protocol (MCP) Server for Glama.ai...")
     test_mcp_server_rpc_tools()
     print("   ✅ Glama.ai MCP stdio JSON-RPC server verified.")
 
-    print("\n🎉 ALL 11 TESTS & CAPABILITIES PASSED SUCCESSFULLY!")
+    print("\n🎉 ALL 12 TESTS & CAPABILITIES PASSED SUCCESSFULLY!")
 
 
 if __name__ == "__main__":
