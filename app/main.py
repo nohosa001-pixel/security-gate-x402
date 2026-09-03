@@ -154,7 +154,11 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
     elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    path = request.url.path
+    if path in ["/", "/dashboard", "/playground", "/manifest.json", "/safe-icon.svg"] or path.startswith("/static"):
+        response.headers["Content-Security-Policy"] = "frame-ancestors 'self' https://app.safe.global https://*.safe.global https://*.gnosis-safe.io;"
+    else:
+        response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Processing-Time-Ms"] = f"{elapsed_ms:.2f}"
     return response
 
