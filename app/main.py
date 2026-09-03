@@ -42,6 +42,7 @@ from app.enterprise_manager import enterprise_manager
 from app.onchain_signer import onchain_signer
 from app.multi_chain import list_all_chains, get_chain_info
 from app.credit_rating_engine import credit_engine
+from app.compliance_engine import compliance_engine
 
 app = FastAPI(
     title="Agent Security & Hallucination Gate (x402)",
@@ -51,7 +52,7 @@ app = FastAPI(
         "cryptographic attestation on Polygon, Base, and Arbitrum. "
         "Explore the interactive Web Dashboard at /dashboard."
     ),
-    version="1.1.0",
+    version="1.2.1",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -206,7 +207,7 @@ async def root(request: Request):
     return {
         "service": "agent-security-gate-x402",
         "description": "Deterministic Security & Hallucination Inspection Micro-Oracle",
-        "version": "1.1.0",
+        "version": "1.2.1",
         "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
         "network": "Polygon, Base, Arbitrum (Multi-chain)",
         "price_per_query": "0.002 USDC",
@@ -215,6 +216,11 @@ async def root(request: Request):
             "inspect_security": "/inspect",
             "inspect_ast_code": "/inspect/ast",
             "onchain_attestation": "/api/v1/gate/attestation/onchain",
+            "credit_rating": "/api/v1/credit/{agent_address}",
+            "credit_attestation": "/api/v1/credit/attestation",
+            "compliance_passport": "/api/v1/compliance/passport/{agent_address}",
+            "compliance_eu_ai_act": "/api/v1/compliance/eu-ai-act",
+            "compliance_attestation": "/api/v1/compliance/attestation",
             "multichain_configs": "/api/v1/gate/chains",
             "vault_deposit": "/api/v1/vault/deposit",
             "vault_balance": "/api/v1/vault/balance/{agent_address}",
@@ -248,7 +254,7 @@ async def health():
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "service": "Agent Security Gate x402",
         "oracle": "Agent Security Gate x402",
-        "version": "1.1.0"
+        "version": "1.2.1"
     }
 
 
@@ -529,6 +535,57 @@ async def create_credit_attestation(req: Dict[str, Any]):
     chain_id = req.get("chain_id", 137)
     validity_seconds = req.get("validity_seconds", 3600)
     return credit_engine.generate_credit_certificate(agent_address, chain_id, validity_seconds)
+
+
+# --- Regulatory Compliance & EU AI Act Shield Endpoints ---
+
+@app.get("/api/v1/compliance/passport/{agent_address}", tags=["Regulatory Compliance"])
+async def get_compliance_passport(agent_address: str):
+    """
+    Returns the official EU AI Act (Articles 50 & 53) Compliance Passport & Audit Evaluation.
+    """
+    return compliance_engine.evaluate_compliance(agent_address)
+
+
+@app.get("/api/v1/compliance/eu-ai-act", tags=["Regulatory Compliance"])
+async def get_eu_ai_act_summary():
+    """
+    Returns technical documentation of the Agent Security Gate x402 compliance shield for EU AI Act.
+    """
+    return {
+        "regulation": "EU AI Act (Regulation EU 2024/1689)",
+        "compliance_architecture": "Deterministic Micro-Oracle Guardrail",
+        "supported_articles": [
+            {
+                "article": "Article 50",
+                "title": "Transparency & Synthetic Marking",
+                "coverage": "Cryptographic EIP-191 / EIP-712 provenance signatures on all agent actions."
+            },
+            {
+                "article": "Article 53",
+                "title": "GPAI Systemic Risk & Technical Mitigation",
+                "coverage": "Continuous sub-10ms AST code parsing, prompt injection blocking, and NLI factual verification."
+            },
+            {
+                "article": "Article 9",
+                "title": "Risk Management Lifecycle",
+                "coverage": "Automated runtime guardrails preventing unvetted on-chain and off-chain execution."
+            }
+        ],
+        "zero_retention_guarantee": "Complies with EU GDPR: Zero persistent logging of user prompts or payloads."
+    }
+
+
+@app.post("/api/v1/compliance/attestation", tags=["Regulatory Compliance"])
+async def issue_compliance_certificate(req: Dict[str, Any]):
+    """
+    Issues an on-chain verifiable EIP-712 Compliance Certificate for enterprise smart contracts.
+    """
+    agent_address = req.get("agent_address")
+    if not agent_address:
+        raise HTTPException(status_code=400, detail="Missing 'agent_address'")
+    chain_id = req.get("chain_id", 137)
+    return compliance_engine.issue_onchain_compliance_certificate(agent_address, chain_id)
 
 
 # --- Vault Endpoints ---

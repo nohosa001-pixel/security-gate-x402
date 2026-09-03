@@ -106,6 +106,20 @@ TOOLS = [
             },
             "required": ["agent_address"]
         }
+    },
+    {
+        "name": "get_eu_ai_act_compliance_passport",
+        "description": "Retrieve the official EU AI Act (Regulation EU 2024/1689 Articles 50 & 53) Compliance Passport & Audit Evaluation for an autonomous AI agent.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_address": {
+                    "type": "string",
+                    "description": "EVM wallet address of the autonomous agent to audit."
+                }
+            },
+            "required": ["agent_address"]
+        }
     }
 ]
 
@@ -233,6 +247,23 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         {
                             "type": "text",
                             "text": json.dumps(credit_data, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "get_eu_ai_act_compliance_passport":
+            from app.compliance_engine import compliance_engine
+            agent_addr = tool_args.get("agent_address", "")
+            passport = compliance_engine.evaluate_compliance(agent_addr)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(passport, indent=2, ensure_ascii=False)
                         }
                     ]
                 }

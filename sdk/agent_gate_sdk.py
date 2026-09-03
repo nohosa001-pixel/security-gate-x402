@@ -272,6 +272,21 @@ class SecurityGateClient:
                 resp.raise_for_status()
                 return resp.json()
 
+    def get_compliance_passport(self, agent_address: Optional[str] = None) -> Dict[str, Any]:
+        """Retrieves official EU AI Act (Articles 50 & 53) Compliance Passport and Audit Evaluation."""
+        addr = agent_address or self.client_address or "0x0000000000000000000000000000000000000000"
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.get(f"/api/v1/compliance/passport/{addr}")
+            resp.raise_for_status()
+            return resp.json()
+        else:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(f"{self.gate_url}/api/v1/compliance/passport/{addr}")
+                resp.raise_for_status()
+                return resp.json()
+
 
 def gate_inspect(
     client: Optional[SecurityGateClient] = None,

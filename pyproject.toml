@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-security-gate-x402"
-version = "1.1.0"
+version = "1.2.1"
 description = "Ultra-low latency (<10ms) deterministic security, prompt injection, secret leak, dangerous AST, and factual hallucination inspection micro-oracle for autonomous agents on Polygon, Base, and Arbitrum."
 readme = "README.md"
 requires-python = ">=3.10"
