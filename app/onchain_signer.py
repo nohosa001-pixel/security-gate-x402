@@ -122,3 +122,91 @@ class OnchainSecuritySigner:
 
 
 onchain_signer = OnchainSecuritySigner()
+ORACLE_ACCOUNT = onchain_signer.account
+
+
+def generate_eip712_attestation(
+    agent_output: str,
+    risk_score: float,
+    verdict: str,
+    chain_id: int = 137,
+    validity_seconds: int = 300,
+    verifying_contract: str = "0x0000000000000000000000000000000000000000"
+) -> Dict[str, Any]:
+    """Generates an EIP-712 security attestation dict using the active signer."""
+    sig_res = onchain_signer.generate_eip712_signature(
+        action_payload=agent_output,
+        risk_score=risk_score,
+        verdict=verdict,
+        chain_id=chain_id,
+        validity_seconds=validity_seconds,
+        verifying_contract=verifying_contract
+    )
+    return {
+        "status": "attested",
+        "payload_hash": sig_res["action_payload_hash"],
+        "risk_score": int(round(risk_score * 100)),
+        "verdict": verdict,
+        "expires_at": sig_res["expires_at"],
+        "chain_id": chain_id,
+        "oracle_signer": sig_res["signer_address"],
+        "v": sig_res["v"],
+        "r": sig_res["r"],
+        "s": sig_res["s"],
+        "signature": f"{sig_res['r']}{sig_res['s'][2:]}{sig_res['v']:02x}",
+        "abi_calldata": sig_res["abi_calldata"]
+    }
+
+
+def verify_attestation_signature(
+    attestation: Dict[str, Any],
+    chain_id: int = 137,
+    verifying_contract: str = "0x0000000000000000000000000000000000000000"
+) -> bool:
+    """Verifies that an attestation was signed by the valid Oracle account."""
+    try:
+        domain_data = {
+            "name": "AgentSecurityGateOracle",
+            "version": "1.0.0",
+            "chainId": chain_id,
+            "verifyingContract": verifying_contract
+        }
+        types = {
+            "EIP712Domain": [
+                {"name": "name", "type": "string"},
+                {"name": "version", "type": "string"},
+                {"name": "chainId", "type": "uint256"},
+                {"name": "verifyingContract", "type": "address"}
+            ],
+            "SecurityAttestation": [
+                {"name": "payloadHash", "type": "bytes32"},
+                {"name": "riskScore", "type": "uint8"},
+                {"name": "verdict", "type": "string"},
+                {"name": "expiresAt", "type": "uint256"}
+            ]
+        }
+        message_data = {
+            "payloadHash": bytes.fromhex(attestation["payload_hash"][2:]),
+            "riskScore": int(attestation["risk_score"]),
+            "verdict": attestation["verdict"],
+            "expiresAt": int(attestation["expires_at"])
+        }
+        structured_data = {
+            "types": types,
+            "primaryType": "SecurityAttestation",
+            "domain": domain_data,
+            "message": message_data
+        }
+        signable_msg = encode_typed_data(full_message=structured_data)
+        
+        # Reconstruct signature bytes (r: 32, s: 32, v: 1)
+        r_bytes = bytes.fromhex(attestation["r"][2:])
+        s_bytes = bytes.fromhex(attestation["s"][2:])
+        v_byte = bytes([attestation["v"]])
+        sig_bytes = r_bytes + s_bytes + v_byte
+
+        recovered_address = Account.recover_message(signable_msg, signature=sig_bytes)
+        return recovered_address.lower() == onchain_signer.signer_address.lower()
+    except Exception:
+        return False
+
