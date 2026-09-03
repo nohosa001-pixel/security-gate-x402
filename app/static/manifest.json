@@ -1,0 +1,13 @@
+{
+  "name": "Agent Security Gate x402",
+  "description": "Autonomous AI Agent Treasury Defense & FICO Credit Rating Oracle for Gnosis Safe{Wallet}. Enforces cryptographic Proof-of-Safety on agent transactions.",
+  "iconPath": "safe-icon.svg",
+  "appUrl": "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+  "chains": [137, 8453, 42161, 1],
+  "tags": ["security", "ai-agents", "oracle", "guard", "defi"],
+  "category": "security",
+  "developer": {
+    "name": "Security Gate Team",
+    "url": "https://github.com/nohosa001-pixel/security-gate-x402"
+  }
+}

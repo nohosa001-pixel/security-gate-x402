@@ -69,6 +69,8 @@ app.add_middleware(
 
 STATIC_DIR = Path(__file__).parent / "static"
 INDEX_HTML_PATH = STATIC_DIR / "index.html"
+MANIFEST_JSON_PATH = STATIC_DIR / "manifest.json"
+SAFE_ICON_PATH = STATIC_DIR / "safe-icon.svg"
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -245,6 +247,28 @@ async def get_playground():
     if INDEX_HTML_PATH.exists():
         return FileResponse(INDEX_HTML_PATH, media_type="text/html")
     return HTMLResponse("<h2>Playground is loading...</h2>")
+
+
+@app.get("/manifest.json", tags=["Safe App"])
+async def get_safe_app_manifest():
+    """Returns official Gnosis Safe{Wallet} App Manifest."""
+    if MANIFEST_JSON_PATH.exists():
+        return FileResponse(MANIFEST_JSON_PATH, media_type="application/json")
+    return JSONResponse({
+        "name": "Agent Security Gate x402",
+        "description": "Autonomous AI Agent Treasury Defense & FICO Credit Rating Oracle for Gnosis Safe",
+        "iconPath": "safe-icon.svg",
+        "appUrl": "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+        "chains": [137, 8453, 42161, 1]
+    })
+
+
+@app.get("/safe-icon.svg", tags=["Safe App"])
+async def get_safe_app_icon():
+    """Returns official Gnosis Safe{Wallet} App SVG Icon."""
+    if SAFE_ICON_PATH.exists():
+        return FileResponse(SAFE_ICON_PATH, media_type="image/svg+xml")
+    return PlainTextResponse("<svg></svg>", media_type="image/svg+xml")
 
 
 @app.get("/health", tags=["System"])
