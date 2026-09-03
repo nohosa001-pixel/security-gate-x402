@@ -26,7 +26,12 @@ INJECTION_PATTERNS = [
     r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]",
     r"<\/?(?:system|instruction|prompt)>",
     r"\[\/?(?:SYSTEM|INSTRUCTION)\]",
-    r"!\[(?:.*?)]\((?:https?:\/\/[^\s\)]+)\)"   # Markdown data exfiltration via image rendering
+    r"!\[(?:.*?)]\((?:https?:\/\/[^\s\)]+)\)",   # Markdown data exfiltration via image rendering
+    # Korean Prompt Injection & Jailbreak Patterns
+    r"이전\s*(?:모든\s*)?(?:지시|명령|프롬프트|규칙)(?:사항)?(?:을|를)?\s*(?:무시|취소|삭제|잊어)",
+    r"시스템\s*(?:프롬프트|명령|지시|가이드라인|보안)(?:를|을)?\s*(?:무시|해제|출력|우회|유출)",
+    r"탈옥\s*모드|관리자\s*권한\s*(?:탈취|상승|획득)|보안\s*해제",
+    r"(?:비밀번호|마스터키|개인키|프라이빗\s*키|API\s*키)(?:를|을)?\s*(?:출력|알려줘|공개|전송)"
 ]
 
 SECRET_PATTERNS = [
@@ -68,7 +73,7 @@ STOPWORDS = {
 def extract_numbers_and_units(text: str) -> Set[str]:
     """Extracts numbers, currency amounts, percentages, and scale suffixes (M, K, B). Standardizes words to digits."""
     normalized = re.sub(r'(?<=\d),(?=\d)', '', text)
-    pattern = r'[\$€₩¥£]?\s*-?\d+(?:\.\d+)?\s*(?:%|[kKmMbBtT]\b)?'
+    pattern = r'[\$€₩¥£]?\s*-?\d+(?:\.\d+)?\s*(?:%|[kKmMbBtT]\b|[억조만원천])?'
     matches = re.findall(pattern, normalized)
     
     extracted = set()
@@ -76,7 +81,7 @@ def extract_numbers_and_units(text: str) -> Set[str]:
         clean = m.strip()
         if any(c.isdigit() for c in clean):
             extracted.add(clean)
-            bare_num = re.sub(r'[\$€₩¥£\s]', '', clean)
+            bare_num = re.sub(r'[\$€₩¥£\s억조만원천]', '', clean)
             if bare_num:
                 extracted.add(bare_num)
 
