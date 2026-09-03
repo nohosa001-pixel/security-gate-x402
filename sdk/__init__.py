@@ -6,11 +6,17 @@ from .agent_gate_sdk import (
     gate_inspect,
     verify_attestation
 )
+from .integrations import (
+    SecurityGateCallbackHandler,
+    SecurityGateTool
+)
 
 __all__ = [
     "SecurityGateClient",
     "SecurityGateBlockedError",
     "PaymentRequired402Error",
     "gate_inspect",
-    "verify_attestation"
+    "verify_attestation",
+    "SecurityGateCallbackHandler",
+    "SecurityGateTool"
 ]

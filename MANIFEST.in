@@ -7,3 +7,4 @@ recursive-include .well-known *
 recursive-include app/static *
 recursive-include contracts *
 recursive-include sdk *
+global-exclude *.py[cod] __pycache__ *.so

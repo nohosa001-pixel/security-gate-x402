@@ -1,0 +1,17 @@
+# Smithery.ai MCP Server Configuration for Agent Security Gate x402
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      gateUrl:
+        type: string
+        description: "Agent Security Gate Base URL or local gateway"
+        default: "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"
+      vaultKey:
+        type: string
+        description: "Optional pre-funded Agent Payment Vault session key for unlimited M2M throughput"
+  commandFunction:
+    python:
+      - "-m"
+      - "mcp_server"
