@@ -92,6 +92,20 @@ TOOLS = [
             },
             "required": ["action_payload"]
         }
+    },
+    {
+        "name": "get_agent_credit_rating",
+        "description": "Retrieve the dynamic FICO-style credit score (300-850), investment grade (AAA-D), and uncollateralized lending capacity for an autonomous AI agent.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_address": {
+                    "type": "string",
+                    "description": "EVM wallet address of the autonomous agent to query."
+                }
+            },
+            "required": ["agent_address"]
+        }
     }
 ]
 
@@ -202,6 +216,23 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         {
                             "type": "text",
                             "text": json.dumps(sig, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "get_agent_credit_rating":
+            from app.credit_rating_engine import credit_engine
+            agent_addr = tool_args.get("agent_address", "")
+            credit_data = credit_engine.compute_credit_score(agent_addr)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(credit_data, indent=2, ensure_ascii=False)
                         }
                     ]
                 }

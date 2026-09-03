@@ -41,6 +41,7 @@ from app.vault_manager import vault_manager
 from app.enterprise_manager import enterprise_manager
 from app.onchain_signer import onchain_signer
 from app.multi_chain import list_all_chains, get_chain_info
+from app.credit_rating_engine import credit_engine
 
 app = FastAPI(
     title="Agent Security & Hallucination Gate (x402)",
@@ -349,6 +350,20 @@ async def inspect_payload(
     if len(_recent_audit_events) > MAX_RECENT_EVENTS:
         _recent_audit_events.pop(0)
 
+    # 5. Record telemetry for agent credit rating oracle
+    agent_addr = None
+    if isinstance(payer_info, str) and payer_info.startswith("0x"):
+        agent_addr = payer_info
+    else:
+        hdr_addr = request.headers.get("x-client-address")
+        if hdr_addr and hdr_addr.startswith("0x"):
+            agent_addr = hdr_addr
+        elif getattr(req, "client_address", None) and str(getattr(req, "client_address")).startswith("0x"):
+            agent_addr = str(getattr(req, "client_address"))
+    if agent_addr:
+        is_hal = audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False
+        credit_engine.record_audit(agent_addr, audit.verdict, is_hal)
+
     response_data = InspectionResponse(
         status="success",
         timestamp=issued_at,
@@ -490,6 +505,30 @@ async def get_onchain_security_attestation(
     )
 
     return OnChainAttestationResponse(**signed_payload)
+
+
+# --- Agent Credit Rating Agency Oracle Endpoints ---
+
+@app.get("/api/v1/credit/{agent_address}", tags=["Credit Oracle"])
+async def get_agent_credit_rating(agent_address: str):
+    """
+    Returns the dynamic institutional credit rating (FICO 300-850), grade (AAA-D),
+    and uncollateralized loan capacity for an autonomous AI agent.
+    """
+    return credit_engine.compute_credit_score(agent_address)
+
+
+@app.post("/api/v1/credit/attestation", tags=["Credit Oracle"])
+async def create_credit_attestation(req: Dict[str, Any]):
+    """
+    Issues an on-chain verifiable EIP-712 Credit Certificate for smart contracts and DeFi lenders.
+    """
+    agent_address = req.get("agent_address")
+    if not agent_address:
+        raise HTTPException(status_code=400, detail="Missing 'agent_address'")
+    chain_id = req.get("chain_id", 137)
+    validity_seconds = req.get("validity_seconds", 3600)
+    return credit_engine.generate_credit_certificate(agent_address, chain_id, validity_seconds)
 
 
 # --- Vault Endpoints ---

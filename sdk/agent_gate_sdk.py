@@ -241,6 +241,37 @@ class SecurityGateClient:
 
         return data
 
+    def get_credit_rating(self, agent_address: Optional[str] = None) -> Dict[str, Any]:
+        """Queries the agent's institutional credit score (300-850), grade (AAA-D), and loan capacity."""
+        addr = agent_address or self.client_address or "0x0000000000000000000000000000000000000000"
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.get(f"/api/v1/credit/{addr}")
+            resp.raise_for_status()
+            return resp.json()
+        else:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(f"{self.gate_url}/api/v1/credit/{addr}")
+                resp.raise_for_status()
+                return resp.json()
+
+    def get_credit_attestation(self, agent_address: Optional[str] = None, chain_id: int = 137) -> Dict[str, Any]:
+        """Issues an on-chain EIP-712 Credit Certificate for smart contracts and DeFi lenders."""
+        addr = agent_address or self.client_address or "0x0000000000000000000000000000000000000000"
+        payload = {"agent_address": addr, "chain_id": chain_id}
+        if self.app:
+            from fastapi.testclient import TestClient
+            tc = TestClient(self.app)
+            resp = tc.post("/api/v1/credit/attestation", json=payload)
+            resp.raise_for_status()
+            return resp.json()
+        else:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.post(f"{self.gate_url}/api/v1/credit/attestation", json=payload)
+                resp.raise_for_status()
+                return resp.json()
+
 
 def gate_inspect(
     client: Optional[SecurityGateClient] = None,
