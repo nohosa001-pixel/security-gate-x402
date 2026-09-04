@@ -40,6 +40,8 @@ from app.schemas import (
     InsuranceClaimRequest,
     FactoringQuoteRequest,
     FactoringSettleRequest,
+    StrategyAuthRequest,
+    PerformanceSplitRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
@@ -785,6 +787,33 @@ async def settle_factored_invoice(req: FactoringSettleRequest):
         invoice_id=req.invoice_id,
         agent_address=req.agent_address,
         amount_settled=req.amount_settled
+    )
+
+
+# --- Treasury Vault & Hedge Fund Endpoints ---
+
+@app.post("/api/v1/treasury/authorize", tags=["Treasury"])
+async def authorize_treasury_strategy(req: StrategyAuthRequest):
+    """Audits an AI fund manager strategy and issues EIP-712 TradeAuthorization for AgentTreasuryVault.sol."""
+    from app.asset_management_engine import asset_management_engine
+    return asset_management_engine.authorize_trade_strategy(
+        strategy_id=req.strategy_id,
+        agent_address=req.agent_address,
+        target_protocol=req.target_protocol,
+        max_allocation_usdc=req.max_allocation_usdc,
+        max_slippage_bps=req.max_slippage_bps,
+        strategy_rationale=req.strategy_rationale,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/treasury/performance-split", tags=["Treasury"])
+async def calculate_treasury_performance_split(req: PerformanceSplitRequest):
+    """Calculates 15% AI manager fee, 5% Oracle guard fee, and 80% net investor profit."""
+    from app.asset_management_engine import asset_management_engine
+    return asset_management_engine.calculate_performance_split(
+        gross_profit_usdc=req.gross_profit_usdc
     )
 
 
