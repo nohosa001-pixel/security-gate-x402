@@ -36,6 +36,8 @@ from app.schemas import (
     MCPToolCallResponse,
     EscrowAuditRequest,
     LoanQuoteRequest,
+    InsuranceQuoteRequest,
+    InsuranceClaimRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
@@ -722,6 +724,37 @@ async def get_loan_quote(req: LoanQuoteRequest):
         requested_amount_usdc=req.requested_amount_usdc,
         duration_days=req.duration_days,
         chain_id=req.chain_id
+    )
+
+
+# --- Insurance Pool Endpoints ---
+
+@app.post("/api/v1/insurance/quote", tags=["Insurance"])
+async def get_insurance_quote(req: InsuranceQuoteRequest):
+    """Calculates actuarial premium quote and issues EIP-712 PolicyQuote for AgentInsurancePool.sol."""
+    from app.insurance_engine import insurance_engine
+    return insurance_engine.get_policy_quote(
+        agent_address=req.agent_address,
+        beneficiary_address=req.beneficiary_address,
+        coverage_amount_usdc=req.coverage_amount_usdc,
+        duration_days=req.duration_days,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/insurance/claim", tags=["Insurance"])
+async def adjudicate_insurance_claim(req: InsuranceClaimRequest):
+    """Adjudicates incident claim and issues EIP-712 ClaimAttestation for instant indemnity payout from AgentInsurancePool.sol."""
+    from app.insurance_engine import insurance_engine
+    return insurance_engine.adjudicate_claim(
+        policy_id=req.policy_id,
+        agent_address=req.agent_address,
+        claimant_address=req.claimant_address,
+        claim_amount_usdc=req.claim_amount_usdc,
+        incident_description=req.incident_description,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
     )
 
 

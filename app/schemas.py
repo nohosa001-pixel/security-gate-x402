@@ -233,3 +233,24 @@ class LoanQuoteRequest(BaseModel):
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
 
 
+# --- Insurance Pool Schemas ---
+
+class InsuranceQuoteRequest(BaseModel):
+    agent_address: str = Field(..., description="EVM wallet address of the insured agent", examples=["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"])
+    beneficiary_address: str = Field(..., description="EVM address of policy beneficiary/client", examples=["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"])
+    coverage_amount_usdc: float = Field(..., description="Requested liability coverage amount in USDC", examples=[500.0])
+    duration_days: int = Field(30, description="Insurance policy duration in days", examples=[30])
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentInsurancePool contract address")
+
+
+class InsuranceClaimRequest(BaseModel):
+    policy_id: int = Field(..., description="Insurance policy ID", examples=[1])
+    agent_address: str = Field(..., description="Faulty agent EVM address", examples=["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"])
+    claimant_address: str = Field(..., description="Claimant / beneficiary EVM address", examples=["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"])
+    claim_amount_usdc: float = Field(..., description="Requested indemnity compensation in USDC", examples=[100.0])
+    incident_description: str = Field(..., description="Description of the failure, hallucination, or exploit incident")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentInsurancePool contract address")
+
+
