@@ -38,6 +38,8 @@ from app.schemas import (
     LoanQuoteRequest,
     InsuranceQuoteRequest,
     InsuranceClaimRequest,
+    FactoringQuoteRequest,
+    FactoringSettleRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
@@ -755,6 +757,34 @@ async def adjudicate_insurance_claim(req: InsuranceClaimRequest):
         incident_description=req.incident_description,
         chain_id=req.chain_id,
         verifying_contract=req.verifying_contract
+    )
+
+
+# --- Factoring Pool Endpoints ---
+
+@app.post("/api/v1/factoring/quote", tags=["Factoring"])
+async def get_factoring_quote(req: FactoringQuoteRequest):
+    """Calculates receivables discount quote and issues EIP-712 FactoringAttestation for AgentFactoringPool.sol."""
+    from app.factoring_engine import factoring_engine
+    return factoring_engine.get_factoring_quote(
+        invoice_id=req.invoice_id,
+        escrow_job_id=req.escrow_job_id,
+        agent_address=req.agent_address,
+        face_value_usdc=req.face_value_usdc,
+        duration_days=req.duration_days,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/factoring/settle", tags=["Factoring"])
+async def settle_factored_invoice(req: FactoringSettleRequest):
+    """Records full invoice settlement from escrow and rewards agent's on-chain credit score."""
+    from app.factoring_engine import factoring_engine
+    return factoring_engine.record_settlement(
+        invoice_id=req.invoice_id,
+        agent_address=req.agent_address,
+        amount_settled=req.amount_settled
     )
 
 

@@ -53,6 +53,9 @@ def test_insurance_quote_unproven_agent():
     risky_agent = "0x8888888888888888888888888888888888888888"
     beneficiary = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
 
+    for _ in range(3):
+        credit_engine.record_audit(risky_agent, verdict="BLOCKED", hallucination_detected=True)
+
     quote = insurance_engine.get_policy_quote(
         agent_address=risky_agent,
         beneficiary_address=beneficiary,

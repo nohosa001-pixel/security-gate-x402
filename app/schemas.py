@@ -254,3 +254,21 @@ class InsuranceClaimRequest(BaseModel):
     verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentInsurancePool contract address")
 
 
+# --- Factoring Pool Schemas ---
+
+class FactoringQuoteRequest(BaseModel):
+    invoice_id: int = Field(..., description="Invoice / Receivable ID", examples=[101])
+    escrow_job_id: int = Field(..., description="Associated AgentEscrow Job ID", examples=[99])
+    agent_address: str = Field(..., description="EVM address of the receivable holder agent", examples=["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"])
+    face_value_usdc: float = Field(..., description="Face value of the receivable due at milestone", examples=[100.0])
+    duration_days: int = Field(30, description="Days remaining until maturity / milestone payment", examples=[14, 30, 60])
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentFactoringPool contract address")
+
+
+class FactoringSettleRequest(BaseModel):
+    invoice_id: int = Field(..., description="Invoice / Receivable ID to settle", examples=[101])
+    agent_address: str = Field(..., description="EVM address of the receivable holder agent", examples=["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"])
+    amount_settled: float = Field(..., description="Full face value amount paid into factoring pool", examples=[100.0])
+
+
