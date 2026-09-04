@@ -1,39 +1,48 @@
-{
-  "$schema": "https://glama.ai/mcp/schemas/server.json",
-  "name": "agent-security-gate-x402",
-  "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, AST dangerous code, and factual hallucination micro-oracle with EIP-191/EIP-712 cryptographic attestation.",
-  "homepage": "https://github.com/nohosa001-pixel/security-gate-x402",
-  "maintainers": [
-    "nohosa001-pixel"
-  ],
-  "tags": [
-    "security",
-    "guardrails",
-    "hallucination",
-    "x402",
-    "attestation",
-    "polygon",
-    "ai-agents",
-    "mcp",
-    "fastapi"
-  ],
-  "license": "MIT",
-  "tools": [
-    {
-      "name": "inspect_security_and_hallucinations",
-      "description": "Comprehensive security and NLI hallucination inspection for agent outputs against ground truth context with EIP-191 cryptographic attestation."
-    },
-    {
-      "name": "verify_agent_output",
-      "description": "High-speed (<5ms) deterministic prompt injection, jailbreak, and secret leak scanner for autonomous agent actions."
-    },
-    {
-      "name": "inspect_code_ast_safety",
-      "description": "Deterministic Python AST parser scanning for hazardous calls (subprocess, os.system, eval, exec, socket, token leakage)."
-    },
-    {
-      "name": "get_onchain_security_attestation",
-      "description": "Generate EIP-712 cryptographic signatures and Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails."
-    }
-  ]
+﻿{
+  ": https://glama.ai/mcp/schemas/server.json,
+ name: agent-security-gate-x402,
+ description: Ultra-low latency (<10ms) zero-trust security gate, prompt injection defense, secret key leak guard, AST code safety, AI agent credit rating, and EU AI Act compliance oracle with EIP-191/712 cryptographic attestations.,
+ homepage: https://github.com/nohosa001-pixel/security-gate-x402,
+ maintainers: [
+ nohosa001-pixel
+ ],
+ tags: [
+ security,
+ guardrails,
+ hallucination,
+ x402,
+ attestation,
+ polygon,
+ ai-agents,
+ mcp,
+ credit-rating,
+ eu-ai-act
+ ],
+ license: MIT,
+ tools: [
+ {
+ name: inspect_security_and_hallucinations,
+ description: Comprehensive security and NLI hallucination inspection for agent outputs against trusted ground truth context. Evaluates prompt injections, secret leaks, and factual consistency. Returns structured audit report with risk score (0.0 to 1.0), verdict (SAFE/UNSAFE), and EIP-191 cryptographic attestation signature. Usage Guidelines: Use this tool to verify factual integrity and safety before dispatching agent outputs to users or smart contracts.
+ },
+ {
+ name: verify_agent_output,
+ description: High-speed (<5ms) deterministic prompt injection, jailbreak, and private key/API secret leak scanner for autonomous agent actions. Returns structured JSON with boolean is_safe flag, matched threat patterns, and severity level. Usage Guidelines: Use for ultra-fast, pre-flight safety screening of prompts and intermediate model responses.
+ },
+ {
+ name: inspect_code_ast_safety,
+ description: Deterministic Python Abstract Syntax Tree (AST) parser scanning for hazardous calls (subprocess, os.system, eval, exec, socket, token leakage). Returns detailed safety audit detailing prohibited imports and syntax violations. Usage Guidelines: Use before executing LLM-generated code in sandboxes or runtime environments.
+ },
+ {
+ name: get_onchain_security_attestation,
+ description: Generate EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails on Polygon. Returns attestation hash, round ID, and signature components. Usage Guidelines: Use when EVM smart contracts require cryptographic proof of safety before executing on-chain transactions.
+ },
+ {
+ name: get_agent_credit_rating,
+ description: Retrieve dynamic FICO-style credit score (300-850), investment grade (AAA-D), and uncollateralized lending capacity for an autonomous AI agent based on on-chain history and performance. Returns comprehensive credit score, risk tier, and debt ceiling. Usage Guidelines: Use in agent-to-agent lending, DeFi undercollateralized loans, or autonomous financial interactions.
+ },
+ {
+ name: get_eu_ai_act_compliance_passport,
+ description: Retrieve the official EU AI Act (Regulation EU 2024/1689 Articles 50 & 53) Compliance Passport & Audit Evaluation for an autonomous AI agent. Returns compliance status, transparency checklist, and regulatory attestation hash. Usage Guidelines: Use to certify AI agent governance and regulatory compliance across European jurisdictions.
+ }
+ ]
 }
