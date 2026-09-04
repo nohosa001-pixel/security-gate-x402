@@ -211,3 +211,15 @@ class MCPToolCallRequest(BaseModel):
 class MCPToolCallResponse(BaseModel):
     content: List[Dict[str, Any]] = Field(default_factory=list, description="MCP content array")
     isError: bool = Field(default=False, description="Whether execution resulted in an error")
+
+
+# --- Escrow & Slashing Schemas ---
+
+class EscrowAuditRequest(BaseModel):
+    job_id: int = Field(..., description="Escrow task job ID", examples=[1])
+    deliverable: str = Field(..., description="Deliverable text or code from worker agent", examples=["Data analysis complete with 100% accuracy"])
+    ground_truth_spec: Optional[str] = Field(None, description="Original job requirement spec to verify factual accuracy", examples=["Analyze revenue ledger for Q3."])
+    is_code: bool = Field(False, description="Whether deliverable is executable code")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentEscrow contract address")
+

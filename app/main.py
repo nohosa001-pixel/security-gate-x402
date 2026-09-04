@@ -34,6 +34,7 @@ from app.schemas import (
     MultiChainInfo,
     MCPToolCallRequest,
     MCPToolCallResponse,
+    EscrowAuditRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
@@ -690,6 +691,23 @@ async def get_chain_details(chain_id: int):
 async def get_recent_events():
     """Returns recent inspection audit events for monitoring dashboards."""
     return {"status": "success", "events": list(_recent_audit_events)}
+
+
+# --- Agent Escrow & Slashing Endpoints ---
+
+@app.post("/api/v1/escrow/audit", tags=["Escrow"])
+async def audit_escrow_task(req: EscrowAuditRequest):
+    """Audits an agent task deliverable and issues an EIP-712 attestation for AgentEscrow.sol."""
+    from app.escrow_engine import escrow_engine
+    result = escrow_engine.evaluate_deliverable(
+        job_id=req.job_id,
+        deliverable=req.deliverable,
+        ground_truth_spec=req.ground_truth_spec,
+        is_code=req.is_code,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+    return result
 
 
 # --- MCP Tool Call Endpoints ---
