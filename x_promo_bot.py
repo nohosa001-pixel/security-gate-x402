@@ -27,7 +27,7 @@ DASHBOARD_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashbo
 PLAYGROUND_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground"
 PYPI_URL = "https://pypi.org/project/agent-security-gate-x402/"
 GITHUB_URL = "https://github.com/nohosa001-pixel/security-gate-x402"
-GLAMA_URL = "https://glama.ai/mcp/servers/nohosa001-pixel/agent-security-gate-x402"
+GLAMA_URL = "https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402"
 
 # X API Credentials (from .env)
 X_API_KEY = os.getenv("X_API_KEY", "")

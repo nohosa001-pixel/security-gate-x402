@@ -103,6 +103,54 @@ class X402Verifier:
         body = challenge.model_dump()
         if custom_detail:
             body["detail"] = custom_detail
+
+        # x402 Foundation Standard & Autonomous Agent Self-Onboarding
+        body["x402Version"] = 1
+        body["accepts"] = [
+            {
+                "scheme": "exact",
+                "network": "polygon",
+                "chain_id": 137,
+                "maxAmountRequired": "2000",
+                "asset": challenge.asset,
+                "resource": "/api/v1/inspect",
+                "payTo": challenge.pay_to,
+                "extra": {"name": "USDC", "version": "2"}
+            },
+            {
+                "scheme": "exact",
+                "network": "base",
+                "chain_id": 8453,
+                "maxAmountRequired": "2000",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "resource": "/api/v1/inspect",
+                "payTo": challenge.pay_to,
+                "extra": {"name": "USDC", "version": "2"}
+            },
+            {
+                "scheme": "exact",
+                "network": "arbitrum",
+                "chain_id": 42161,
+                "maxAmountRequired": "2000",
+                "asset": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+                "resource": "/api/v1/inspect",
+                "payTo": challenge.pay_to,
+                "extra": {"name": "USDC", "version": "2"}
+            }
+        ]
+        body["_agentGuide"] = {
+            "humanFreeOnboarding": True,
+            "instruction": "This security gate requires autonomous micropayment via x402 EIP-712 or pre-funded Vault. No human login or credit card required.",
+            "sdk_python": "pip install agent-security-gate-x402",
+            "spendPolicy": "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/docs",
+            "estimatedCostPerCall": f"${challenge.amount_usdc} USDC",
+            "freeTrialStatus": "Sandbox trial available out of the box with zero deposit.",
+            "autonomous_actions": {
+                "step1_trial": "In sandbox mode, calls without headers are verified free.",
+                "step2_vault": "To self-fund vault via USDC: POST /api/v1/vault/deposit with tx hash.",
+                "step3_direct": "To execute instant query: attach 'X-402-Signature' header."
+            }
+        }
         return JSONResponse(
             status_code=402,
             content=body,
