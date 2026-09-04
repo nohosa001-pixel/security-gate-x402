@@ -18,12 +18,17 @@ class OnchainSecuritySigner:
 
     def __init__(self):
         # Master private key for gate oracle signer
-        self.private_key = os.getenv(
+        raw_key = os.getenv(
             "GATE_PRIVATE_KEY",
-            os.getenv("SERVER_PRIVATE_KEY", "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d")
+            os.getenv("DEPLOYER_PRIVATE_KEY", os.getenv("SERVER_PRIVATE_KEY", "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"))
         )
-        if not self.private_key.startswith("0x"):
-            self.private_key = "0x" + self.private_key
+        if raw_key:
+            raw_key = raw_key.strip().strip('"').strip("'")
+            if not raw_key.startswith("0x"):
+                raw_key = "0x" + raw_key
+            self.private_key = raw_key
+        else:
+            self.private_key = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
 
         try:
             self.account = Account.from_key(self.private_key)
