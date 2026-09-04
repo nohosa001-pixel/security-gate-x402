@@ -223,3 +223,13 @@ class EscrowAuditRequest(BaseModel):
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
     verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentEscrow contract address")
 
+
+# --- Lending Pool Schemas ---
+
+class LoanQuoteRequest(BaseModel):
+    agent_address: str = Field(..., description="EVM wallet address of the borrower agent", examples=["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"])
+    requested_amount_usdc: float = Field(..., description="Requested uncollateralized loan amount in USDC", examples=[50.0])
+    duration_days: int = Field(30, description="Loan duration in days", examples=[14, 30, 60])
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+
+

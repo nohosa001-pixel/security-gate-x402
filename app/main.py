@@ -35,6 +35,7 @@ from app.schemas import (
     MCPToolCallRequest,
     MCPToolCallResponse,
     EscrowAuditRequest,
+    LoanQuoteRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
@@ -708,6 +709,20 @@ async def audit_escrow_task(req: EscrowAuditRequest):
         verifying_contract=req.verifying_contract
     )
     return result
+
+
+# --- Lending Pool Endpoints ---
+
+@app.post("/api/v1/lending/quote", tags=["Lending"])
+async def get_loan_quote(req: LoanQuoteRequest):
+    """Calculates loan quote and issues EIP-712 credit certificate for AgentLendingPool.sol."""
+    from app.lending_engine import lending_engine
+    return lending_engine.get_loan_quote(
+        agent_address=req.agent_address,
+        requested_amount_usdc=req.requested_amount_usdc,
+        duration_days=req.duration_days,
+        chain_id=req.chain_id
+    )
 
 
 # --- MCP Tool Call Endpoints ---
