@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 
 from fastapi import FastAPI, Request, Depends, HTTPException, status, Query, Path as FPath
-from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -79,6 +79,8 @@ STATIC_DIR = Path(__file__).parent / "static"
 INDEX_HTML_PATH = STATIC_DIR / "index.html"
 MANIFEST_JSON_PATH = STATIC_DIR / "manifest.json"
 SAFE_ICON_PATH = STATIC_DIR / "safe-icon.svg"
+ROBOTS_TXT_PATH = STATIC_DIR / "robots.txt"
+SITEMAP_XML_PATH = STATIC_DIR / "sitemap.xml"
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -242,7 +244,9 @@ async def root(request: Request):
             "recent_audit_events": "/api/v1/gate/events/recent",
             "ap2_manifest": "/.well-known/ap2",
             "mcp_tools": "/mcp/tools",
-            "llms_manifest": "/llms.txt"
+            "llms_manifest": "/llms.txt",
+            "robots_txt": "/robots.txt",
+            "sitemap_xml": "/sitemap.xml"
         }
     }
 
@@ -328,6 +332,23 @@ async def get_ap2_manifest():
         with open(AP2_FILE_PATH, "r", encoding="utf-8") as f:
             return JSONResponse(content=json.load(f))
     return JSONResponse({"error": "AP2 manifest not configured"}, status_code=404)
+
+
+@app.get("/robots.txt", tags=["SEO"])
+async def get_robots_txt():
+    if ROBOTS_TXT_PATH.exists():
+        return PlainTextResponse(ROBOTS_TXT_PATH.read_text(encoding="utf-8"))
+    return PlainTextResponse("User-agent: *\nAllow: /\nSitemap: https://eudragent.com/sitemap.xml\n")
+
+
+@app.get("/sitemap.xml", tags=["SEO"])
+async def get_sitemap_xml():
+    if SITEMAP_XML_PATH.exists():
+        return Response(content=SITEMAP_XML_PATH.read_text(encoding="utf-8"), media_type="application/xml")
+    return Response(
+        content='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://eudragent.com/</loc></url></urlset>',
+        media_type="application/xml"
+    )
 
 
 # --- Core Inspection Endpoints ---
