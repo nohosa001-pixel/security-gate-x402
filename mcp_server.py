@@ -16,8 +16,8 @@ from app.onchain_signer import onchain_signer
 
 MCP_SERVER_INFO = {
     "name": "agent-security-gate-x402",
-    "version": "1.1.0",
-    "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, and factual hallucination micro-oracle with EIP-191/EIP-712 cryptographic attestation."
+    "version": "1.2.2",
+    "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, factual hallucination inspection micro-oracle, uncollateralized lending, and malpractice insurance for autonomous agents with EIP-191/EIP-712 attestations."
 }
 
 TOOLS = [
@@ -153,6 +153,68 @@ TOOLS = [
                 }
             },
             "required": ["agent_address"]
+        }
+    },
+    {
+        "name": "quote_agent_insurance",
+        "description": "Calculates actuarial underwriting premium and issues a cryptographically signed EIP-712 PolicyQuote for autonomous AI agent malpractice, prompt injection, and operational liability insurance. Use this tool ONLY when an AI agent or its operator seeks liability/malpractice coverage against prompt injection losses, hallucination damage, or smart contract execution errors. Do NOT use this tool for evaluating general loan capacity; use `get_agent_loan_quote` instead. Do NOT use this tool for off-chain text auditing; use `inspect_agent_output` instead.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_address": {
+                    "type": "string",
+                    "description": "Checksummed EVM wallet address (0x...) of the autonomous AI agent seeking insurance coverage.",
+                    "default": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                    "examples": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x71C637024457bb52792e55106d80a3E70d8a5944"]
+                },
+                "beneficiary_address": {
+                    "type": "string",
+                    "description": "EVM address of the client or treasury beneficiary entitled to receive insurance indemnity upon adjudicated loss.",
+                    "default": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+                    "examples": ["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"]
+                },
+                "coverage_amount_usdc": {
+                    "type": "number",
+                    "description": "Total requested USDC coverage limit in case of agent malpractice or failure.",
+                    "default": 500.0,
+                    "examples": [100.0, 500.0, 2000.0]
+                },
+                "duration_days": {
+                    "type": "integer",
+                    "description": "Policy validity period in days (e.g. 7, 30, 90).",
+                    "default": 30,
+                    "examples": [7, 30, 90]
+                }
+            },
+            "required": ["agent_address"]
+        }
+    },
+    {
+        "name": "get_agent_loan_quote",
+        "description": "Evaluates uncollateralized credit loan qualification for an autonomous AI agent and returns an EIP-712 CreditCertificate for on-chain submission to AgentLendingPool.sol on Polygon. Use this tool ONLY when an autonomous AI agent needs to borrow USDC capital uncollateralized to fund operational runway, staking deposits, or task execution. Do NOT use this tool for purchasing liability protection; use `quote_agent_insurance` instead. Do NOT use this tool for raw prompt injection scanning; use `verify_agent_output` instead.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_address": {
+                    "type": "string",
+                    "description": "Checksummed EVM wallet address (0x...) of the autonomous AI agent requesting credit.",
+                    "default": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                    "examples": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x71C637024457bb52792e55106d80a3E70d8a5944"]
+                },
+                "requested_amount_usdc": {
+                    "type": "number",
+                    "description": "Desired uncollateralized loan amount in USDC.",
+                    "default": 50.0,
+                    "examples": [20.0, 50.0, 500.0]
+                },
+                "duration_days": {
+                    "type": "integer",
+                    "description": "Loan repayment duration in days.",
+                    "default": 30,
+                    "examples": [7, 14, 30]
+                }
+            },
+            "required": ["agent_address", "requested_amount_usdc"]
         }
     }
 ]
@@ -298,6 +360,56 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         {
                             "type": "text",
                             "text": json.dumps(passport, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "quote_agent_insurance":
+            from app.insurance_engine import AgentInsuranceEngine
+            insurance_engine = AgentInsuranceEngine()
+            agent_addr = tool_args.get("agent_address", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+            beneficiary = tool_args.get("beneficiary_address", "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
+            coverage = float(tool_args.get("coverage_amount_usdc", 500.0))
+            duration = int(tool_args.get("duration_days", 30))
+            quote = insurance_engine.get_policy_quote(
+                agent_address=agent_addr,
+                beneficiary_address=beneficiary,
+                coverage_amount_usdc=coverage,
+                duration_days=duration
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(quote, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "get_agent_loan_quote":
+            from app.lending_engine import AgentLendingEngine
+            lending_engine = AgentLendingEngine()
+            agent_addr = tool_args.get("agent_address", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+            requested_amount = float(tool_args.get("requested_amount_usdc", 50.0))
+            duration = int(tool_args.get("duration_days", 30))
+            loan_quote = lending_engine.get_loan_quote(
+                agent_address=agent_addr,
+                requested_amount_usdc=requested_amount,
+                duration_days=duration
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(loan_quote, indent=2, ensure_ascii=False)
                         }
                     ]
                 }

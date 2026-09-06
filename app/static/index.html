@@ -451,7 +451,7 @@
             🟣 Polygon Mainnet: 3 Contracts Verified ↗
           </span>
         </a>
-        <a href="https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-7qxtp3324q-du.a.run.app&chain=matic" target="_blank" style="text-decoration: none;">
+        <a href="https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic" target="_blank" style="text-decoration: none;">
           <span class="badge badge-highlight">
             🏛️ Safe{Wallet} App Store Certified ↗
           </span>
@@ -611,7 +611,7 @@
         </div>
         <div style="display: flex; gap: 8px;">
           <span class="badge badge-highlight">Polygon Mainnet LIVE</span>
-          <a href="https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-7qxtp3324q-du.a.run.app&chain=matic" target="_blank" style="text-decoration: none;">
+          <a href="https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic" target="_blank" style="text-decoration: none;">
             <button class="preset-chip" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff; font-weight: bold; border: none; cursor: pointer; padding: 6px 14px;">
               🚀 Open in Safe{Wallet} App Store
             </button>
@@ -970,7 +970,7 @@ from sdk.agent_gate_sdk import SecurityGateClient, gate_inspect
 
 # 2. Initialize with your $50 pre-funded session key
 client = SecurityGateClient(
-    gate_url="https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+    gate_url="https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
     vault_key="vault_key_YOUR_DEPOSITED_SESSION_KEY"
 )
 
@@ -984,7 +984,7 @@ def run_autonomous_agent(prompt: str) -> str:
 
       http: `import httpx, asyncio
 
-GATE_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/api/v1/inspect"
+GATE_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/inspect"
 HEADERS = {"X-Vault-Key": "vault_key_YOUR_DEPOSITED_SESSION_KEY"}
 
 async def audit_agent_output(output_text: str):
@@ -1004,7 +1004,7 @@ import httpx
 class SecurityGateGuardrail:
     def __init__(self, vault_key: str):
         self.headers = {"X-Vault-Key": vault_key}
-        self.url = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/api/v1/inspect"
+        self.url = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/inspect"
 
     def parse(self, text: str) -> str:
         res = httpx.post(self.url, json={"agent_output": text}, headers=self.headers).json()

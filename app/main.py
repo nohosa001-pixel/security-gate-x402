@@ -274,7 +274,7 @@ async def get_safe_app_manifest():
         "name": "Agent Security Gate x402",
         "description": "Autonomous AI Agent Treasury Defense & FICO Credit Rating Oracle for Gnosis Safe",
         "iconPath": "safe-icon.svg",
-        "appUrl": "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+        "appUrl": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
         "chains": [137, 8453, 42161, 1]
     })
 

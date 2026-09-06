@@ -2,7 +2,7 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/agent-security-gate-x402.svg?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/agent-security-gate-x402/)
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
-[![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/)
+[![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)](https://fastapi.tiangolo.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -15,7 +15,7 @@
 
 ## 🖥️ Interactive Web Dashboard & Simulator (Live)
 
-🌐 **[https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/)**
+🌐 **[https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)**
 
 Explore the full consumer and enterprise visual interface directly in your browser:
 - 🛡️ **Prompt Injection & Jailbreak Radar**: Live testing against DAN prompts, system tag escapes, and adversarial suffixes.
@@ -30,12 +30,12 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 | Service / Endpoint | Description | URL Link |
 |---|---|---|
-| 🖥️ **Web Dashboard** | Interactive visual UI, security simulator & audit tester | [Launch Dashboard](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard) |
-| ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground) |
-| 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/inspect) |
-| 📜 **On-Chain Calldata** | EIP-712 smart contract attestation calldata endpoint | [`/api/v1/gate/attestation/onchain`](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/api/v1/gate/attestation/onchain) |
-| 📖 **Swagger API Docs** | Full interactive OpenAPI documentation | [View Swagger Docs](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/docs) |
-| 🤖 **LLM Agent Manifest** | Machine-readable tool specifications | [`/llms.txt`](https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/llms.txt) |
+| 🖥️ **Web Dashboard** | Interactive visual UI, security simulator & audit tester | [Launch Dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard) |
+| ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground) |
+| 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
+| 📜 **On-Chain Calldata** | EIP-712 smart contract attestation calldata endpoint | [`/api/v1/gate/attestation/onchain`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/gate/attestation/onchain) |
+| 📖 **Swagger API Docs** | Full interactive OpenAPI documentation | [View Swagger Docs](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs) |
+| 🤖 **LLM Agent Manifest** | Machine-readable tool specifications | [`/llms.txt`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/llms.txt) |
 
 ---
 
