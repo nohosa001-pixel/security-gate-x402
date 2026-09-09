@@ -86,11 +86,21 @@ class AuditAttestation(BaseModel):
     signature: str = Field(..., description="EIP-191 cryptographic signature from gate server")
 
 
+class AuditProof(BaseModel):
+    proof_hash: str = Field(..., description="Deterministic SHA-256 fingerprint of the audit record snapshot")
+    signature: str = Field(..., description="EIP-191 cryptographic signature from the Sheriff gate server")
+    issuer: str = Field(..., description="Gate server Ethereum address that issued this proof")
+    terms: str = Field(default="ZERO_LIABILITY_AS_IS_PROVENANCE_V1", description="Legal terms binding the inspection snapshot")
+    timestamp: int = Field(..., description="Unix epoch timestamp when audit proof was sealed")
+    audit_record: Dict[str, Any] = Field(default_factory=dict, description="Immutable snapshot of inspection metadata")
+
+
 class InspectionResponse(BaseModel):
     status: str = Field(default="success", description="Status code or status message")
     timestamp: str = Field(..., description="ISO 8601 UTC timestamp of inspection")
     audit: AuditReport = Field(..., description="Comprehensive security and hallucination audit report")
     attestation: Optional[AuditAttestation] = Field(default=None, description="Cryptographic Proof-of-Safety attestation for downstream agents and smart contracts")
+    audit_proof: Optional[AuditProof] = Field(default=None, description="Zero-Liability provenance and cryptographic audit proof")
     payment_receipt: Dict[str, Any] = Field(default_factory=dict, description="x402 payment settlement receipt on Polygon")
 
 

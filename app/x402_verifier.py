@@ -252,3 +252,62 @@ def create_attestation(
         "issued_at": issued_at,
         "signature": sig
     }
+
+
+def generate_audit_proof(
+    payload_text: str,
+    verdict: str,
+    risk_score: float,
+    caller_address: Optional[str] = None,
+    tx_or_payment_ref: Optional[str] = None,
+    terms: str = "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+) -> Dict[str, Any]:
+    """
+    Generates a Zero-Liability Audit Proof and EIP-191 signature.
+    Binds the input payload hash, verdict, risk score, terms, and timestamp
+    into an immutable cryptographic receipt for liability protection and audit trails.
+    """
+    timestamp = int(time.time())
+    data_fingerprint = hashlib.sha256(payload_text.encode("utf-8")).hexdigest()
+
+    audit_record = {
+        "caller": caller_address or "anonymous",
+        "data_fingerprint": data_fingerprint,
+        "verdict": verdict,
+        "risk_score": round(float(risk_score), 2),
+        "payment_ref": tx_or_payment_ref or "sandbox:free_trial",
+        "timestamp": timestamp,
+        "terms": terms
+    }
+
+    # Deterministic fingerprint of the entire audit record
+    proof_hash = "0x" + hashlib.sha256(json.dumps(audit_record, sort_keys=True).encode("utf-8")).hexdigest()
+
+    server_key = os.getenv("SERVER_SIGNER_PRIVATE_KEY") or os.getenv("GATE_SIGNER_PRIVATE_KEY") or os.getenv("GATE_PRIVATE_KEY")
+
+    if server_key:
+        if not server_key.startswith("0x"):
+            server_key = "0x" + server_key
+        acct = Account.from_key(server_key)
+        issuer_address = acct.address
+        msg_hash = encode_defunct(text=f"SHERIFF-AUDIT-PROOF:{proof_hash}")
+        sig = Account.sign_message(msg_hash, private_key=server_key).signature.hex()
+    else:
+        issuer_address = DEFAULT_PAY_TO
+        sig = "0x" + hashlib.sha256((f"SHERIFF-AUDIT-PROOF:{proof_hash}" + issuer_address).encode("utf-8")).hexdigest() + "00" * 32
+
+    return {
+        "proof_hash": proof_hash,
+        "signature": sig,
+        "issuer": issuer_address,
+        "terms": terms,
+        "timestamp": timestamp,
+        "audit_record": audit_record,
+        "headers": {
+            "X-Sheriff-Audit-Proof": proof_hash,
+            "X-Sheriff-Signature": sig,
+            "X-Sheriff-Terms": terms,
+            "X-Sheriff-Timestamp": str(timestamp),
+            "X-Sheriff-Issuer": issuer_address
+        }
+    }

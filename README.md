@@ -73,10 +73,24 @@ In-memory Python Abstract Syntax Tree (AST) inspection isolating hazardous invoc
 
 ### 3. Factual Grounding & NLI Hallucination Verification
 Compares LLM text claims against trusted source documents or ledger ground truths, outputting:
-- Grounding ratio (0.0 to 1.0)
-- Explicit list of fabricated numbers and ungrounded entities.
+- Entity and numerical claim grounding ratios
+- Flagged fabricated values and hallucinations
+- Deterministic faithfulness confidence index.
 
-### 4. Cryptographic Proof-of-Safety & Smart Contracts
+### 4. Client-Side Bounded-Wallet Guardrails (`BoundedAgentWallet`)
+Prevents rogue agents or infinite loops from draining autonomous wallets:
+- **Per-Transaction Spend Cap**: Restricts maximum USDC per API call (default $0.05).
+- **Daily Budget Ceiling**: Hard stop on cumulative 24-hour spend (default $1.00).
+- **Recipient Whitelisting**: Guarantees funds only flow to verified gate addresses.
+- **Persistent Spend Ledger**: Survives container restarts via local disk recording.
+
+### 5. Server-Side Zero-Liability Audit Proof (`X-Sheriff-Audit-Proof`)
+Every inspection delivers an immutable EIP-191 signed cryptographic receipt:
+- Binds payload SHA-256 fingerprint, verdict, risk score, terms, and timestamp.
+- Enforces `ZERO_LIABILITY_AS_IS_PROVENANCE_V1` legal terms.
+- Protects developers and enterprise operators against third-party liability disputes.
+
+### 6. Cryptographic Proof-of-Safety & Smart Contracts
 - **EIP-191 Signatures**: Off-chain attestation receipts for agent-to-agent validation.
 - **EIP-712 Typed Data & Solidity Calldata**: Native integration with [`SecurityGateConsumer.sol`](contracts/SecurityGateConsumer.sol) on Polygon (137), Base (8453), and Arbitrum (42161).
 

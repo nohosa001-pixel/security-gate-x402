@@ -20,6 +20,7 @@ from app.schemas import (
     InspectionResponse,
     AuditReport,
     AuditAttestation,
+    AuditProof,
     NLIReport,
     PricingTier,
     VaultDepositRequest,
@@ -44,7 +45,7 @@ from app.schemas import (
     PerformanceSplitRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
-from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address
+from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address, generate_audit_proof
 from app.vault_manager import vault_manager
 from app.enterprise_manager import enterprise_manager
 from app.onchain_signer import onchain_signer
@@ -399,7 +400,36 @@ async def inspect_payload(
         "tier": extra_headers.get("X-Tier", "STANDARD")
     }
 
-    # 4. Record recent audit event in rolling buffer
+    # Resolve agent caller address for attribution & audit proof
+    agent_addr = None
+    if isinstance(payer_info, str) and payer_info.startswith("0x"):
+        agent_addr = payer_info
+    else:
+        hdr_addr = request.headers.get("x-client-address")
+        if hdr_addr and hdr_addr.startswith("0x"):
+            agent_addr = hdr_addr
+        elif getattr(req, "client_address", None) and str(getattr(req, "client_address")).startswith("0x"):
+            agent_addr = str(getattr(req, "client_address"))
+
+    # 4. Formulate Zero-Liability Audit Proof & cryptographic provenance seal
+    caller_ref = agent_addr if agent_addr else (payer_info if isinstance(payer_info, str) else "anonymous")
+    audit_proof_dict = generate_audit_proof(
+        payload_text=req.agent_output,
+        verdict=audit.verdict,
+        risk_score=audit.risk_score,
+        caller_address=caller_ref if caller_ref.startswith("0x") else None,
+        tx_or_payment_ref=str(payer_info)
+    )
+    audit_proof = AuditProof(
+        proof_hash=audit_proof_dict["proof_hash"],
+        signature=audit_proof_dict["signature"],
+        issuer=audit_proof_dict["issuer"],
+        terms=audit_proof_dict["terms"],
+        timestamp=audit_proof_dict["timestamp"],
+        audit_record=audit_proof_dict["audit_record"]
+    )
+
+    # 5. Record recent audit event in rolling buffer
     client_ip = request.client.host if request.client else "127.0.0.1"
     masked_ip = ".".join(client_ip.split(".")[:2]) + ".*.*" if "." in client_ip else "masked"
     _recent_audit_events.append({
@@ -415,16 +445,7 @@ async def inspect_payload(
     if len(_recent_audit_events) > MAX_RECENT_EVENTS:
         _recent_audit_events.pop(0)
 
-    # 5. Record telemetry for agent credit rating oracle
-    agent_addr = None
-    if isinstance(payer_info, str) and payer_info.startswith("0x"):
-        agent_addr = payer_info
-    else:
-        hdr_addr = request.headers.get("x-client-address")
-        if hdr_addr and hdr_addr.startswith("0x"):
-            agent_addr = hdr_addr
-        elif getattr(req, "client_address", None) and str(getattr(req, "client_address")).startswith("0x"):
-            agent_addr = str(getattr(req, "client_address"))
+    # 6. Record telemetry for agent credit rating oracle
     if agent_addr:
         is_hal = audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False
         credit_engine.record_audit(agent_addr, audit.verdict, is_hal)
@@ -434,11 +455,14 @@ async def inspect_payload(
         timestamp=issued_at,
         audit=audit,
         attestation=attestation,
+        audit_proof=audit_proof,
         payment_receipt=payment_receipt
     )
 
     resp = JSONResponse(content=response_data.model_dump())
     for k, v in extra_headers.items():
+        resp.headers[k] = v
+    for k, v in audit_proof_dict["headers"].items():
         resp.headers[k] = v
     resp.headers["X-Audit-Verdict"] = audit.verdict
     resp.headers["X-Audit-Risk-Score"] = str(audit.risk_score)

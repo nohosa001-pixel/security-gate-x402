@@ -56,6 +56,117 @@ class PaymentRequired402Error(Exception):
         self.quote_id = self.challenge.get("quote_id")
 
 
+class BudgetExceededError(Exception):
+    """Raised when an autonomous agent transaction violates the BoundedAgentWallet spend policy."""
+    def __init__(self, message: str, requested_amount: float, limit: float, reason: str):
+        self.requested_amount = requested_amount
+        self.limit = limit
+        self.reason = reason
+        self.formatted_card = (
+            f"🚫 [BOUNDED-WALLET BLOCKED] {message}\n"
+            f"  Requested: ${requested_amount:.4f} USDC | Limit: ${limit:.4f} USDC\n"
+            f"  Violation: {reason}"
+        )
+        super().__init__(self.formatted_card)
+
+
+class BoundedAgentWallet:
+    """
+    Client-side guardrail wallet preventing agent budget drain.
+    Enforces per-transaction limits, daily spend caps, recipient whitelisting,
+    and persistent local ledger recording to survive process restarts.
+    """
+    DEFAULT_SHERIFF_GATE = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+
+    def __init__(
+        self,
+        private_key: Optional[str] = None,
+        daily_limit_usdc: float = 1.0,
+        per_tx_limit_usdc: float = 0.05,
+        whitelist: Optional[list] = None,
+        ledger_path: Optional[str] = None
+    ):
+        import threading
+        self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
+        self.daily_limit_usdc = float(daily_limit_usdc)
+        self.per_tx_limit_usdc = float(per_tx_limit_usdc)
+        self.whitelist = {addr.lower() for addr in (whitelist or [self.DEFAULT_SHERIFF_GATE])}
+        self.ledger_path = ledger_path
+        self._lock = threading.Lock()
+        self.in_memory_records: list = []
+
+        if self.ledger_path and os.path.exists(self.ledger_path):
+            self._load_ledger()
+
+    def _load_ledger(self):
+        import json
+        try:
+            with open(self.ledger_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    self.in_memory_records = data
+        except Exception:
+            self.in_memory_records = []
+
+    def _save_ledger(self):
+        import json
+        if not self.ledger_path:
+            return
+        try:
+            with open(self.ledger_path, "w", encoding="utf-8") as f:
+                json.dump(self.in_memory_records, f, indent=2)
+        except Exception:
+            pass
+
+    def get_daily_spent(self) -> float:
+        """Returns total USDC spent in the sliding last 24 hours."""
+        import time
+        cutoff = time.time() - 86400
+        with self._lock:
+            return sum(
+                r["amount_usdc"] 
+                for r in self.in_memory_records 
+                if r.get("timestamp", 0) > cutoff
+            )
+
+    def can_pay(self, recipient: str, amount_usdc: float) -> tuple:
+        """
+        Validates whether a transaction is permitted under budget constraints.
+        Returns (is_allowed: bool, reason: str).
+        """
+        import time
+        amount = float(amount_usdc)
+        clean_recipient = recipient.lower()
+
+        # 1. Whitelist Check
+        if clean_recipient not in self.whitelist:
+            return False, f"Recipient {recipient} is not in authorized whitelist"
+
+        # 2. Per-Transaction Limit Check
+        if amount > self.per_tx_limit_usdc:
+            return False, f"Requested ${amount:.4f} exceeds per-transaction limit of ${self.per_tx_limit_usdc:.4f}"
+
+        # 3. Daily Limit Check
+        current_daily = self.get_daily_spent()
+        if current_daily + amount > self.daily_limit_usdc:
+            return False, f"Daily limit reached: Current spent ${current_daily:.4f} + requested ${amount:.4f} > limit ${self.daily_limit_usdc:.4f}"
+
+        return True, "APPROVED"
+
+    def record_spend(self, recipient: str, amount_usdc: float, audit_proof: Optional[str] = None):
+        """Records confirmed transaction in the persistent ledger."""
+        import time
+        entry = {
+            "timestamp": time.time(),
+            "recipient": recipient,
+            "amount_usdc": float(amount_usdc),
+            "audit_proof": audit_proof
+        }
+        with self._lock:
+            self.in_memory_records.append(entry)
+            self._save_ledger()
+
+
 class SecurityGateClient:
     """Client for interacting with the agent-security-gate-x402 micro-oracle."""
 
@@ -69,7 +180,8 @@ class SecurityGateClient:
         is_dev: bool = False,
         app: Optional[Any] = None,
         auto_deposit_on_402: bool = False,
-        auto_deposit_amount: float = 50.0
+        auto_deposit_amount: float = 50.0,
+        bounded_wallet: Optional[BoundedAgentWallet] = None
     ):
         self.gate_url = gate_url.rstrip("/")
         self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
@@ -79,6 +191,7 @@ class SecurityGateClient:
         self.app = app
         self.auto_deposit_on_402 = auto_deposit_on_402
         self.auto_deposit_amount = auto_deposit_amount
+        self.bounded_wallet = bounded_wallet
 
         if self.private_key and not self.private_key.startswith("0x"):
             self.private_key = "0x" + self.private_key
@@ -97,8 +210,8 @@ class SecurityGateClient:
 
         msg = "x402-agent-security-gate:0.002-usdc:polygon:137"
         msg_hash = encode_defunct(text=msg)
-        signed = Account.sign_message(msg_hash, private_key=self.private_key)
-        return signed.signature.hex()
+        sig = Account.sign_message(msg_hash, private_key=self.private_key).signature.hex()
+        return sig
 
     def _build_headers(self) -> Dict[str, str]:
         headers = {
@@ -122,7 +235,7 @@ class SecurityGateClient:
         is_code: bool = False,
         raise_on_block: bool = True
     ) -> Dict[str, Any]:
-        """Synchronously inspects agent output against the security gate."""
+        """Synchronously inspects agent output against the security gate with optional Bounded-Wallet guardrails."""
         headers = self._build_headers()
         payload = {
             "agent_output": agent_output,
@@ -130,12 +243,36 @@ class SecurityGateClient:
             "context_ground_truth": context_ground_truth
         }
 
+        # Pre-check bounded wallet if configured
+        estimated_cost = 0.002
+        default_recipient = BoundedAgentWallet.DEFAULT_SHERIFF_GATE
+        if self.bounded_wallet:
+            can_pay, reason = self.bounded_wallet.can_pay(default_recipient, estimated_cost)
+            if not can_pay:
+                raise BudgetExceededError(
+                    "Autonomous inspection blocked by client BoundedAgentWallet",
+                    requested_amount=estimated_cost,
+                    limit=self.bounded_wallet.daily_limit_usdc,
+                    reason=reason
+                )
+
         if self.app:
             from fastapi.testclient import TestClient
             tc = TestClient(self.app)
             resp = tc.post("/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
                 challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                pay_to = challenge.get("pay_to", default_recipient)
+                deposit_cost = float(challenge.get("amount_usdc", self.auto_deposit_amount))
+                if self.bounded_wallet:
+                    can_pay, reason = self.bounded_wallet.can_pay(pay_to, deposit_cost)
+                    if not can_pay:
+                        raise BudgetExceededError(
+                            "Autonomous vault deposit blocked by client BoundedAgentWallet",
+                            requested_amount=deposit_cost,
+                            limit=self.bounded_wallet.daily_limit_usdc,
+                            reason=reason
+                        )
                 if self.auto_deposit_on_402:
                     self.deposit_vault(amount_usdc=self.auto_deposit_amount)
                     headers = self._build_headers()
@@ -147,11 +284,23 @@ class SecurityGateClient:
                     )
             resp.raise_for_status()
             data = resp.json()
+            resp_headers = resp.headers
         else:
             with httpx.Client(timeout=10.0) as client:
                 resp = client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
                 if resp.status_code == 402:
                     challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                    pay_to = challenge.get("pay_to", default_recipient)
+                    deposit_cost = float(challenge.get("amount_usdc", self.auto_deposit_amount))
+                    if self.bounded_wallet:
+                        can_pay, reason = self.bounded_wallet.can_pay(pay_to, deposit_cost)
+                        if not can_pay:
+                            raise BudgetExceededError(
+                                "Autonomous vault deposit blocked by client BoundedAgentWallet",
+                                requested_amount=deposit_cost,
+                                limit=self.bounded_wallet.daily_limit_usdc,
+                                reason=reason
+                            )
                     if self.auto_deposit_on_402:
                         self.deposit_vault(amount_usdc=self.auto_deposit_amount)
                         headers = self._build_headers()
@@ -163,6 +312,22 @@ class SecurityGateClient:
                         )
                 resp.raise_for_status()
                 data = resp.json()
+                resp_headers = resp.headers
+
+        # Record spend in bounded wallet if enabled
+        audit_proof_str = resp_headers.get("x-sheriff-audit-proof") or (data.get("audit_proof", {}).get("proof_hash") if isinstance(data.get("audit_proof"), dict) else None)
+        if self.bounded_wallet:
+            self.bounded_wallet.record_spend(default_recipient, estimated_cost, audit_proof=audit_proof_str)
+
+        # Ensure audit_proof from headers is attached if missing in body
+        if "audit_proof" not in data and audit_proof_str:
+            data["audit_proof"] = {
+                "proof_hash": audit_proof_str,
+                "signature": resp_headers.get("x-sheriff-signature"),
+                "terms": resp_headers.get("x-sheriff-terms", "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"),
+                "timestamp": int(resp_headers.get("x-sheriff-timestamp", 0)),
+                "issuer": resp_headers.get("x-sheriff-issuer")
+            }
 
         verdict = data.get("audit", {}).get("verdict")
         if raise_on_block and verdict in ("BLOCKED", "FLAGGED") and not data.get("audit", {}).get("is_safe", True):
@@ -237,7 +402,7 @@ class SecurityGateClient:
         is_code: bool = False,
         raise_on_block: bool = True
     ) -> Dict[str, Any]:
-        """Asynchronously inspects agent output against the security gate."""
+        """Asynchronously inspects agent output against the security gate with optional Bounded-Wallet guardrails."""
         headers = self._build_headers()
         payload = {
             "agent_output": agent_output,
@@ -245,11 +410,35 @@ class SecurityGateClient:
             "context_ground_truth": context_ground_truth
         }
 
+        # Pre-check bounded wallet if configured
+        estimated_cost = 0.002
+        default_recipient = BoundedAgentWallet.DEFAULT_SHERIFF_GATE
+        if self.bounded_wallet:
+            can_pay, reason = self.bounded_wallet.can_pay(default_recipient, estimated_cost)
+            if not can_pay:
+                raise BudgetExceededError(
+                    "Autonomous inspection blocked by client BoundedAgentWallet",
+                    requested_amount=estimated_cost,
+                    limit=self.bounded_wallet.daily_limit_usdc,
+                    reason=reason
+                )
+
         transport = httpx.ASGITransport(app=self.app) if self.app else None
         async with httpx.AsyncClient(transport=transport, timeout=10.0) as client:
             resp = await client.post(f"{self.gate_url}/api/v1/inspect", json=payload, headers=headers)
             if resp.status_code == 402:
                 challenge = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                pay_to = challenge.get("pay_to", default_recipient)
+                deposit_cost = float(challenge.get("amount_usdc", self.auto_deposit_amount))
+                if self.bounded_wallet:
+                    can_pay, reason = self.bounded_wallet.can_pay(pay_to, deposit_cost)
+                    if not can_pay:
+                        raise BudgetExceededError(
+                            "Autonomous vault deposit blocked by client BoundedAgentWallet",
+                            requested_amount=deposit_cost,
+                            limit=self.bounded_wallet.daily_limit_usdc,
+                            reason=reason
+                        )
                 if self.auto_deposit_on_402:
                     self.deposit_vault(amount_usdc=self.auto_deposit_amount)
                     headers = self._build_headers()
@@ -261,6 +450,22 @@ class SecurityGateClient:
                     )
             resp.raise_for_status()
             data = resp.json()
+            resp_headers = resp.headers
+
+        # Record spend in bounded wallet if enabled
+        audit_proof_str = resp_headers.get("x-sheriff-audit-proof") or (data.get("audit_proof", {}).get("proof_hash") if isinstance(data.get("audit_proof"), dict) else None)
+        if self.bounded_wallet:
+            self.bounded_wallet.record_spend(default_recipient, estimated_cost, audit_proof=audit_proof_str)
+
+        # Ensure audit_proof from headers is attached if missing in body
+        if "audit_proof" not in data and audit_proof_str:
+            data["audit_proof"] = {
+                "proof_hash": audit_proof_str,
+                "signature": resp_headers.get("x-sheriff-signature"),
+                "terms": resp_headers.get("x-sheriff-terms", "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"),
+                "timestamp": int(resp_headers.get("x-sheriff-timestamp", 0)),
+                "issuer": resp_headers.get("x-sheriff-issuer")
+            }
 
         verdict = data.get("audit", {}).get("verdict")
         if raise_on_block and verdict in ("BLOCKED", "FLAGGED") and not data.get("audit", {}).get("is_safe", True):
