@@ -1,4 +1,4 @@
-# The Spend Firewall for Autonomous Agents (`agent-security-gate-x402`) 🛡️⚡
+# The Sheriff of Agent Finance (`agent-security-gate-x402`) 🛡️🤠⚡
 
 [![PyPI Version](https://img.shields.io/pypi/v/agent-security-gate-x402.svg?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/agent-security-gate-x402/)
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
@@ -7,7 +7,9 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)](https://fastapi.tiangolo.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **"The Spend Firewall for Autonomous Agents: Verified data in. Signed policy out. Every payment auditable on-chain."**
+> **"The Sheriff of Agent Finance: Guarding Autonomous Wallets & Transactions in the Wild West of AI."**
+>
+> *Before an autonomous AI agent moves a single dollar, the Sheriff inspects, attests, and secures the transaction.*
 >
 > **Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle with EIP-191 & EIP-712 cryptographic attestations on Polygon, Base, and Arbitrum.**
 
@@ -16,6 +18,8 @@
 ## 🖥️ Interactive Web Dashboard & Simulator (Live)
 
 🌐 **[https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)**
+
+![The Sheriff of Agent Finance - Live Security Gate Dashboard](assets/dashboard_demo.gif)
 
 Explore the full consumer and enterprise visual interface directly in your browser:
 - 🛡️ **Prompt Injection & Jailbreak Radar**: Live testing against DAN prompts, system tag escapes, and adversarial suffixes.

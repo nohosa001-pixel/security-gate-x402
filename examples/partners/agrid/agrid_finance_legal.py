@@ -1,15 +1,12 @@
 """
 A GRID Enterprise Finance, Accounting & Legal Integration Module.
-Provides:
-1. [Finance]: Treasury vault pre-funding, auto-topup threshold, runway cash-flow forecasting.
-2. [Accounting]: Micro-expense journal entries ($0.002/query), reconciliation ledger, fiscal invoicing.
-3. [Legal]: EIP-712 tamper-proof audit trail archiving, OFAC sanctions compliance, zero-retention verification.
+Self-contained partner PoC module.
 """
 
 import time
 import json
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from app.vault_manager import vault_manager
 from app.x402_verifier import is_sanctioned_address
 from app.onchain_signer import onchain_signer
@@ -58,9 +55,6 @@ class AGridIntegrationController:
         self._journal_entries: List[AGridJournalEntry] = []
         self._legal_audit_trail: List[AGridLegalAttestationRecord] = []
 
-    # -------------------------------------------------------------
-    # 1. FINANCE (재무 관리 & 자금 런웨이)
-    # -------------------------------------------------------------
     def finance_fund_treasury(self, deposit_amount_usdc: float) -> Dict[str, Any]:
         """A GRID 재무 지갑에서 선불 Vault로 자금 집행 (최소 50 USDC 이상)"""
         if deposit_amount_usdc < 50.0:
@@ -92,9 +86,6 @@ class AGridIntegrationController:
             "recommended_topup_usdc": 50.0 if needs_topup else 0.0
         }
 
-    # -------------------------------------------------------------
-    # 2. ACCOUNTING (회계 분개 & 지출 대사)
-    # -------------------------------------------------------------
     def accounting_record_consumption(self, session_key: str, cost_usdc: float, queries: int = 1) -> AGridJournalEntry:
         """에이전트 보안 감사 소비 시 복식부기 회계 전표 자동 발행"""
         now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -128,9 +119,6 @@ class AGridIntegrationController:
             journal_entries_count=len(self._journal_entries)
         )
 
-    # -------------------------------------------------------------
-    # 3. LEGAL & COMPLIANCE (법률 감사 증적 & 컴플라이언스)
-    # -------------------------------------------------------------
     def legal_audit_and_archive(
         self,
         action_type: str,
@@ -140,10 +128,6 @@ class AGridIntegrationController:
         signature: str,
         counterparty_address: Optional[str] = None
     ) -> AGridLegalAttestationRecord:
-        """
-        A GRID 법률/컴플라이언스용 EIP-712 위변조 불가 감사 증적(Audit Trail) 아카이빙
-        """
-        # 1. OFAC & 자금세탁방지(AML) 제재 검증
         if counterparty_address and is_sanctioned_address(counterparty_address):
             raise PermissionError(f"A GRID Legal Warning: Counterparty {counterparty_address} is OFAC Sanctioned.")
 
@@ -165,7 +149,6 @@ class AGridIntegrationController:
         return record
 
     def legal_get_audit_trail(self) -> List[AGridLegalAttestationRecord]:
-        """A GRID 법무팀용 증적 조회"""
         return self._legal_audit_trail
 
 

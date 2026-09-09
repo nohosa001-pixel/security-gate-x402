@@ -7,7 +7,7 @@ startCommand:
       gateUrl:
         type: string
         description: "Agent Security Gate Base URL or local gateway"
-        default: "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"
+        default: "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
       vaultKey:
         type: string
         description: "Optional pre-funded Agent Payment Vault session key for unlimited M2M throughput"

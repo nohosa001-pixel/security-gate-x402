@@ -5,8 +5,12 @@ EIP-712 attestation calldata, and agent vault balances.
 """
 
 import sys
+import os
 import json
 import time
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 from app.security_engine import audit_payload, parse_code_ast
 from app.onchain_signer import onchain_signer
 from app.vault_manager import vault_manager

@@ -59,11 +59,21 @@ class NLIReport(BaseModel):
     details: Dict[str, Any] = Field(default_factory=dict, description="Detailed NLI / token grounding statistics")
 
 
+class IncidentDetail(BaseModel):
+    category: str = Field(..., description="Threat category: PROMPT_INJECTION, SECRET_LEAK, DANGEROUS_AST_CALL, CODE_SYNTAX_ERROR, FACTUAL_HALLUCINATION")
+    severity: str = Field(default="HIGH", description="Severity level: 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'")
+    reason: str = Field(..., description="Human-readable plain English explanation of the threat")
+    matched_snippet: Optional[str] = Field(default=None, description="Contextual excerpt of the offending token or pattern")
+    action_taken: str = Field(default="TOOL_CALL_BLOCKED", description="Recommended or enforced mitigation action")
+
+
 class AuditReport(BaseModel):
     verdict: str = Field(..., description="Audit verdict: 'PASSED', 'FLAGGED', or 'BLOCKED'")
     risk_score: float = Field(..., description="Combined threat & hallucination risk score (0.0 safe to 100.0 critical)")
     is_safe: bool = Field(..., description="True if output is safe to release without blockers")
     threats: List[str] = Field(default_factory=list, description="List of identified security violations and threats")
+    incidents: List[IncidentDetail] = Field(default_factory=list, description="Structured, explainable incident details for team observability & SIEM")
+    cli_summary: Optional[str] = Field(default=None, description="Human-readable one-line terminal/Slack log summary")
     nli_verification: Optional[NLIReport] = Field(default=None, description="Factual faithfulness & hallucination report if context was provided")
 
 

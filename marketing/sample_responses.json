@@ -1,0 +1,134 @@
+{
+  "clean": {
+    "status": "success",
+    "timestamp": "2026-09-08T05:41:00Z",
+    "audit": {
+      "verdict": "PASSED",
+      "risk_score": 0.0,
+      "is_safe": true,
+      "threats": [],
+      "nli_verification": null
+    },
+    "attestation": {
+      "issuer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "subject_hash": "caa9278774ffcc802b42311f6ba7d25694592c32bdd0a84d7b3be76d0c5916ad",
+      "verdict": "PASSED",
+      "risk_score": 0.0,
+      "issued_at": "2026-09-08T05:41:00Z",
+      "signature": "0x29f6936b452c4d23fd6b174819d931aa92d7f49814234949eb957e6b833a56f00000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "payment_receipt": {
+      "payer": "sandbox:169.254.169.126",
+      "protocol": "x402",
+      "network": "Polygon Mainnet (137)",
+      "cost_settled_usdc": "0.002",
+      "latency_ms": 4.6,
+      "tier": "FREE_TRIAL"
+    }
+  },
+  "injection": {
+    "status": "success",
+    "timestamp": "2026-09-08T05:41:00Z",
+    "audit": {
+      "verdict": "FLAGGED",
+      "risk_score": 0.4,
+      "is_safe": false,
+      "threats": [
+        "Prompt Injection Pattern: ignore\\s+(?:all\\s+)?(?:previous|above)\\s+instructions?"
+      ],
+      "nli_verification": null
+    },
+    "attestation": {
+      "issuer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "subject_hash": "dfb4555bdad0958f5b385ef8b603bdcff96034f91738584418ef31b91abd199c",
+      "verdict": "FLAGGED",
+      "risk_score": 0.4,
+      "issued_at": "2026-09-08T05:41:00Z",
+      "signature": "0x0dfbb3e1ebdbe110211bcbb447094419ae55aa00001928d65b73359469d310ed0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "payment_receipt": {
+      "payer": "sandbox:169.254.169.126",
+      "protocol": "x402",
+      "network": "Polygon Mainnet (137)",
+      "cost_settled_usdc": "0.002",
+      "latency_ms": 0.25,
+      "tier": "FREE_TRIAL"
+    }
+  },
+  "ast": {
+    "status": "success",
+    "ast_analysis": {
+      "status": "success",
+      "is_safe": false,
+      "hazards": [
+        {
+          "type": "DANGEROUS_SYSTEM_CALL",
+          "detail": "Import of high-risk module 'os'"
+        },
+        {
+          "type": "DANGEROUS_SYSTEM_CALL",
+          "detail": "Execution method call 'system()'"
+        }
+      ],
+      "parsed_ast_nodes": 10
+    },
+    "is_safe": false,
+    "latency_ms": 0.17
+  },
+  "credit": {
+    "agent_address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "credit_score": 690,
+    "grade": "BBB",
+    "grade_description": "Lower Medium Investment Grade",
+    "max_uncollateralized_loan_usdc": 10000.0,
+    "default_probability": "2.10%",
+    "metrics": {
+      "safety_score": 140,
+      "faithfulness_score": 100,
+      "solvency_score": 150,
+      "volume_score": 0,
+      "vault_balance_usdc": 15200.0,
+      "total_audits": 0,
+      "security_incidents": 0
+    },
+    "timestamp": 1788846061
+  },
+  "compliance": {
+    "passport_id": "EU-AI-40C7C10CDA1DBEBE",
+    "regulation": "EU_AI_ACT_2024_1689",
+    "agent_address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "compliance_status": "CERTIFIED_COMPLIANT",
+    "is_certified": true,
+    "evaluated_at": 1788846292,
+    "expires_at": 1791438292,
+    "institutional_credit_score": 690,
+    "institutional_grade": "BBB",
+    "audited_articles": {
+      "article_50_transparency": {
+        "requirement": "Marking and detection of AI-generated content & agentic origin.",
+        "status": "PASS",
+        "mechanism": "EIP-191 / EIP-712 tamper-proof cryptographic attestation attached to every output."
+      },
+      "article_53_risk_mitigation": {
+        "requirement": "Continuous systemic risk management, hallucination containment, and anti-jailbreak guardrails.",
+        "status": "PASS",
+        "mechanism": "Deterministic AST parser & NLI factual faithfulness validation engine (<10ms)."
+      },
+      "article_9_risk_management": {
+        "requirement": "Continuous technical monitoring throughout the lifecycle of the AI system.",
+        "status": "PASS",
+        "mechanism": "Agent Security Gate x402 real-time continuous micro-oracle inspection."
+      },
+      "gdpr_data_privacy": {
+        "requirement": "Zero data retention of prompt payloads and user personally identifiable information (PII).",
+        "status": "PASS",
+        "mechanism": "Ephemeral in-memory deterministic inspection with zero disk persistence."
+      }
+    },
+    "issuer": {
+      "organization": "Agent Security Gate x402 Compliance Authority",
+      "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "protocol": "x402 / AP2"
+    }
+  }
+}

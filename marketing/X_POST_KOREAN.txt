@@ -23,8 +23,8 @@ AI 응답을 5ms 안에 정밀 검증하고 온체인 EIP-712 보증서까지 �
 === [3번 트윗: 무료 체험 링크 & MCP 연동] ===
 🚀 지금 바로 브라우저 UI에서 무료로 보안 테스트를 시작하세요!
 
-🖥️ 라이브 대시보드: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
-⚡ 인터랙티브 샌드박스: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground
+🖥️ 라이브 대시보드: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard
+⚡ 인터랙티브 샌드박스: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground
 📦 PyPI 패키지: https://pypi.org/project/agent-security-gate-x402/
 
 Claude Desktop 및 Cursor MCP 1-클릭 연동도 완벽 지원합니다 🌐 (3/3)
@@ -40,5 +40,5 @@ Claude Desktop 및 Cursor MCP 1-클릭 연동도 완벽 지원합니다 🌐 (3/
 ✅ Claude / Cursor MCP 1-클릭 연동
 ✅ 0.002 USDC 초소액 온체인 정산
 
-👉 웹 대시보드 바로가기: https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard
+👉 웹 대시보드 바로가기: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard
 #AI에이전트 #보안게이트웨이 #AIGuardrails

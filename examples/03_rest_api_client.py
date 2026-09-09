@@ -13,7 +13,7 @@ from eth_account.messages import encode_defunct
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-LIVE_GATE_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"
+LIVE_GATE_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
 
 
 def verify_gate_attestation(attestation: dict, original_text: str) -> bool:

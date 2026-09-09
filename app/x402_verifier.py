@@ -142,7 +142,7 @@ class X402Verifier:
             "humanFreeOnboarding": True,
             "instruction": "This security gate requires autonomous micropayment via x402 EIP-712 or pre-funded Vault. No human login or credit card required.",
             "sdk_python": "pip install agent-security-gate-x402",
-            "spendPolicy": "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/docs",
+            "spendPolicy": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs",
             "estimatedCostPerCall": f"${challenge.amount_usdc} USDC",
             "freeTrialStatus": "Sandbox trial available out of the box with zero deposit.",
             "autonomous_actions": {

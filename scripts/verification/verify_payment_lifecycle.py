@@ -17,7 +17,7 @@ from eth_account.messages import encode_defunct
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"))
+BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"))
 
 
 def test_payment_systems():

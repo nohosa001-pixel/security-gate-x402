@@ -22,9 +22,9 @@ if hasattr(sys.stdout, "reconfigure"):
 load_dotenv(override=True)
 
 # Configuration & Links
-GCP_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"
-DASHBOARD_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/dashboard"
-PLAYGROUND_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app/playground"
+GCP_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
+DASHBOARD_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard"
+PLAYGROUND_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground"
 PYPI_URL = "https://pypi.org/project/agent-security-gate-x402/"
 GITHUB_URL = "https://github.com/nohosa001-pixel/security-gate-x402"
 GLAMA_URL = "https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402"

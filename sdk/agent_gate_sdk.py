@@ -11,10 +11,37 @@ from eth_account.messages import encode_defunct
 
 
 class SecurityGateBlockedError(Exception):
-    """Raised when an agent output is blocked by the security gate."""
+    """Raised when an agent output or tool call is blocked by the security gate."""
     def __init__(self, message: str, audit_report: Dict[str, Any]):
-        super().__init__(message)
+        self.raw_message = message
         self.audit_report = audit_report
+        self.verdict = audit_report.get("verdict", "BLOCKED")
+        self.risk_score = audit_report.get("risk_score", 0.0)
+        self.incidents = audit_report.get("incidents", [])
+        self.cli_summary = audit_report.get("cli_summary") or message
+
+        # Build clean, human-readable card representation for developer/oncall logs
+        lines = [
+            f"{self.cli_summary}",
+            f"  Verdict: {self.verdict} | Risk: {self.risk_score}% | Safe: False"
+        ]
+        if self.incidents:
+            lines.append("  Incident Breakdown:")
+            for inc in self.incidents:
+                cat = inc.get("category", "THREAT")
+                sev = inc.get("severity", "HIGH")
+                reason = inc.get("reason", "")
+                snippet = inc.get("matched_snippet")
+                lines.append(f"    • [{sev}] {cat}: {reason}")
+                if snippet:
+                    lines.append(f"      Matched Context: {snippet}")
+        elif audit_report.get("threats"):
+            lines.append("  Detected Threats:")
+            for t in audit_report.get("threats", []):
+                lines.append(f"    • {t}")
+
+        self.formatted_card = "\n".join(lines)
+        super().__init__(self.formatted_card)
 
 
 class PaymentRequired402Error(Exception):
@@ -139,8 +166,9 @@ class SecurityGateClient:
 
         verdict = data.get("audit", {}).get("verdict")
         if raise_on_block and verdict in ("BLOCKED", "FLAGGED") and not data.get("audit", {}).get("is_safe", True):
-            threats = ", ".join(data.get("audit", {}).get("threats", []))
-            raise SecurityGateBlockedError(f"Agent output {verdict} by Security Gate: {threats}", data.get("audit", {}))
+            audit = data.get("audit", {})
+            summary = audit.get("cli_summary") or f"Agent output {verdict} by Security Gate: {', '.join(audit.get('threats', []))}"
+            raise SecurityGateBlockedError(summary, audit)
 
         return data
 
@@ -236,8 +264,9 @@ class SecurityGateClient:
 
         verdict = data.get("audit", {}).get("verdict")
         if raise_on_block and verdict in ("BLOCKED", "FLAGGED") and not data.get("audit", {}).get("is_safe", True):
-            threats = ", ".join(data.get("audit", {}).get("threats", []))
-            raise SecurityGateBlockedError(f"Agent output {verdict} by Security Gate: {threats}", data.get("audit", {}))
+            audit = data.get("audit", {})
+            summary = audit.get("cli_summary") or f"Agent output {verdict} by Security Gate: {', '.join(audit.get('threats', []))}"
+            raise SecurityGateBlockedError(summary, audit)
 
         return data
 

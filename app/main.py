@@ -53,8 +53,9 @@ from app.credit_rating_engine import credit_engine
 from app.compliance_engine import compliance_engine
 
 app = FastAPI(
-    title="Agent Security & Hallucination Gate (x402)",
+    title="The Sheriff of Agent Finance (x402 Security Gate)",
     description=(
+        "The Sheriff of Agent Finance: Guarding Autonomous Wallets & Transactions in the Wild West of AI. "
         "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, "
         "dangerous AST code, and factual hallucination inspection micro-oracle with EIP-191 / EIP-712 "
         "cryptographic attestation on Polygon, Base, and Arbitrum. "
@@ -85,7 +86,6 @@ if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
-MCP_SPEC_FILE_PATH = Path(__file__).parent.parent / "mcp_tool_spec.json"
 LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
 
 # Rate limit and free trial usage tracker for backward compatibility
@@ -222,6 +222,8 @@ async def root(request: Request):
 
     return {
         "service": "agent-security-gate-x402",
+        "identity": "The Sheriff of Agent Finance",
+        "tagline": "Guarding Autonomous Wallets & Transactions in the Wild West of AI",
         "description": "Deterministic Security & Hallucination Inspection Micro-Oracle",
         "version": "1.2.1",
         "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",

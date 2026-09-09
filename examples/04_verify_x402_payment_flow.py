@@ -17,7 +17,7 @@ from eth_account.messages import encode_defunct
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-LIVE_GATE_URL = "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"
+LIVE_GATE_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
 
 # Test EVM Agent Wallet (Mock wallet for automated agent verification)
 AGENT_PRIVATE_KEY = os.getenv("TEST_AGENT_KEY", "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d")

@@ -17,7 +17,7 @@ from sdk.agent_gate_sdk import SecurityGateClient, SecurityGateBlockedError, gat
 
 # Initialize client pointing to Cloud Run Live Server
 client = SecurityGateClient(
-    gate_url="https://agent-security-gate-x402-7qxtp3324q-du.a.run.app",
+    gate_url="https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
     is_dev=True # Uses development / free-trial signature
 )
 

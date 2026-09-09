@@ -1,7 +1,7 @@
 {
   "protocol": "AP2/1.0",
   "service": "Agent Output Security & Hallucination Gate",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "Deterministic, ultra-low latency (<10ms) security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle for autonomous agents.",
   "supported_rails": [
     "x402-polygon-usdc"

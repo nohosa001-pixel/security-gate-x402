@@ -15,7 +15,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 load_dotenv()
 
-BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-7qxtp3324q-du.a.run.app"))
+BASE_URL = os.getenv("GATE_URL", os.getenv("TARGET_URL", "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"))
 
 
 def run_benchmark():
