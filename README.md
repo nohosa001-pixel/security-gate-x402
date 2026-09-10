@@ -4,6 +4,8 @@
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
 [![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
+[![CI Test Suite](https://github.com/nohosa001-pixel/security-gate-x402/actions/workflows/ci.yml/badge.svg)](https://github.com/nohosa001-pixel/security-gate-x402/actions)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](SECURITY.md)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)](https://fastapi.tiangolo.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -45,7 +47,12 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 ## ⚡ 1-Click MCP Integration (Claude Desktop & Cursor)
 
-Connect to Claude Desktop, Cursor, Gemini, or any Model Context Protocol client instantly:
+Connect to Claude Desktop, Cursor, Windsurf, or any Model Context Protocol (MCP) client in seconds without building from source:
+
+### 1. Claude Desktop Setup
+Add the configuration snippet below to your `claude_desktop_config.json`:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -57,6 +64,17 @@ Connect to Claude Desktop, Cursor, Gemini, or any Model Context Protocol client 
   }
 }
 ```
+
+### 2. Cursor IDE Integration
+1. Open **Cursor Settings** (`Ctrl + ,` or `Cmd + ,`) → Navigate to **Features** → **MCP Servers**.
+2. Click **Add New MCP Server**.
+3. Set **Type**: `command`
+4. Set **Name**: `security-gate-x402`
+5. Set **Command**: `uvx agent-security-gate-x402`
+
+### 3. Registry & One-Click Installs
+- 🌐 **[Glama.ai MCP Registry](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)**: Verified & approved server listing.
+- 📦 **[Smithery.ai Registry](https://smithery.ai/server/agent-security-gate-x402)**: Instant web & CLI deployment.
 
 ---
 
@@ -128,9 +146,28 @@ uvicorn app.main:app --port 8000 --reload
 
 ---
 
-## 📜 Smart Contract Integration (`SecurityGateConsumer.sol`)
+## 📜 Smart Contract Integration & Verified Deployments
 
-Autonomous on-chain agents can verify security attestations directly in Solidity:
+Autonomous on-chain agents can verify security attestations directly in Solidity before executing financial transactions.
+
+### ⛓️ Verified Polygon Mainnet Deployments (Chain ID: 137)
+
+The core micro-oracle signers and security consumer contracts are live on Polygon Mainnet:
+
+| Contract / Role | Address | Explorer |
+|---|---|---|
+| 🛡️ **`SecurityGateConsumer`** | `0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA` | [PolygonScan](https://polygonscan.com/address/0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA#code) |
+| 🏰 **`SafeSecurityGateGuard`** | `0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173` | [PolygonScan](https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173#code) |
+| 🤝 **`AgentEscrow`** | `0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d` | [PolygonScan](https://polygonscan.com/address/0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d) |
+| 📊 **`AgentCreditOracle`** | `0x6418f408cFf03F862D7691f01fAb00a895E6aB93` | [PolygonScan](https://polygonscan.com/address/0x6418f408cFf03F862D7691f01fAb00a895E6aB93) |
+| 📋 **`AgentComplianceRegistry`** | `0x28292D76E07E5539F15F3b97935dE8E0432E76DD` | [PolygonScan](https://polygonscan.com/address/0x28292D76E07E5539F15F3b97935dE8E0432E76DD) |
+| 🏦 **`AgentLendingPool`** | `0xe43a9C368808B2dfF139D27789C40A3C8F2282cF` | [PolygonScan](https://polygonscan.com/address/0xe43a9C368808B2dfF139D27789C40A3C8F2282cF) |
+| ☂️ **`AgentInsurancePool`** | `0x4f115665a2BdE534bb7fC426e89ca0BfE2De3B50` | [PolygonScan](https://polygonscan.com/address/0x4f115665a2BdE534bb7fC426e89ca0BfE2De3B50) |
+| 🔄 **`AgentFactoringPool`** | `0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0` | [PolygonScan](https://polygonscan.com/address/0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0) |
+| 🏛️ **`AgentTreasuryVault`** | `0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638` | [PolygonScan](https://polygonscan.com/address/0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638) |
+| 🔑 **Oracle Signer / Treasury** | `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf` | [PolygonScan](https://polygonscan.com/address/0x255F9991233f86B29dB847c8d5b8CB9915e80dCf) |
+
+### 🛠️ Solidity Integration Example (`SecurityGateConsumer.sol`)
 
 ```solidity
 // SPDX-License-Identifier: MIT
