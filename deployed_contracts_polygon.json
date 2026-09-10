@@ -11,7 +11,8 @@
     "AgentLendingPool": "0xe43a9C368808B2dfF139D27789C40A3C8F2282cF",
     "AgentInsurancePool": "0x4f115665a2BdE534bb7fC426e89ca0BfE2De3B50",
     "AgentFactoringPool": "0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0",
-    "AgentTreasuryVault": "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638"
+    "AgentTreasuryVault": "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638",
+    "SecurityGateConsumer": "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA"
   },
-  "updated_at": "2026-09-04T08:25:14Z"
+  "updated_at": "2026-09-09T23:54:04Z"
 }

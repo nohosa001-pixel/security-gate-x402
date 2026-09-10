@@ -216,6 +216,51 @@ TOOLS = [
             },
             "required": ["agent_address", "requested_amount_usdc"]
         }
+    },
+    {
+        "name": "submit_agent_trade_intent",
+        "description": "Submits an autonomous AI agent trade intent to the Universal Agent-Native Exchange Solver on Polygon. Solves market or limit orders for ETH/USDC, BTC/USDC, and SOL/USDC using sub-second Pyth Hermes oracle prices, executing atomically against the AgentEscrow clearing house and AgentTreasuryVault DMM. Use this tool when an autonomous AI agent wants to execute hedging swaps or trade digital assets programmatically.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_address": {
+                    "type": "string",
+                    "description": "Checksummed EVM wallet address (0x...) of the autonomous AI agent.",
+                    "default": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                    "examples": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]
+                },
+                "pair": {
+                    "type": "string",
+                    "description": "Trading pair, e.g. ETH/USDC, BTC/USDC, SOL/USDC, POL/USDC.",
+                    "default": "ETH/USDC",
+                    "examples": ["ETH/USDC", "BTC/USDC", "SOL/USDC"]
+                },
+                "direction": {
+                    "type": "string",
+                    "description": "BUY (Long) or SELL (Short).",
+                    "default": "BUY",
+                    "examples": ["BUY", "SELL"]
+                },
+                "amount_usdc": {
+                    "type": "number",
+                    "description": "Trade size denominated in USDC (minimum 0.001).",
+                    "default": 10.0,
+                    "examples": [10.0, 50.0, 250.0]
+                },
+                "intent_type": {
+                    "type": "string",
+                    "description": "MARKET or LIMIT order execution type.",
+                    "default": "MARKET",
+                    "examples": ["MARKET", "LIMIT"]
+                },
+                "limit_price": {
+                    "type": "number",
+                    "description": "Optional target price if intent_type is LIMIT.",
+                    "default": None
+                }
+            },
+            "required": ["agent_address", "direction", "amount_usdc"]
+        }
     }
 ]
 
@@ -410,6 +455,30 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         {
                             "type": "text",
                             "text": json.dumps(loan_quote, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "submit_agent_trade_intent":
+            from app.trade_engine import AgentTradeIntent, exchange_solver
+            intent = AgentTradeIntent(
+                agent_address=tool_args.get("agent_address", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"),
+                pair=tool_args.get("pair", "ETH/USDC"),
+                direction=tool_args.get("direction", "BUY"),
+                amount_usdc=float(tool_args.get("amount_usdc", 10.0)),
+                intent_type=tool_args.get("intent_type", "MARKET"),
+                limit_price=float(tool_args["limit_price"]) if tool_args.get("limit_price") is not None else None
+            )
+            exec_result = exchange_solver.solve_intent(intent)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(exec_result.model_dump(), indent=2, ensure_ascii=False)
                         }
                     ]
                 }

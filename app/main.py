@@ -52,6 +52,7 @@ from app.onchain_signer import onchain_signer
 from app.multi_chain import list_all_chains, get_chain_info
 from app.credit_rating_engine import credit_engine
 from app.compliance_engine import compliance_engine
+from app.trade_engine import AgentTradeIntent, exchange_solver
 
 app = FastAPI(
     title="The Sheriff of Agent Finance (x402 Security Gate)",
@@ -864,6 +865,26 @@ async def calculate_treasury_performance_split(req: PerformanceSplitRequest):
     )
 
 
+# --- Universal Autonomous Agent Exchange Endpoints (Phase 2) ---
+
+@app.post("/api/v1/trade/intent", tags=["Exchange"])
+async def submit_trade_intent(intent: AgentTradeIntent):
+    """Submits an autonomous AI agent trade intent to the Pyth Hermes Intent Solver."""
+    return exchange_solver.solve_intent(intent)
+
+
+@app.get("/api/v1/trade/price/{pair:path}", tags=["Exchange"])
+async def get_trade_pair_price(pair: str):
+    """Fetches sub-second real-time oracle price for a trading pair from Pyth Hermes."""
+    return exchange_solver.get_oracle_price(pair)
+
+
+@app.get("/api/v1/trade/orders", tags=["Exchange"])
+async def get_recent_exchange_orders(limit: int = 10):
+    """Retrieves recently executed or settled trade intents on the Exchange."""
+    return {"orders": exchange_solver.get_recent_trades(limit)}
+
+
 # --- MCP Tool Call Endpoints ---
 
 @app.get("/mcp/tools", tags=["MCP"])
@@ -924,6 +945,18 @@ async def call_mcp_tool(
         agent_addr = args.get("agent_address", "")
         passport = compliance_engine.evaluate_compliance(agent_addr)
         return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(passport, indent=2, ensure_ascii=False)}])
+
+    elif tool_name == "submit_agent_trade_intent":
+        intent = AgentTradeIntent(
+            agent_address=args.get("agent_address", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"),
+            pair=args.get("pair", "ETH/USDC"),
+            direction=args.get("direction", "BUY"),
+            amount_usdc=float(args.get("amount_usdc", 10.0)),
+            intent_type=args.get("intent_type", "MARKET"),
+            limit_price=float(args["limit_price"]) if args.get("limit_price") is not None else None
+        )
+        exec_result = exchange_solver.solve_intent(intent)
+        return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(exec_result.model_dump(), indent=2, ensure_ascii=False)}])
 
     return MCPToolCallResponse(content=[{"type": "text", "text": f"Tool '{tool_name}' not found."}], isError=True)
 
