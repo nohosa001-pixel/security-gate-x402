@@ -5,6 +5,12 @@ pragma solidity ^0.8.20;
  * @title SecurityGateConsumer
  * @notice Verifies cryptographic EIP-712 Proof-of-Safety attestations issued by Agent Security Gate x402
  *         before executing autonomous on-chain agent actions on Polygon, Base, or Arbitrum.
+ * @dev All oracle signatures and contract calls are governed by ZERO_LIABILITY_AS_IS_PROVENANCE_V1.
+ *      The oracle attestation represents an automated technical heuristic and carries ZERO warranty
+ *      or financial guarantee. Downstream agents, callers, and wallet owners execute transactions
+ *      at their own exclusive risk.
+ * @custom:terms ZERO_LIABILITY_AS_IS_PROVENANCE_V1
+ * @custom:terms-url https://github.com/nohosa001-pixel/security-gate-x402/blob/main/TERMS_OF_SERVICE.md
  */
 contract SecurityGateConsumer {
     address public oracleSigner;

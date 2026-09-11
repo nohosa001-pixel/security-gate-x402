@@ -306,12 +306,14 @@ def generate_audit_proof(
         "signature": sig,
         "issuer": issuer_address,
         "terms": terms,
+        "terms_url": "/api/v1/terms",
         "timestamp": timestamp,
         "audit_record": audit_record,
         "headers": {
             "X-Sheriff-Audit-Proof": proof_hash,
             "X-Sheriff-Signature": sig,
             "X-Sheriff-Terms": terms,
+            "X-Sheriff-Terms-Url": "/api/v1/terms",
             "X-Sheriff-Timestamp": str(timestamp),
             "X-Sheriff-Issuer": issuer_address
         }

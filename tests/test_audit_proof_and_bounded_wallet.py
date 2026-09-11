@@ -68,6 +68,7 @@ class TestZeroLiabilityAuditProof:
         assert "x-sheriff-audit-proof" in resp.headers
         assert "x-sheriff-signature" in resp.headers
         assert resp.headers.get("x-sheriff-terms") == "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+        assert resp.headers.get("x-sheriff-terms-url") == "/api/v1/terms"
 
         # Verify Response JSON Body
         data = resp.json()
@@ -75,6 +76,28 @@ class TestZeroLiabilityAuditProof:
         assert data["audit_proof"]["proof_hash"] == resp.headers["x-sheriff-audit-proof"]
         assert data["audit_proof"]["signature"] == resp.headers["x-sheriff-signature"]
         assert data["audit_proof"]["terms"] == "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+        assert data["audit_proof"]["terms_url"] == "/api/v1/terms"
+
+    def test_terms_endpoint_json(self, test_client):
+        for endpoint in ["/api/v1/terms", "/terms"]:
+            resp = test_client.get(endpoint)
+            assert resp.status_code == 200
+            data = resp.json()
+            assert data["terms_identifier"] == "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+            assert data["liability_cap_usd"] == 50.0
+            assert "canonical_terms_sha256" in data
+            assert len(data["canonical_terms_sha256"]) == 64
+            assert "as_is" in data["summary"]
+            assert "limitation_of_liability" in data["summary"]
+            assert data["status"] == "active"
+
+    def test_terms_endpoint_raw_markdown(self, test_client):
+        resp = test_client.get("/api/v1/terms?format=raw")
+        assert resp.status_code == 200
+        assert "ZERO_LIABILITY_AS_IS_PROVENANCE_V1" in resp.text
+        assert resp.headers.get("x-sheriff-terms") == "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+        assert "markdown" in resp.headers.get("content-type", "")
+
 
 
 class TestBoundedAgentWalletGuardrails:

@@ -4,6 +4,7 @@ Provides ultra-low latency (<10ms) deterministic security, prompt injection filt
 dangerous AST parsing, NLI hallucination verification, Vault management, and EIP-712/191 attestations.
 """
 
+import hashlib
 import json
 import os
 import time
@@ -43,6 +44,7 @@ from app.schemas import (
     FactoringSettleRequest,
     StrategyAuthRequest,
     PerformanceSplitRequest,
+    TermsOfServiceResponse,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address, generate_audit_proof
@@ -302,15 +304,56 @@ async def health():
     }
 
 
-@app.get("/terms", tags=["Legal"])
-async def get_terms():
-    return {
-        "service": "Agent Security Gate x402",
-        "terms": {
-            "as_is_disclaimer": "The service is provided 'as is' without warranty of any kind.",
-            "limitation_of_liability": "In no event shall the authors or copyright holders be liable for any claim or damages."
-        }
-    }
+TERMS_OF_SERVICE_PATH = Path(__file__).resolve().parent.parent / "TERMS_OF_SERVICE.md"
+
+
+def _get_terms_sha256() -> str:
+    if TERMS_OF_SERVICE_PATH.exists():
+        return hashlib.sha256(TERMS_OF_SERVICE_PATH.read_bytes()).hexdigest()
+    return "4bcef3fc4f3ea00fbd14f5325c4d2127869bee0a7a23356225fcbdc7e6c77073"
+
+
+@app.get(
+    "/api/v1/terms",
+    response_model=TermsOfServiceResponse,
+    tags=["Legal"],
+    summary="Get Canonical Legal Terms & Liability Limitations (ZERO_LIABILITY_AS_IS_PROVENANCE_V1)"
+)
+@app.get(
+    "/terms",
+    response_model=TermsOfServiceResponse,
+    tags=["Legal"],
+    summary="Get Canonical Legal Terms & Liability Limitations (Alias)"
+)
+async def get_terms(format: Optional[str] = Query(None, description="Set to 'raw' or 'markdown' to retrieve full text markdown")):
+    """
+    Returns the canonical terms of service, liability limitations, and cryptographic terms hash
+    binding all EIP-191/712 audit proofs and oracle attestations issued by Agent Security Gate x402.
+    """
+    if format in ("raw", "markdown", "text") and TERMS_OF_SERVICE_PATH.exists():
+        return Response(
+            content=TERMS_OF_SERVICE_PATH.read_text(encoding="utf-8"),
+            media_type="text/markdown; charset=utf-8",
+            headers={"X-Sheriff-Terms": "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"}
+        )
+
+    return TermsOfServiceResponse(
+        terms_identifier="ZERO_LIABILITY_AS_IS_PROVENANCE_V1",
+        version="1.0.0",
+        effective_date="2026-09-10",
+        title="Terms of Service & Legal Disclaimer (ZERO_LIABILITY_AS_IS_PROVENANCE_V1)",
+        summary={
+            "as_is": "All oracle attestations, risk scores, and smart contracts are provided strictly AS-IS without warranty of any kind.",
+            "no_100_percent_guarantee": "Security evaluations are deterministic heuristics. Zero-day exploits, novel evasions, and adversarial jailbreaks are not 100% guaranteed to be detected.",
+            "no_financial_advice": "Verdicts (PASSED, FLAGGED, BLOCKED) are technical heuristics, not financial, investment, legal, or solvency advice.",
+            "limitation_of_liability": "Strict aggregate liability cap of $50.00 USD or the total fees paid by caller in the past 30 days, whichever is greater.",
+            "blockchain_finality": "Transactions dispatched by agent wallets or smart contracts are irreversible. Client runtime holds final authority."
+        },
+        liability_cap_usd=50.0,
+        canonical_terms_sha256=_get_terms_sha256(),
+        full_text_url="https://github.com/nohosa001-pixel/security-gate-x402/blob/main/TERMS_OF_SERVICE.md",
+        status="active"
+    )
 
 
 @app.get("/privacy", tags=["Legal"])

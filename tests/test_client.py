@@ -62,6 +62,8 @@ def test_terms_and_privacy_endpoints():
     terms_data = terms_resp.json()
     assert "as_is_disclaimer" in terms_data["terms"]
     assert "limitation_of_liability" in terms_data["terms"]
+    assert terms_data["terms_identifier"] == "ZERO_LIABILITY_AS_IS_PROVENANCE_V1"
+    assert terms_data["liability_cap_usd"] == 50.0
 
     privacy_resp = client.get("/privacy")
     assert privacy_resp.status_code == 200

@@ -97,7 +97,9 @@ The Sheriff architecture enforces a defense-in-depth security model across five 
 - All inspection evaluations issue an **EIP-191** or **EIP-712** signature verifiable on-chain:
   - Payload SHA-256 fingerprint binding.
   - Risk score (0–100) and explicit verdict (`ALLOW`, `WARN`, `BLOCK`).
-  - Legal disclaimer binding: `ZERO_LIABILITY_AS_IS_PROVENANCE_V1`.
+  - Legal disclaimer binding: [`ZERO_LIABILITY_AS_IS_PROVENANCE_V1`](TERMS_OF_SERVICE.md).
+  - Programmatic verification via `GET /api/v1/terms` or header `X-Sheriff-Terms-Url`.
+  - Enforces strict liability cap ($50 USD / 30-day fee ceiling) and explicit non-financial advice classification.
 
 ---
 

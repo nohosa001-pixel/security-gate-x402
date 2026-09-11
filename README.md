@@ -105,7 +105,8 @@ Prevents rogue agents or infinite loops from draining autonomous wallets:
 ### 5. Server-Side Zero-Liability Audit Proof (`X-Sheriff-Audit-Proof`)
 Every inspection delivers an immutable EIP-191 signed cryptographic receipt:
 - Binds payload SHA-256 fingerprint, verdict, risk score, terms, and timestamp.
-- Enforces `ZERO_LIABILITY_AS_IS_PROVENANCE_V1` legal terms.
+- Enforces [`ZERO_LIABILITY_AS_IS_PROVENANCE_V1`](TERMS_OF_SERVICE.md) legal terms.
+- Query canonical legal terms & liability limits via `GET /api/v1/terms` or inspect response header `X-Sheriff-Terms-Url`.
 - Protects developers and enterprise operators against third-party liability disputes.
 
 ### 6. Cryptographic Proof-of-Safety & Smart Contracts
