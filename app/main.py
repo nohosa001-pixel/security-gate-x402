@@ -300,7 +300,7 @@ async def health():
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "service": "Agent Security Gate x402",
         "oracle": "Agent Security Gate x402",
-        "version": "1.2.2"
+        "version": "1.2.3"
     }
 
 
