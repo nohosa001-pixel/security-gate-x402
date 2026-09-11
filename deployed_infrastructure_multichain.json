@@ -1,0 +1,18 @@
+{
+  "base": {
+    "safe_guard_address": "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
+    "safe_guard_tx": "303bf30f035ce502a9734872c55fe27f694980c2425968339b5458b632eae2a0",
+    "credit_oracle_address": "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
+    "credit_oracle_tx": "bbdbd7f47dd5778327677977f4ffa92b5623758474925676326e4ff0cacdb586",
+    "vault_contract_address": "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
+    "vault_contract_tx": "1a3fe6eb1613be5031396460b7629cbd949a4adb5207a8407180ce768d9ee773"
+  },
+  "arbitrum": {
+    "safe_guard_address": "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
+    "safe_guard_tx": "66b1ca62fb57a9962eccac14af0b39bae10dd86f18e3af50d321ed1430f8f04e",
+    "credit_oracle_address": "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
+    "credit_oracle_tx": "3bb95e70e31bdd7d9c6c774acac01e1321575a6931b987a415a51d84e760abf0",
+    "vault_contract_address": "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
+    "vault_contract_tx": "2d0953d4cd449518cd8642927241a28c972bc6b8a609f66d331e6fefca42b919"
+  }
+}

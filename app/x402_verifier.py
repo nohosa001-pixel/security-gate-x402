@@ -16,6 +16,7 @@ import httpx
 from app.schemas import PaymentDemand402, PricingTier
 from app.vault_manager import vault_manager
 from app.enterprise_manager import enterprise_manager
+from app.multi_chain import find_chain, SUPPORTED_CHAINS
 
 load_dotenv()
 
@@ -71,7 +72,7 @@ class X402Verifier:
         quote_id: Optional[str] = None,
         pay_to: Optional[str] = None,
         amount_usdc: Optional[str] = None,
-        chain_id: int = POLYGON_CHAIN_ID
+        chain_id: Optional[Any] = None
     ) -> PaymentDemand402:
         now = int(time.time())
         q_id = quote_id or f"quote_{uuid.uuid4().hex[:12]}"
@@ -82,24 +83,34 @@ class X402Verifier:
         except ValueError:
             micro_units = MICRO_USDC_AMOUNT
         
+        # Multi-chain resolution: Polygon, Base, Arbitrum, etc.
+        target_chain = find_chain(chain_id if chain_id is not None else POLYGON_CHAIN_ID)
+        network_name = target_chain.network_slug or "polygon"
+        usdc_contract = target_chain.usdc_address
+
         return PaymentDemand402(
             error="Payment Required",
             protocol="x402",
-            network="polygon",
-            chain_id=chain_id,
-            asset=POLYGON_USDC_CONTRACT,
+            network=network_name,
+            chain_id=target_chain.chain_id,
+            asset=usdc_contract,
             amount_usdc=amt,
             amount_micro_units=micro_units,
             pay_to=recipient,
             quote_id=q_id,
             expires_at=now + QUOTE_TTL_SECONDS,
             payment_header="Authorization-x402",
-            description=f"Agent Output Security & Hallucination Gate Inspection Fee (${amt} USDC on Polygon)"
+            description=f"Agent Output Security & Hallucination Gate Inspection Fee (${amt} USDC on {target_chain.name})"
         )
 
     @classmethod
-    def build_402_response(cls, tier: PricingTier = PricingTier.STANDARD, custom_detail: Optional[str] = None) -> JSONResponse:
-        challenge = cls.generate_challenge()
+    def build_402_response(
+        cls, 
+        tier: PricingTier = PricingTier.STANDARD, 
+        custom_detail: Optional[str] = None,
+        chain_id: Optional[Any] = None
+    ) -> JSONResponse:
+        challenge = cls.generate_challenge(chain_id=chain_id)
         body = challenge.model_dump()
         if custom_detail:
             body["detail"] = custom_detail
@@ -112,7 +123,7 @@ class X402Verifier:
                 "network": "polygon",
                 "chain_id": 137,
                 "maxAmountRequired": "2000",
-                "asset": challenge.asset,
+                "asset": SUPPORTED_CHAINS[137].usdc_address,
                 "resource": "/api/v1/inspect",
                 "payTo": challenge.pay_to,
                 "extra": {"name": "USDC", "version": "2"}
@@ -122,7 +133,7 @@ class X402Verifier:
                 "network": "base",
                 "chain_id": 8453,
                 "maxAmountRequired": "2000",
-                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "asset": SUPPORTED_CHAINS[8453].usdc_address,
                 "resource": "/api/v1/inspect",
                 "payTo": challenge.pay_to,
                 "extra": {"name": "USDC", "version": "2"}
@@ -132,7 +143,7 @@ class X402Verifier:
                 "network": "arbitrum",
                 "chain_id": 42161,
                 "maxAmountRequired": "2000",
-                "asset": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+                "asset": SUPPORTED_CHAINS[42161].usdc_address,
                 "resource": "/api/v1/inspect",
                 "payTo": challenge.pay_to,
                 "extra": {"name": "USDC", "version": "2"}
@@ -140,15 +151,17 @@ class X402Verifier:
         ]
         body["_agentGuide"] = {
             "humanFreeOnboarding": True,
-            "instruction": "This security gate requires autonomous micropayment via x402 EIP-712 or pre-funded Vault. No human login or credit card required.",
+            "instruction": "This security gate requires autonomous micropayment via x402 EIP-712 or pre-funded Vault. Supports Polygon, Base, and Arbitrum.",
             "sdk_python": "pip install agent-security-gate-x402",
             "spendPolicy": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs",
             "estimatedCostPerCall": f"${challenge.amount_usdc} USDC",
             "freeTrialStatus": "Sandbox trial available out of the box with zero deposit.",
+            "activeNetwork": challenge.network,
+            "activeChainId": challenge.chain_id,
             "autonomous_actions": {
                 "step1_trial": "In sandbox mode, calls without headers are verified free.",
                 "step2_vault": "To self-fund vault via USDC: POST /api/v1/vault/deposit with tx hash.",
-                "step3_direct": "To execute instant query: attach 'X-402-Signature' header."
+                "step3_direct": "To execute instant query: attach 'X-402-Signature' header with chain_id."
             }
         }
         return JSONResponse(
@@ -161,7 +174,8 @@ class X402Verifier:
                 "X-402-Asset": challenge.asset,
                 "X-402-Amount": challenge.amount_usdc,
                 "X-Payment-Protocol": "x402",
-                "X-Payment-Network": "polygon",
+                "X-Payment-Network": challenge.network,
+                "X-Payment-Chain-Id": str(challenge.chain_id),
                 "X-Payment-Amount": challenge.amount_usdc,
                 "X-Payment-Address": challenge.pay_to,
             }

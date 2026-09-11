@@ -1,0 +1,12 @@
+{
+  "network": "Base Mainnet",
+  "chain_id": 8453,
+  "contract_name": "SecurityGateConsumer",
+  "contract_address": "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35",
+  "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+  "deployer_address": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+  "transaction_hash": "0x5cea8d21f178f0c3c046f8106beda58191bc25c167c37a90bcb083eb4bbd2fd2",
+  "block_number": 51156003,
+  "deployed_at_utc": "2026-09-11T04:35:45Z",
+  "explorer_url": "https://basescan.org/address/0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35"
+}

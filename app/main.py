@@ -181,6 +181,14 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
 async def require_x402_payment(request: Request, tier: PricingTier = PricingTier.STANDARD):
     """Enforces x402 payment authorization, pre-funded vault balance, or Sandbox Free Tier."""
     client_addr = request.headers.get("x-client-address") or request.headers.get("X-Client-Address") or "anonymous"
+    req_chain = (
+        request.headers.get("x-chain-id") or 
+        request.headers.get("X-Chain-ID") or 
+        request.headers.get("x-network") or 
+        request.headers.get("X-Network") or 
+        request.query_params.get("chain_id") or 
+        request.query_params.get("network")
+    )
     
     # 1. Sanctions OFAC check
     if is_sanctioned_address(client_addr):
@@ -194,7 +202,7 @@ async def require_x402_payment(request: Request, tier: PricingTier = PricingTier
     if auth_header or api_key or vault_key:
         is_authorized, reason, extra_headers = x402_verifier.verify_request_payment(request, tier=tier)
         if not is_authorized:
-            return x402_verifier.build_402_response(tier=tier, custom_detail=reason if "Insufficient" in str(reason) else None)
+            return x402_verifier.build_402_response(tier=tier, custom_detail=reason if "Insufficient" in str(reason) else None, chain_id=req_chain)
         request.state.authorized_payer = reason
         request.state.extra_headers = extra_headers or {}
         return None
@@ -203,7 +211,7 @@ async def require_x402_payment(request: Request, tier: PricingTier = PricingTier
     if client_addr != "anonymous":
         usage = _free_trial_usage.get(client_addr.lower(), 0)
         if usage >= FREE_TRIAL_LIMIT and os.getenv("ENV") != "development_unlimited":
-            return x402_verifier.build_402_response(tier=tier, custom_detail="Free trials exhausted for this address. Payment required.")
+            return x402_verifier.build_402_response(tier=tier, custom_detail="Free trials exhausted for this address. Payment required.", chain_id=req_chain)
         _free_trial_usage[client_addr.lower()] = usage + 1
         rem = max(0, FREE_TRIAL_LIMIT - (usage + 1))
         request.state.authorized_payer = f"sandbox:{client_addr}"
@@ -781,6 +789,16 @@ async def get_supported_chains():
 @app.get("/api/v1/gate/chains/{chain_id}", tags=["Multi-Chain"])
 async def get_chain_details(chain_id: int):
     return {"status": "success", "chain": get_chain_info(chain_id)}
+
+
+@app.get("/api/v1/gate/challenge", tags=["Multi-Chain"])
+async def get_gate_challenge(chain_id: Optional[str] = None, network: Optional[str] = None):
+    """
+    Returns an x402 payment challenge for a specific blockchain network.
+    Supports chain_id (e.g. 137, 8453, 42161) or network name ('polygon', 'base', 'arbitrum').
+    """
+    selected = chain_id or network or "137"
+    return x402_verifier.build_402_response(chain_id=selected)
 
 
 # --- Recent Events REST Endpoint ---

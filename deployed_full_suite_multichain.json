@@ -1,0 +1,16 @@
+{
+  "base": {
+    "compliance_registry": "0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
+    "agent_escrow": "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
+    "insurance_pool": "0x90308AedEe6430D11e5214cf9d2F563333D33Ef2",
+    "lending_pool": "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+    "factoring_pool": "0x6418f408cFf03F862D7691f01fAb00a895E6aB93"
+  },
+  "arbitrum": {
+    "compliance_registry": "0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
+    "agent_escrow": "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
+    "insurance_pool": "0x90308AedEe6430D11e5214cf9d2F563333D33Ef2",
+    "lending_pool": "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+    "factoring_pool": "0x6418f408cFf03F862D7691f01fAb00a895E6aB93"
+  }
+}

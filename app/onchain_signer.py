@@ -190,9 +190,20 @@ def verify_attestation_signature(
                 {"name": "expiresAt", "type": "uint256"}
             ]
         }
+        payload_hex = attestation.get("payload_hash") or attestation.get("action_payload_hash")
+        if payload_hex.startswith("0x"):
+            payload_hex = payload_hex[2:]
+            
+        raw_risk = attestation["risk_score"]
+        # If risk_score was given as float 0.0-1.0, convert to basis points 0-100
+        if isinstance(raw_risk, float) and raw_risk <= 1.0:
+            risk_score_int = int(round(raw_risk * 100))
+        else:
+            risk_score_int = int(raw_risk)
+
         message_data = {
-            "payloadHash": bytes.fromhex(attestation["payload_hash"][2:]),
-            "riskScore": int(attestation["risk_score"]),
+            "payloadHash": bytes.fromhex(payload_hex),
+            "riskScore": risk_score_int,
             "verdict": attestation["verdict"],
             "expiresAt": int(attestation["expires_at"])
         }

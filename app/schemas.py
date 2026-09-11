@@ -202,8 +202,10 @@ class OnChainAttestationResponse(BaseModel):
 class MultiChainInfo(BaseModel):
     name: str
     chain_id: int
+    network_slug: Optional[str] = None
     rpc_url: str
     usdc_address: str
+    explorer_url: Optional[str] = None
     vault_contract_address: Optional[str] = None
     consumer_contract_address: Optional[str] = None
     safe_guard_address: Optional[str] = None

@@ -13,6 +13,9 @@
     "x402",
     "attestation",
     "polygon",
+    "base",
+    "arbitrum",
+    "multichain",
     "ai-agents",
     "mcp",
     "credit-rating",
@@ -99,7 +102,7 @@
     },
     {
       "name": "get_onchain_security_attestation",
-      "description": "Generates EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails on Polygon and Base networks. Use this tool ONLY when preparing on-chain smart contract transactions that require cryptographic EIP-712 safety proof (v, r, s calldata) for an on-chain Safe or Guard contract. Do NOT use this tool for off-chain safety screening or general text auditing; use `inspect_agent_output` instead.",
+      "description": "Generates EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails across Polygon, Base, and Arbitrum networks. Use this tool ONLY when preparing on-chain smart contract transactions that require cryptographic EIP-712 safety proof (v, r, s calldata) for an on-chain Safe or Guard contract. Do NOT use this tool for off-chain safety screening or general text auditing; use `inspect_agent_output` instead.",
       "inputSchema": {
         "type": "object",
         "properties": {

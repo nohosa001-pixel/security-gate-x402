@@ -181,7 +181,8 @@ class SecurityGateClient:
         app: Optional[Any] = None,
         auto_deposit_on_402: bool = False,
         auto_deposit_amount: float = 50.0,
-        bounded_wallet: Optional[BoundedAgentWallet] = None
+        bounded_wallet: Optional[BoundedAgentWallet] = None,
+        chain: Any = 137
     ):
         self.gate_url = gate_url.rstrip("/")
         self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
@@ -192,6 +193,20 @@ class SecurityGateClient:
         self.auto_deposit_on_402 = auto_deposit_on_402
         self.auto_deposit_amount = auto_deposit_amount
         self.bounded_wallet = bounded_wallet
+
+        # Multi-chain configuration: Polygon (137), Base (8453), Arbitrum (42161)
+        chain_map = {"polygon": 137, "matic": 137, "base": 8453, "arbitrum": 42161, "arb": 42161}
+        if isinstance(chain, str) and chain.lower() in chain_map:
+            self.chain_id = chain_map[chain.lower()]
+            self.network = chain.lower()
+        else:
+            try:
+                self.chain_id = int(chain)
+                rev_map = {137: "polygon", 8453: "base", 42161: "arbitrum"}
+                self.network = rev_map.get(self.chain_id, "polygon")
+            except (ValueError, TypeError):
+                self.chain_id = 137
+                self.network = "polygon"
 
         if self.private_key and not self.private_key.startswith("0x"):
             self.private_key = "0x" + self.private_key
@@ -208,7 +223,7 @@ class SecurityGateClient:
                 return "x402_test_sig_agent_client"
             return None
 
-        msg = "x402-agent-security-gate:0.002-usdc:polygon:137"
+        msg = f"x402-agent-security-gate:0.002-usdc:{self.network}:{self.chain_id}"
         msg_hash = encode_defunct(text=msg)
         sig = Account.sign_message(msg_hash, private_key=self.private_key).signature.hex()
         return sig
@@ -216,7 +231,9 @@ class SecurityGateClient:
     def _build_headers(self) -> Dict[str, str]:
         headers = {
             "Content-Type": "application/json",
-            "X-Client-Address": self.client_address
+            "X-Client-Address": self.client_address,
+            "X-Chain-ID": str(self.chain_id),
+            "X-Network": self.network
         }
         if self.api_key:
             headers["X-API-Key"] = self.api_key
