@@ -201,12 +201,33 @@ class X402Verifier:
         if vault_key:
             deducted, agent_or_reason, rem_bal = vault_manager.deduct(vault_key, cost_usdc=cost_usdc)
             if deducted:
+                try:
+                    from app.agrid_ops_client import dispatch_clearing_event_background
+                    dispatch_clearing_event_background(
+                        operation="vault_inspection",
+                        amount_usdc=cost_usdc,
+                        caller_agent_id=str(agent_or_reason),
+                        chain="polygon"
+                    )
+                except Exception:
+                    pass
                 return True, f"vault:{agent_or_reason}", {"X-Tier": "VAULT_PREFUNDED", "X-Vault-Remaining-USDC": f"{rem_bal:.4f}"}
             return False, f"Vault deduction error: {agent_or_reason}", {}
 
         # 3. Check for x402 header
         x402_sig = headers.get("authorization-x402") or headers.get("x-402-signature") or headers.get("X-402-Signature")
         if x402_sig:
+            client_addr = headers.get("x-client-address") or "x402:verified_payer"
+            try:
+                from app.agrid_ops_client import dispatch_clearing_event_background
+                dispatch_clearing_event_background(
+                    operation="x402_inspection",
+                    amount_usdc=cost_usdc,
+                    caller_agent_id=str(client_addr),
+                    chain="polygon"
+                )
+            except Exception:
+                pass
             if x402_sig.startswith("x402_test_") or x402_sig == "x402_dev_bypass":
                 return True, "x402:test_payer", {"X-Tier": "STANDARD_X402"}
             # Facilitator check fallback
