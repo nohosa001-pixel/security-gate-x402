@@ -10,6 +10,7 @@ import os
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+from pydantic import BaseModel, Field
 
 from fastapi import FastAPI, Request, Depends, HTTPException, status, Query, Path as FPath
 from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse, Response
@@ -277,6 +278,18 @@ async def get_playground():
     if INDEX_HTML_PATH.exists():
         return FileResponse(INDEX_HTML_PATH, media_type="text/html")
     return HTMLResponse("<h2>Playground is loading...</h2>")
+
+
+class AgentChatRequest(BaseModel):
+    message: str = Field(..., description="Message or prompt sent to Sheriff Agent")
+
+
+@app.post("/api/v1/agent/interact", tags=["Showcase Agent"])
+async def interact_with_agent(req: AgentChatRequest):
+    """Interactive endpoint to converse with Sheriff Agent and test real-time security interception."""
+    from showcase_agent.sheriff_agent import sheriff_instance
+    return sheriff_instance.process_message(req.message)
+
 
 
 @app.get("/manifest.json", tags=["Safe App"])
