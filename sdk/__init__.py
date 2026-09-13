@@ -3,6 +3,8 @@ from .agent_gate_sdk import (
     SecurityGateClient,
     SecurityGateBlockedError,
     PaymentRequired402Error,
+    BudgetExceededError,
+    BoundedAgentWallet,
     gate_inspect,
     verify_attestation
 )
@@ -15,6 +17,8 @@ __all__ = [
     "SecurityGateClient",
     "SecurityGateBlockedError",
     "PaymentRequired402Error",
+    "BudgetExceededError",
+    "BoundedAgentWallet",
     "gate_inspect",
     "verify_attestation",
     "SecurityGateCallbackHandler",

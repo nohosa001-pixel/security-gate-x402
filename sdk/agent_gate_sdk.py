@@ -172,7 +172,7 @@ class SecurityGateClient:
 
     def __init__(
         self,
-        gate_url: str = "http://localhost:8080",
+        gate_url: Optional[str] = None,
         private_key: Optional[str] = None,
         vault_key: Optional[str] = None,
         api_key: Optional[str] = None,
@@ -184,7 +184,12 @@ class SecurityGateClient:
         bounded_wallet: Optional[BoundedAgentWallet] = None,
         chain: Any = 137
     ):
-        self.gate_url = gate_url.rstrip("/")
+        if gate_url:
+            self.gate_url = gate_url.rstrip("/")
+        else:
+            self.gate_url = os.getenv("SECURITY_GATE_URL") or (
+                "http://localhost:8080" if (is_dev or app) else "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
+            )
         self.private_key = private_key or os.getenv("AGENT_WALLET_PRIVATE_KEY")
         self.vault_key = vault_key or os.getenv("AGENT_VAULT_KEY")
         self.api_key = api_key or os.getenv("AGENT_API_KEY")

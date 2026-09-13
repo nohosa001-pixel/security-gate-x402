@@ -18,6 +18,7 @@ This standard specifies an on-chain interface and cryptographic verification flo
 ## Motivation
 
 As autonomous AI agents manage decentralized treasuries, execute high-frequency arbitrage, and participate in automated lending markets, existing smart contract architectures lack deterministic mechanisms to verify whether an agent's transaction payload has been verified against:
+
 1. Adversarial prompt injection attacks or unauthorized logic hijacking.
 2. Systemic hallucinations or arithmetic discrepancies in transaction calldata.
 3. Creditworthiness and insolvency limits.

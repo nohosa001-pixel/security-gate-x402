@@ -35,57 +35,71 @@ X_API_SECRET = os.getenv("X_API_SECRET", "")
 X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "")
 X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET", "")
 
-# 1. 한국어 사용자 서비스 & UI 중심 스레드 (Korean Launch Thread)
+# 1. 한국어 사용자 서비스 & UI 중심 스레드 (Korean Launch Thread - The Sheriff Persona)
 KOREAN_THREAD = [
     (
-        "🤖 AI 에이전트 개발할 때 프롬프트 주입(탈옥), 위험 코드 실행, 환각(Hallucination) 때문에 불안하셨나요? 🛡️\n\n"
-        "AI 응답을 5ms 안에 정밀 검증하고 온체인 EIP-712 보증서까지 발급해주는 'Agent Security Gate x402'가 출시되었습니다! ⚡\n\n"
-        "브라우저에서 로그인 없이 즉시 시뮬레이션해 보세요 👇 (1/3)\n"
-        "#AI보안 #AIAgent #프롬프트인젝션 #FastAPI #Web3"
+        "🚨 자율 에이전트 금융의 무법지대를 끝낼 보안관!!! 🤠\n\n"
+        "AI 에이전트한테 지갑 개인키 쥐여주고 프롬프트에 '착하게 거래해'라고 적어두셨나요?\n"
+        "죄송하지만 그건 보안이 아니라 '기도(Prayer)'입니다.\n\n"
+        "보이지 않는 프롬프트 인젝션 한 줄이면 에이전트는 3초 만에 지갑 잔고를 공격자에게 송금합니다.\n"
+        "The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)\n"
+        "#AI보안 #AIAgent #프롬프트인젝션 #Web3 #MCP"
     ),
     (
-        "✨ 웹 대시보드 & 플레이그라운드에서 바로 체험 가능한 4대 핵심 기능:\n\n"
-        "🛡️ 탈옥·인젝션 레이더: 시스템 프롬프트 탈취 & DAN 공격 5ms 차단\n"
-        "⚡ 위험 AST 코드 분석: os.system, eval, 소켓 탈취 즉시 검출\n"
-        "🔍 NLI 환각 검증: 원문 대비 허위 수치 및 거짓 주장 완벽 판별\n"
-        "📜 EIP-712 온체인 서명: Polygon/Base 스마트 컨트랙트 보증 calldata 발급\n\n"
-        "(2/3)"
+        "🔒 에이전트 코드에 딱 3줄만 걸어두면 끝납니다:\n\n"
+        "1. 악성 쉘 탈취(`os.system`, `eval`, 역방향 소켓) 5ms 즉각 차단\n"
+        "2. 할루시네이션 가짜 수치/주소 조작 원천 봉쇄\n"
+        "3. Bounded-Wallet: 에이전트가 폭주해도 1회 $0.05 / 일일 $1.00 이상 절대 못 쓰게 물리적 수갑 체결 🛡️\n\n"
+        "(2/4)"
     ),
     (
-        "🚀 지금 바로 브라우저 UI에서 무료로 보안 테스트를 시작하세요!\n\n"
-        f"🖥️ 라이브 대시보드: {DASHBOARD_URL}\n"
-        f"⚡ 인터랙티브 샌드박스: {PLAYGROUND_URL}\n"
-        f"📦 PyPI 패키지: {PYPI_URL}\n\n"
-        "Claude Desktop 및 Cursor MCP 1-클릭 연동도 완벽 지원합니다 🌐 (3/3)\n"
-        "#개발자도구 #인공지능 #보안게이트웨이 #MCP"
+        "📜 '착한 말'을 믿지 마세요. 우리는 암호화 서명만 믿습니다.\n\n"
+        "이미 Polygon 메인넷에 배포된 스마트 컨트랙트가 오라클의 EIP-712 안전 보증서가 없는 에이전트 트랜잭션은 가스비 1원도 못 빼가도록 온체인에서 즉시 Revert(차단)합니다.\n\n"
+        "지금 브라우저에서, 보안관의 활약상을 직접 보세요!\n"
+        f"🖥️ 라이브 시뮬레이터: {DASHBOARD_URL} (3/4)"
+    ),
+    (
+        "⚡ Cursor나 Claude Desktop 쓰시는 분들은 설치도 필요 없습니다.\n\n"
+        "MCP에 한 줄 추가하면 에이전트 방화벽이 바로 켜집니다:\n"
+        "👉 uvx agent-security-gate-x402\n\n"
+        f"📦 PyPI: {PYPI_URL}\n"
+        f"🌐 Glama 레지스트리 공식 승인: {GLAMA_URL}\n\n"
+        "에이전트 통장을 지키는 보안관!!! 🤠 (4/4)"
     )
 ]
 
-# 2. 글로벌 사용자 서비스 & UI 중심 스레드 (Global Launch Thread)
+# 2. 글로벌 사용자 서비스 & UI 중심 스레드 (Global Launch Thread - The Sheriff Persona)
 GLOBAL_THREAD = [
     (
-        "🛡️ Worried about prompt injections, malicious AST code execution, and hallucinations in your AI agents?\n\n"
-        "Introducing Agent Security Gate x402 ⚡\n"
-        "Ultra-low latency (<5ms) deterministic guardrails + EIP-712 cryptographic on-chain attestations on Polygon, Base & Arbitrum.\n\n"
-        f"Test it live in your browser without login 👇 (1/3)\n"
-        f"🌐 {DASHBOARD_URL}\n"
-        "#AIAgents #CyberSecurity #Guardrails #Web3 #MCP"
+        "🤠 Giving an autonomous AI agent your wallet's private key without spend guardrails is like handing a Ferrari to a toddler and whispering 'drive carefully.'\n\n"
+        "Prompt injections bypass system tags in 1 prompt.\n"
+        "Hallucinations fabricate addresses.\n"
+        "Infinite loops drain wallets.\n\n"
+        "The Wild West is over. Meet The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)\n"
+        "#AIAgents #Web3 #CyberSecurity #Guardrails #MCP"
     ),
     (
-        "⚡ Key Features available directly on the Web UI:\n\n"
-        "🛡️ Injection & Jailbreak Radar: Neutralize prompt breakouts in <5ms\n"
-        "⚡ Dangerous AST Analyzer: Detect eval, subprocess, os.system & socket leaks\n"
-        "🔍 NLI Hallucination Check: Surface unanchored numbers & false claims\n"
-        "📜 EIP-712 On-Chain Attestation: Instant ABI calldata for EVM smart contracts\n\n"
-        "(2/3)"
+        "🔒 Protect any Python / LangChain / ElizaOS agent in 3 lines of code:\n\n"
+        "• Deterministic <5ms prompt injection & breakout radar\n"
+        "• In-memory AST sandbox killing os.system & eval\n"
+        "• BoundedAgentWallet: Hard daily spend ceiling + recipient whitelist 🛡️\n\n"
+        "No complex enterprise sales calls. Pure plug-and-play code. (2/4)"
     ),
     (
-        "🚀 Integrate in 1-Click with Claude Desktop, Cursor, and Python SDK!\n\n"
-        f"🖥️ Interactive Dashboard: {DASHBOARD_URL}\n"
-        f"🎮 Live Playground: {PLAYGROUND_URL}\n"
+        "📜 We don't trust LLM vibes. We trust cryptographic signatures.\n\n"
+        "Every inspection issues an EIP-712/EIP-191 attestation.\n"
+        "Deployed on Polygon Mainnet (0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA):\n"
+        "If the Sheriff hasn't signed it, the smart contract strictly reverts. Zero balance drain.\n\n"
+        f"Test your malicious payloads live without login:\n"
+        f"🖥️ {DASHBOARD_URL} (3/4)"
+    ),
+    (
+        "⚡ Connect to Cursor IDE or Claude Desktop in 5 seconds via MCP:\n\n"
+        "👉 uvx agent-security-gate-x402\n\n"
         f"📦 PyPI: pip install agent-security-gate-x402\n"
+        f"🌐 Verified on Glama MCP Registry: {GLAMA_URL}\n"
         f"🐙 GitHub: {GITHUB_URL}\n\n"
-        "Securing autonomous agent economies at $0.002 per micro-audit 💎 (3/3)"
+        "Put an on-chain seatbelt on your autonomous agent before it's too late. 💎 (4/4)"
     )
 ]
 

@@ -1,4 +1,5 @@
 # Terms of Service & Legal Disclaimer
+
 ## Canonical Identifier: `ZERO_LIABILITY_AS_IS_PROVENANCE_V1`
 
 **Last Updated & Effective Date:** September 10, 2026  
@@ -28,6 +29,7 @@ If an autonomous agent or bot programmatically interacts with this Service, the 
 ## 3. "AS IS" & Express Disclaimer of Warranties
 
 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
+
 * THE SERVICE, ITS SMART CONTRACTS (`SecurityGateConsumer.sol`, `SafeSecurityGateGuard.sol`), ORACLE SIGNATURES, AND ATTESTATIONS ARE PROVIDED STRICTLY ON AN **"AS IS"** AND **"AS AVAILABLE"** BASIS.
 * THE OPERATORS, DEVELOPERS, AND CONTRIBUTORS EXPRESSLY DISCLAIM ALL WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
 * NO ORAL OR WRITTEN STATEMENT OR VERDICT ISSUED BY THE ORACLE SHALL CREATE ANY WARRANTY NOT EXPRESSLY STATED HEREIN.
@@ -37,6 +39,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
 ## 4. Limitation of Liability
 
 TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE LAW, IN NO EVENT SHALL THE SERVICE OPERATORS, DEVELOPERS, SIGNERS, CONTRIBUTORS, OR AFFILIATES BE LIABLE FOR:
+
 1. **Any Indirect, Special, Consequential, or Punitive Damages:**  
    Including loss of profits, revenue, data, digital assets, tokens, gas fees, or business opportunities arising out of or in connection with the use or inability to use the Service.
 2. **Exploits, Slippage, or Liquidation Events:**  
@@ -45,9 +48,11 @@ TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE LAW, IN NO EVENT SHALL THE SERV
    Chain reorganizations, hard forks, RPC outages, gas spikes, network latency, or validator censorship on Polygon, Base, Arbitrum, Ethereum, or any other settlement layer.
 
 ### Cumulative Liability Cap
+
 IN ANY EVENT, THE TOTAL AGGREGATE LIABILITY OF THE SERVICE OPERATORS ARISING OUT OF OR RELATED TO THIS SERVICE SHALL NOT EXCEED THE GREATER OF:
-- **FIFTY UNITED STATES DOLLARS ($50.00 USD)**, OR
-- **THE TOTAL FEES (IN USDC) ACTUALLY PAID BY THE USER TO THE SERVICE IN THE THIRTY (30) DAYS IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO LIABILITY.**
+
+* **FIFTY UNITED STATES DOLLARS ($50.00 USD)**, OR
+* **THE TOTAL FEES (IN USDC) ACTUALLY PAID BY THE USER TO THE SERVICE IN THE THIRTY (30) DAYS IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO LIABILITY.**
 
 ---
 
@@ -63,6 +68,7 @@ IN ANY EVENT, THE TOTAL AGGREGATE LIABILITY OF THE SERVICE OPERATORS ARISING OUT
 ## 6. Cryptographic Provenance & Proof Verification
 
 When an `AuditProof` or `AuditAttestation` is signed by the Sheriff oracle private key, the signature embeds:
+
 * `terms`: `"ZERO_LIABILITY_AS_IS_PROVENANCE_V1"`
 * `proof_hash`: A deterministic SHA-256 fingerprint of the audit metadata.
 
@@ -79,8 +85,9 @@ To the fullest extent permissible by law, these Terms shall be governed by and c
 ## 8. Modifications & Inquiries
 
 The canonical version of this document is maintained at:
-- Endpoint: `GET /api/v1/terms`
-- Repository: [TERMS_OF_SERVICE.md](https://github.com/nohosa001-pixel/security-gate-x402/blob/main/TERMS_OF_SERVICE.md)
-- Canonical SHA-256 Fingerprint: Published and verifiable via `/api/v1/terms`
+
+* Endpoint: `GET /api/v1/terms`
+* Repository: [TERMS_OF_SERVICE.md](https://github.com/nohosa001-pixel/security-gate-x402/blob/main/TERMS_OF_SERVICE.md)
+* Canonical SHA-256 Fingerprint: Published and verifiable via `/api/v1/terms`
 
 Inquiries regarding institutional agreements or custom SLAs should be directed to `security@agent-finance.org`.

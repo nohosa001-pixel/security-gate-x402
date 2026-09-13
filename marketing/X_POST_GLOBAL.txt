@@ -1,33 +1,44 @@
-# 🌐 Agent Security Gate x402 - Official X (Twitter) Launch Thread
+# 🤠 The Sheriff of Agent Finance - X (Twitter) Official Launch Thread (Global)
 
-=== [Tweet 1: The Problem & Solution] ===
-🛡️ Worried about prompt injections, malicious AST code execution, and hallucinations in your AI agents?
+=== [Tweet 1: The Cold Truth & Reality Check] ===
+🤠 Giving an autonomous AI agent your wallet's private key without spend guardrails is like handing a Ferrari to a toddler and whispering 'drive carefully.'
 
-Introducing Agent Security Gate x402 ⚡
-Ultra-low latency (<5ms) deterministic guardrails + EIP-712 cryptographic on-chain attestations on Polygon, Base & Arbitrum.
+Prompt injections bypass system tags in 1 prompt.
+Hallucinations fabricate addresses.
+Infinite loops drain wallets.
 
-Test it live in your browser without login 👇 (1/3)
-🌐 https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard
-#AIAgents #CyberSecurity #Guardrails #Web3 #MCP
-
-
-=== [Tweet 2: Core Capabilities] ===
-⚡ Key Features available directly on the Web UI:
-
-🛡️ Injection & Jailbreak Radar: Neutralize prompt breakouts in <5ms
-⚡ Dangerous AST Analyzer: Detect eval, subprocess, os.system & socket leaks
-🔍 NLI Hallucination Check: Surface unanchored numbers & false claims
-📜 EIP-712 On-Chain Attestation: Instant ABI calldata for EVM smart contracts
-
-(2/3)
+The Wild West is over. Meet The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)
+#AIAgents #Web3 #CyberSecurity #Guardrails #MCP
 
 
-=== [Tweet 3: Links & MCP Integration] ===
-🚀 Integrate in 1-Click with Claude Desktop, Cursor, and Python SDK!
+=== [Tweet 2: 3-Line Handcuffs (Show, Don't Tell)] ===
+🔒 Protect any Python / LangChain / ElizaOS agent in 3 lines of code:
 
-🖥️ Interactive Dashboard: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard
-🎮 Live Playground: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground
+• Deterministic <5ms prompt injection & breakout radar
+• In-memory AST sandbox killing os.system & eval
+• BoundedAgentWallet: Hard daily spend ceiling + recipient whitelist 🛡️
+
+No complex enterprise sales calls. Pure plug-and-play code. (2/4)
+
+
+=== [Tweet 3: Cryptographic Proof on Polygon] ===
+📜 We don't trust LLM vibes. We trust cryptographic signatures.
+
+Every inspection issues an EIP-712/EIP-191 attestation.
+Deployed on Polygon Mainnet (0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA):
+If the Sheriff hasn't signed it, the smart contract strictly reverts. Zero balance drain.
+
+Test your malicious payloads live without login:
+🖥️ https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard (3/4)
+
+
+=== [Tweet 4: Zero-Install Quickstart (CTA)] ===
+⚡ Connect to Cursor IDE or Claude Desktop in 5 seconds via MCP:
+
+👉 uvx agent-security-gate-x402
+
 📦 PyPI: pip install agent-security-gate-x402
+🌐 Verified on Glama MCP Registry: https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402
 🐙 GitHub: https://github.com/nohosa001-pixel/security-gate-x402
 
-Securing autonomous agent economies at $0.002 per micro-audit 💎 (3/3)
+Put an on-chain seatbelt on your autonomous agent before it's too late. 💎 (4/4)

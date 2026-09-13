@@ -24,6 +24,7 @@
 ![The Sheriff of Agent Finance - Live Security Gate Dashboard](assets/dashboard_demo.gif)
 
 Explore the full consumer and enterprise visual interface directly in your browser:
+
 - 🛡️ **Prompt Injection & Jailbreak Radar**: Live testing against DAN prompts, system tag escapes, and adversarial suffixes.
 - ⚡ **Dangerous AST Code Analyzer**: Sub-millisecond Python syntax parsing detecting `os.system`, `subprocess`, `eval`, `exec`, and malicious sockets.
 - 🔍 **Hallucination & NLI Fact-Checker**: Contrast agent generation with ground truth context to surface fabricated numbers and unanchored claims.
@@ -35,7 +36,7 @@ Explore the full consumer and enterprise visual interface directly in your brows
 ## 🔗 Live Service Links & Resources
 
 | Service / Endpoint | Description | URL Link |
-|---|---|---|
+| --- | --- | --- |
 | 🖥️ **Web Dashboard** | Interactive visual UI, security simulator & audit tester | [Launch Dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard) |
 | ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground) |
 | 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
@@ -50,7 +51,9 @@ Explore the full consumer and enterprise visual interface directly in your brows
 Connect to Claude Desktop, Cursor, Windsurf, or any Model Context Protocol (MCP) client in seconds without building from source:
 
 ### 1. Claude Desktop Setup
+
 Add the configuration snippet below to your `claude_desktop_config.json`:
+
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
@@ -66,6 +69,7 @@ Add the configuration snippet below to your `claude_desktop_config.json`:
 ```
 
 ### 2. Cursor IDE Integration
+
 1. Open **Cursor Settings** (`Ctrl + ,` or `Cmd + ,`) → Navigate to **Features** → **MCP Servers**.
 2. Click **Add New MCP Server**.
 3. Set **Type**: `command`
@@ -73,49 +77,62 @@ Add the configuration snippet below to your `claude_desktop_config.json`:
 5. Set **Command**: `uvx agent-security-gate-x402`
 
 ### 3. Registry & One-Click Installs
+
 - 🌐 **[Glama.ai MCP Registry](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)**: Verified & approved server listing.
-- 📦 **[Smithery.ai Registry](https://smithery.ai/server/agent-security-gate-x402)**: Instant web & CLI deployment.
+- 📦 **[PyPI Official Release](https://pypi.org/project/agent-security-gate-x402/)**: Official pip package distribution.
 
 ---
 
 ## 💎 Core Services & Capabilities
 
 ### 1. Ultra-Low Latency Prompt & Security Radar (<5ms)
+
 Deterministic pattern and AST scanning neutralizing prompt injections, system tag breakouts (`</system_instruction>`), and API token / private key leakages before downstream agent propagation.
 
 ### 2. Python Code AST Hazard Auditing
+
 In-memory Python Abstract Syntax Tree (AST) inspection isolating hazardous invocations:
+
 - System execution (`os.system`, `os.popen`, `subprocess.Popen`, `subprocess.run`)
 - Arbitrary code evaluation (`eval`, `exec`, `__import__`)
 - Network socket reverse shells and unencrypted exfiltration vectors.
 
 ### 3. Factual Grounding & NLI Hallucination Verification
+
 Compares LLM text claims against trusted source documents or ledger ground truths, outputting:
+
 - Entity and numerical claim grounding ratios
 - Flagged fabricated values and hallucinations
 - Deterministic faithfulness confidence index.
 
 ### 4. Client-Side Bounded-Wallet Guardrails (`BoundedAgentWallet`)
+
 Prevents rogue agents or infinite loops from draining autonomous wallets:
+
 - **Per-Transaction Spend Cap**: Restricts maximum USDC per API call (default $0.05).
 - **Daily Budget Ceiling**: Hard stop on cumulative 24-hour spend (default $1.00).
 - **Recipient Whitelisting**: Guarantees funds only flow to verified gate addresses.
 - **Persistent Spend Ledger**: Survives container restarts via local disk recording.
 
 ### 5. Server-Side Zero-Liability Audit Proof (`X-Sheriff-Audit-Proof`)
+
 Every inspection delivers an immutable EIP-191 signed cryptographic receipt:
+
 - Binds payload SHA-256 fingerprint, verdict, risk score, terms, and timestamp.
 - Enforces [`ZERO_LIABILITY_AS_IS_PROVENANCE_V1`](TERMS_OF_SERVICE.md) legal terms.
 - Query canonical legal terms & liability limits via `GET /api/v1/terms` or inspect response header `X-Sheriff-Terms-Url`.
 - Protects developers and enterprise operators against third-party liability disputes.
 
 ### 6. Cryptographic Proof-of-Safety & Smart Contracts
+
 - **EIP-191 Signatures**: Off-chain attestation receipts for agent-to-agent validation.
 - **EIP-712 Typed Data & Solidity Calldata**: Native integration with [`SecurityGateConsumer.sol`](contracts/SecurityGateConsumer.sol) on Polygon (137), Base (8453), and Arbitrum (42161).
 
 ---
 
 ## 📦 Quick Start & Installation
+
+> 📖 **[Read the 3-Minute Quickstart Guide](docs/QUICKSTART_3_MINUTES.md)** &bull; 🧪 **[Run 3-Line Agent Demo](examples/quickstart_3lines_agent.py)** &bull; 🌐 **[ElizaOS Plugin](examples/elizaos_security_plugin.ts)**
 
 ### Option 1. Run Instantly with `uvx` (No Installation Required)
 
@@ -156,7 +173,7 @@ Autonomous on-chain agents can verify security attestations directly in Solidity
 The core micro-oracle signers and security consumer contracts are live on Polygon Mainnet:
 
 | Contract / Role | Address | Explorer |
-|---|---|---|
+| --- | --- | --- |
 | 🛡️ **`SecurityGateConsumer`** | `0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA` | [PolygonScan](https://polygonscan.com/address/0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA#code) |
 | 🏰 **`SafeSecurityGateGuard`** | `0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173` | [PolygonScan](https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173#code) |
 | 🤝 **`AgentEscrow`** | `0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d` | [PolygonScan](https://polygonscan.com/address/0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d) |
@@ -251,4 +268,3 @@ python x_promo_bot.py
 ## 📄 License
 
 MIT License &copy; 2026 Security Gate Team
-
