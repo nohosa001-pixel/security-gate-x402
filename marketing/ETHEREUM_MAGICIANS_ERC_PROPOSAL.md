@@ -117,10 +117,15 @@ interface IAgentCreditOracle {
 - **Composable with ERC-4337 & Safe**: Matches existing Safe `ITransactionGuard` signatures and can be extended into an ERC-4337 `IPaymaster` or `IAccount` validation module.
 - **Latency Consideration**: Verification takes place off-chain (<5ms micro-oracle) and only the cryptographic signature is verified on-chain, keeping EVM execution gas minimal (~25,000 gas).
 
-### Reference Implementation
+### Reference Implementation & Live Demo
 
-A fully working, tested reference implementation of `SafeSecurityGateGuard.sol` and the off-chain micro-oracle is available at:
-👉 [https://github.com/nohosa001-pixel/security-gate-x402](https://github.com/nohosa001-pixel/security-gate-x402)
+A fully working, tested reference implementation and live interactive showcase are available:
+- 🌐 **Live Interactive Showcase (Sheriff Agent & Safe Guard)**: [https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard)
+- 🏛️ **Gnosis Safe{Wallet} App Store Certified**: [Open in Safe{Wallet} (Polygon Mainnet)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)
+- 📜 **Deployed Verified Contracts (Polygon Mainnet)**:
+  - `SafeSecurityGateGuard.sol`: [`0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173`](https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173)
+  - `AgentCreditRatingOracle.sol`: [`0x6418f408cFf03F862D7691f01fAb00a895E6aB93`](https://polygonscan.com/address/0x6418f408cFf03F862D7691f01fAb00a895E6aB93)
+- 📦 **Open Source Repository**: [https://github.com/nohosa001-pixel/security-gate-x402](https://github.com/nohosa001-pixel/security-gate-x402)
 
 ### We Welcome Community Feedback
 
