@@ -19,7 +19,7 @@ eip: <to be assigned>
 title: AI Agent Proof-of-Safety Attestation and Transaction Guard Standard
 description: Standardized EIP-712 cryptographic safety attestation and execution guard for autonomous AI agent smart contract accounts.
 author: Security Gate x402 Architecture Team (@nohosa001-pixel)
-discussions-to: https://ethereum-magicians.org/
+discussions-to: https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658
 status: Draft
 type: Standards Track
 category: ERC
