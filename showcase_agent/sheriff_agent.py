@@ -60,10 +60,11 @@ class SheriffAgent:
         
         # 1. If running within the server/app environment, audit in-process for instant (<1ms) deterministic performance
         try:
-            from app.audit_engine import audit_payload
-            from app.eip712_signer import onchain_signer
+            from app.security_engine import audit_payload
+            from app.onchain_signer import onchain_signer
             audit = audit_payload(text=text, is_code="os.system" in text or "exec(" in text)
             sig = onchain_signer.generate_eip712_signature(text, audit.risk_score, audit.verdict)
+            sig_hex = f"{sig.get('r', '0x')}{sig.get('s', '')[2:]}"
             elapsed_ms = (time.perf_counter() - start_t) * 1000.0
             return {
                 "success": True,
@@ -71,10 +72,10 @@ class SheriffAgent:
                 "risk_score": audit.risk_score,
                 "is_safe": audit.is_safe,
                 "threats": audit.threats,
-                "signature": sig.get("signature", "0x..."),
+                "signature": sig_hex,
                 "latency_ms": elapsed_ms
             }
-        except ImportError:
+        except Exception:
             pass
 
         # 2. Remote HTTP Micro-Oracle fallback (for external/standalone CLI agents)
