@@ -95,16 +95,33 @@ class SheriffAgent:
                         "signature": "None",
                         "latency_ms": elapsed_ms
                     }
-        except Exception as exc:
-            return {
-                "success": False,
-                "verdict": "BLOCKED",
-                "risk_score": 1.0,
-                "is_safe": False,
-                "threats": [str(exc)],
-                "signature": "None",
-                "latency_ms": 0.0
-            }
+        except Exception:
+            # Fallback to local in-process micro-oracle engine
+            try:
+                from app.audit_engine import audit_payload
+                from app.eip712_signer import onchain_signer
+                audit = audit_payload(text=text, is_code="os.system" in text or "exec(" in text)
+                sig = onchain_signer.generate_eip712_signature(text, audit.risk_score, audit.verdict)
+                elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+                return {
+                    "success": True,
+                    "verdict": audit.verdict,
+                    "risk_score": audit.risk_score,
+                    "is_safe": audit.is_safe,
+                    "threats": audit.threats,
+                    "signature": sig.get("signature", "0x..."),
+                    "latency_ms": elapsed_ms
+                }
+            except Exception as exc:
+                return {
+                    "success": False,
+                    "verdict": "BLOCKED",
+                    "risk_score": 1.0,
+                    "is_safe": False,
+                    "threats": [str(exc)],
+                    "signature": "None",
+                    "latency_ms": 0.0
+                }
 
     def process_message(self, user_prompt: str) -> Dict[str, Any]:
         """
