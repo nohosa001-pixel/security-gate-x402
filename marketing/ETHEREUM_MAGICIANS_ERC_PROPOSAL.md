@@ -120,6 +120,7 @@ interface IAgentCreditOracle {
 ### Reference Implementation & Live Demo
 
 A fully working, tested reference implementation and live interactive showcase are available:
+
 - 🌐 **Live Interactive Showcase (Sheriff Agent & Safe Guard)**: [https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard)
 - 🏛️ **Gnosis Safe{Wallet} App Store Certified**: [Open in Safe{Wallet} (Polygon Mainnet)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)
 - 📜 **Deployed Verified Contracts (Polygon Mainnet)**:
