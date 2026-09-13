@@ -1063,6 +1063,7 @@ class SecurityGateGuardrail:
 
     window.onload = () => {
       loadRecentEvents();
+      setInterval(loadRecentEvents, 4000);
       switchCodeTab('python');
       updateCalculator();
     };
