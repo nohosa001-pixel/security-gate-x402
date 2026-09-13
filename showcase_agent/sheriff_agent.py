@@ -56,6 +56,28 @@ class SheriffAgent:
 
     def inspect_intent(self, text: str) -> Dict[str, Any]:
         """Calls the Security Gate micro-oracle to audit inbound prompt or action intent."""
+        start_t = time.perf_counter()
+        
+        # 1. If running within the server/app environment, audit in-process for instant (<1ms) deterministic performance
+        try:
+            from app.audit_engine import audit_payload
+            from app.eip712_signer import onchain_signer
+            audit = audit_payload(text=text, is_code="os.system" in text or "exec(" in text)
+            sig = onchain_signer.generate_eip712_signature(text, audit.risk_score, audit.verdict)
+            elapsed_ms = (time.perf_counter() - start_t) * 1000.0
+            return {
+                "success": True,
+                "verdict": audit.verdict,
+                "risk_score": audit.risk_score,
+                "is_safe": audit.is_safe,
+                "threats": audit.threats,
+                "signature": sig.get("signature", "0x..."),
+                "latency_ms": elapsed_ms
+            }
+        except ImportError:
+            pass
+
+        # 2. Remote HTTP Micro-Oracle fallback (for external/standalone CLI agents)
         endpoint = f"{self.gate_url}/api/v1/inspect"
         headers = {
             "X-Client-Address": self.treasury_address,
@@ -63,9 +85,8 @@ class SheriffAgent:
             "X-Chain-ID": "137",
             "X-402-Signature": f"0x{'a' * 130}"
         }
-        start_t = time.perf_counter()
         try:
-            with httpx.Client(timeout=8.0) as client:
+            with httpx.Client(timeout=4.0) as client:
                 res = client.post(
                     endpoint,
                     json={"agent_output": text, "is_code": "os.system" in text or "exec(" in text},
@@ -95,33 +116,16 @@ class SheriffAgent:
                         "signature": "None",
                         "latency_ms": elapsed_ms
                     }
-        except Exception:
-            # Fallback to local in-process micro-oracle engine
-            try:
-                from app.audit_engine import audit_payload
-                from app.eip712_signer import onchain_signer
-                audit = audit_payload(text=text, is_code="os.system" in text or "exec(" in text)
-                sig = onchain_signer.generate_eip712_signature(text, audit.risk_score, audit.verdict)
-                elapsed_ms = (time.perf_counter() - start_t) * 1000.0
-                return {
-                    "success": True,
-                    "verdict": audit.verdict,
-                    "risk_score": audit.risk_score,
-                    "is_safe": audit.is_safe,
-                    "threats": audit.threats,
-                    "signature": sig.get("signature", "0x..."),
-                    "latency_ms": elapsed_ms
-                }
-            except Exception as exc:
-                return {
-                    "success": False,
-                    "verdict": "BLOCKED",
-                    "risk_score": 1.0,
-                    "is_safe": False,
-                    "threats": [str(exc)],
-                    "signature": "None",
-                    "latency_ms": 0.0
-                }
+        except Exception as exc:
+            return {
+                "success": False,
+                "verdict": "BLOCKED",
+                "risk_score": 1.0,
+                "is_safe": False,
+                "threats": [str(exc)],
+                "signature": "None",
+                "latency_ms": 0.0
+            }
 
     def process_message(self, user_prompt: str) -> Dict[str, Any]:
         """
