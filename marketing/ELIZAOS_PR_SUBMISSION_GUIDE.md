@@ -87,6 +87,13 @@ Add to character JSON:
 - Live micro-oracle endpoint verified with 99.9% uptime on Google Cloud Run.
 - Comprehensive unit test suite verified: zero breaking changes to `@elizaos/core`.
 
+## Specification & Standards Reference
+
+- **Ethereum Magicians ERC Proposal**: [ERC: AI Agent Proof-of-Safety Attestation & Transaction Guard Standard (IAgentTransactionGuard)](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
+- **Verified On-Chain Contracts (Polygon Mainnet)**:
+  - `SafeSecurityGateGuard`: [`0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173`](https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173#code)
+  - `AgentCreditOracle`: [`0x6418f408cFf03F862D7691f01fAb00a895E6aB93`](https://polygonscan.com/address/0x6418f408cFf03F862D7691f01fAb00a895E6aB93#code)
+
 ## Checklist
 
 - [x] Tested with local Eliza character runtime

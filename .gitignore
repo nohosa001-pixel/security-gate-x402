@@ -49,6 +49,9 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Submodules / Upstream Forks
+eliza-upstream/
+
 # Runtime Data State
 data/*.json
 data/*.tmp
