@@ -18,9 +18,11 @@
 4. 상단 탭에서 **`My custom apps`** (내 커스텀 앱)를 클릭합니다.
 5. **`Add custom app`** (커스텀 앱 추가) 버튼을 누릅니다.
 6. **App URL** 입력창에 아래 URL을 입력합니다:
+
    ```text
    https://agent-security-gate-x402-212942243360.asia-northeast3.run.app
    ```
+
 7. Safe 인터페이스가 우리 서버의 매니페스트를 자동으로 조회하여 아래와 같이 채워집니다:
    - **App Name**: `Agent Security Gate x402`
    - **Description**: `Autonomous AI Agent Treasury Defense & FICO Credit Rating Oracle for Gnosis Safe`
@@ -35,9 +37,11 @@
 모든 Safe 전 세계 사용자가 검색창에서 바로 우리 앱을 찾아서 쓸 수 있도록 공식 디렉토리에 등록하는 방법입니다.
 
 ### 저장소 정보
+
 - **공식 저장소**: [safe-global/safe-apps-list](https://github.com/safe-global/safe-apps-list)
 
 ### 제출 정보 템플릿
+
 - **App Name**: `Agent Security Gate x402`
 - **URL**: `https://agent-security-gate-x402-212942243360.asia-northeast3.run.app`
 - **Description**: `Deterministic AI Agent Treasury Guard & Autonomous Transaction Micro-Oracle for Safe{Core}. Protects DAO multisigs against prompt injections and budget drains.`
