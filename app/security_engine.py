@@ -240,7 +240,9 @@ def analyze_payload_security(
     is_code: bool = False,
     context_ground_truth: Optional[str] = None
 ) -> Dict[str, Any]:
-    content = (content or "")[:MAX_CONTENT_LENGTH]
+    raw_content = (content or "")[:MAX_CONTENT_LENGTH]
+    # Normalize evasion vectors (null-bytes and zero-width spaces) for regex pattern matching
+    content = raw_content.replace("\x00", " ").replace("\u200b", "").replace("\u200c", "")
     if context_ground_truth:
         context_ground_truth = context_ground_truth[:MAX_CONTENT_LENGTH]
 

@@ -92,7 +92,7 @@ class BoundedAgentWallet:
         self.per_tx_limit_usdc = float(per_tx_limit_usdc)
         self.whitelist = {addr.lower() for addr in (whitelist or [self.DEFAULT_SHERIFF_GATE])}
         self.ledger_path = ledger_path
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self.in_memory_records: list = []
 
         if self.ledger_path and os.path.exists(self.ledger_path):
@@ -165,6 +165,18 @@ class BoundedAgentWallet:
         with self._lock:
             self.in_memory_records.append(entry)
             self._save_ledger()
+
+    def pay_if_allowed(self, recipient: str, amount_usdc: float, audit_proof: Optional[str] = None) -> tuple:
+        """
+        Atomically checks budget constraints and records spend to prevent race conditions.
+        Returns (is_allowed: bool, reason: str).
+        """
+        with self._lock:
+            allowed, reason = self.can_pay(recipient, amount_usdc)
+            if allowed:
+                self.record_spend(recipient, amount_usdc, audit_proof)
+                return True, "APPROVED"
+            return False, reason
 
 
 class SecurityGateClient:
