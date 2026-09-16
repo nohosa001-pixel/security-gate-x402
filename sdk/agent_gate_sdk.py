@@ -135,7 +135,16 @@ class BoundedAgentWallet:
         Returns (is_allowed: bool, reason: str).
         """
         import time
-        amount = float(amount_usdc)
+        import math
+
+        try:
+            amount = float(amount_usdc)
+        except (ValueError, TypeError):
+            return False, f"Invalid transaction amount: {amount_usdc}"
+
+        if math.isnan(amount) or math.isinf(amount) or amount <= 0:
+            return False, f"Transaction amount must be strictly positive and finite: ${amount_usdc}"
+
         clean_recipient = recipient.lower()
 
         # 1. Whitelist Check
@@ -156,10 +165,16 @@ class BoundedAgentWallet:
     def record_spend(self, recipient: str, amount_usdc: float, audit_proof: Optional[str] = None):
         """Records confirmed transaction in the persistent ledger."""
         import time
+        import math
+
+        amount = float(amount_usdc)
+        if math.isnan(amount) or math.isinf(amount) or amount <= 0:
+            raise ValueError(f"Cannot record non-positive or non-finite spend: {amount_usdc}")
+
         entry = {
             "timestamp": time.time(),
             "recipient": recipient,
-            "amount_usdc": float(amount_usdc),
+            "amount_usdc": amount,
             "audit_proof": audit_proof
         }
         with self._lock:

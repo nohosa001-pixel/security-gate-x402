@@ -32,6 +32,36 @@ class AgentInsuranceEngine:
         """
         Calculates actuarial premium and issues an EIP-712 PolicyQuote for AgentInsurancePool.sol.
         """
+        import math
+        try:
+            coverage = float(coverage_amount_usdc)
+        except (ValueError, TypeError):
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Invalid coverage amount: {coverage_amount_usdc}"
+            }
+
+        if math.isnan(coverage) or math.isinf(coverage) or coverage <= 0:
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Coverage amount must be strictly positive and finite: ${coverage_amount_usdc}"
+            }
+
+        if duration_days <= 0 or duration_days > 365:
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Policy duration must be between 1 and 365 days (got {duration_days})"
+            }
+
         if verifying_contract is None:
             verifying_contract = "0x0000000000000000000000000000000000000000"
 
@@ -53,7 +83,7 @@ class AgentInsuranceEngine:
             annual_bps = 1000     # 10.0% APY for C/D
 
         # Premium calculation: coverage * rate * (duration / 365)
-        raw_premium = (coverage_amount_usdc * annual_bps * duration_days) / (365.0 * 10000.0)
+        raw_premium = (coverage * annual_bps * duration_days) / (365.0 * 10000.0)
         premium_usdc = round(max(0.50, raw_premium), 4)
 
         # Risk-free Oracle protocol underwriting fee (15% of premium, min $0.20)
@@ -64,7 +94,7 @@ class AgentInsuranceEngine:
         nonce = secrets.randbelow(10**9)
 
         # Convert USDC amounts to 6-decimal integers for smart contract compatibility
-        coverage_units = int(coverage_amount_usdc * 1_000_000)
+        coverage_units = int(coverage * 1_000_000)
         premium_units = int(premium_usdc * 1_000_000)
         fee_units = int(oracle_fee_usdc * 1_000_000)
 

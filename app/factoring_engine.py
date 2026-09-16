@@ -35,6 +35,36 @@ class AgentFactoringEngine:
         Assesses an agent's creditworthiness to factor an escrow receivable into immediate cash.
         Issues an EIP-712 FactoringAttestation for on-chain submission.
         """
+        import math
+        try:
+            face_val = float(face_value_usdc)
+        except (ValueError, TypeError):
+            return {
+                "status": "rejected",
+                "invoice_id": invoice_id,
+                "agent_address": agent_address,
+                "is_eligible": False,
+                "reason": f"Invalid face value: {face_value_usdc}"
+            }
+
+        if math.isnan(face_val) or math.isinf(face_val) or face_val <= 0:
+            return {
+                "status": "rejected",
+                "invoice_id": invoice_id,
+                "agent_address": agent_address,
+                "is_eligible": False,
+                "reason": f"Invoice face value must be strictly positive and finite: ${face_value_usdc}"
+            }
+
+        if duration_days <= 0 or duration_days > 365:
+            return {
+                "status": "rejected",
+                "invoice_id": invoice_id,
+                "agent_address": agent_address,
+                "is_eligible": False,
+                "reason": f"Factoring duration must be between 1 and 365 days (got {duration_days})"
+            }
+
         if verifying_contract is None:
             verifying_contract = "0x0000000000000000000000000000000000000000"
 
@@ -65,9 +95,20 @@ class AgentFactoringEngine:
         else:
             discount_bps = 700     # 7.0% for B
 
-        discount_fee_usdc = round((face_value_usdc * discount_bps) / 10000.0, 4)
-        oracle_fee_usdc = round(max(0.20, (face_value_usdc * self.ORACLE_FEE_BPS) / 10000.0), 4)
-        advance_amount_usdc = round(face_value_usdc - discount_fee_usdc - oracle_fee_usdc, 4)
+        discount_fee_usdc = round((face_val * discount_bps) / 10000.0, 4)
+        oracle_fee_usdc = round(max(0.20, (face_val * self.ORACLE_FEE_BPS) / 10000.0), 4)
+        advance_amount_usdc = round(face_val - discount_fee_usdc - oracle_fee_usdc, 4)
+
+        if advance_amount_usdc <= 0:
+            return {
+                "status": "rejected",
+                "invoice_id": invoice_id,
+                "agent_address": agent_address,
+                "is_eligible": False,
+                "credit_score": score,
+                "grade": grade,
+                "reason": f"Invoice face value ${face_val:.2f} is insufficient to cover discount and protocol fees (${discount_fee_usdc + oracle_fee_usdc:.2f})"
+            }
 
         apr_equivalent = round((discount_bps / 100.0 / max(1, duration_days)) * 365.0, 2)
         expires_at = int(time.time()) + 3600  # 1 hour attestation validity
@@ -75,7 +116,7 @@ class AgentFactoringEngine:
         nonce = secrets.randbelow(10**9)
 
         # Scale to 6 decimals integer for smart contracts
-        face_units = int(face_value_usdc * 1_000_000)
+        face_units = int(face_val * 1_000_000)
         oracle_fee_units = int(oracle_fee_usdc * 1_000_000)
 
         # 3. Formulate EIP-712 Typed Data
