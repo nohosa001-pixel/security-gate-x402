@@ -74,9 +74,10 @@ x402-security-agent = "mcp_server:main"
 py-modules = ["mcp_server"]
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.txt", ".well-known/*", "static/*", "contracts/*"]
+"app" = ["static/*", "static/**/*"]
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*", "sdk*"]
-exclude = ["app.__pycache__*", "tests*", "*.pyc", "marketing*", "scripts*", "examples*"]
+exclude = ["app.__pycache__*", "tests*", "*.pyc", "marketing*", "scripts*", "examples*", "eliza-upstream*", "packages*", "node_modules*"]
+

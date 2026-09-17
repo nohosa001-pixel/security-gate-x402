@@ -6,4 +6,11 @@ recursive-include .well-known *
 recursive-include app/static *
 recursive-include contracts *
 recursive-include sdk *
+prune eliza-upstream
+prune packages
+prune tests
+prune marketing
+prune scripts
+prune showcase_agent
 global-exclude *.py[cod] __pycache__ *.so
+
