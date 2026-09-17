@@ -15,3 +15,10 @@ tests/
 .vscode/
 dist/
 build/
+eliza-upstream/
+packages/
+contracts/
+marketing/
+showcase_agent/
+node_modules/
+
