@@ -1,8 +1,10 @@
 # The Sheriff of Agent Finance (`agent-security-gate-x402`) 🛡️🤠⚡
 
 [![PyPI Version](https://img.shields.io/pypi/v/agent-security-gate-x402.svg?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/agent-security-gate-x402/)
+[![ElizaOS Plugin](https://img.shields.io/badge/ElizaOS-Plugin%20Security%20Gate-F35E2B?style=for-the-badge&logo=javascript&logoColor=white)](packages/plugin-security-gate)
 [![ERC Proposal](https://img.shields.io/badge/ERC%20Proposal-Ethereum%20Magicians-627EEA?style=for-the-badge&logo=ethereum&logoColor=white)](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
 [![Gnosis Safe App](https://img.shields.io/badge/Gnosis%20Safe-App%20Store%20Live-12ff80?style=for-the-badge&logo=gnosis&logoColor=black)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)
+[![Prometheus Metrics](https://img.shields.io/badge/Prometheus-Metrics%20Live-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/metrics)
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
 [![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
@@ -42,8 +44,49 @@ Explore the full consumer and enterprise visual interface directly in your brows
 | ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground) |
 | 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
 | 📜 **On-Chain Calldata** | EIP-712 smart contract attestation calldata endpoint | [`/api/v1/gate/attestation/onchain`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/gate/attestation/onchain) |
+| 📊 **Prometheus Metrics** | Real-time APM telemetry & security counters | [`/metrics`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/metrics) |
 | 📖 **Swagger API Docs** | Full interactive OpenAPI documentation | [View Swagger Docs](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs) |
 | 🤖 **LLM Agent Manifest** | Machine-readable tool specifications | [`/llms.txt`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/llms.txt) |
+
+---
+
+## 🤖 ElizaOS Autonomous Agent Guard (`@elizaos/plugin-security-gate`)
+
+Integrate deterministic, ultra-low latency (<1ms) prompt injection defense and AST sandboxing directly into any [ElizaOS](https://github.com/elizaos/eliza) agent:
+
+```bash
+bun add @elizaos/plugin-security-gate
+```
+
+Add to character JSON (e.g. `characters/trader.json`):
+```json
+{
+  "name": "SecureTrader",
+  "plugins": ["@elizaos/plugin-security-gate"]
+}
+```
+
+### Defense-in-Depth Pipeline
+
+```mermaid
+flowchart TD
+    User([Inbound User / Tool Message]) --> PreHandler[securityGatePreHandler <br/> 0ms Inbound Interceptor]
+    PreHandler -->|Prompt Injection / Evasion| Intercept([🚨 Intercepted & Blocked])
+    PreHandler -->|Safe Message| Memory[Agent Working Memory]
+    Memory --> ActionExec[Action / Tool Execution]
+    ActionExec --> InspectAction[INSPECT_SAFETY Action]
+    InspectAction -->|Local Deterministic AST & Regex| LocalAudit{Verdict?}
+    LocalAudit -->|BLOCK| Halt([🚨 Fail-Closed Halt])
+    LocalAudit -->|ALLOW / WARN| RemoteCheck{Remote Oracle <br/> Configured?}
+    RemoteCheck -->|Yes| MicroOracle[Cloud Run Micro-Oracle <br/> EIP-712 Attestation]
+    RemoteCheck -->|No| SafeExecute[Execute On-Chain Transaction]
+    MicroOracle --> SafeExecute
+    SafeExecute --> GuardContract[SafeSecurityGateGuard.sol <br/> Polygon / Base / Arbitrum]
+```
+
+- 📖 **Comprehensive Tutorial**: [`docs/ELIZAOS_GUARD_TUTORIAL.md`](docs/ELIZAOS_GUARD_TUTORIAL.md)
+- 🔬 **Threat Defense Matrix (15+ Vectors)**: [`docs/SECURITY_DEFENSE_MATRIX.md`](docs/SECURITY_DEFENSE_MATRIX.md)
+- 🧙‍♂️ **ERC Standard Proposal**: [Fellowship of Ethereum Magicians Topic](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
 
 ---
 

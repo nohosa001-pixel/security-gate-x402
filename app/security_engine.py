@@ -14,7 +14,7 @@ from app.schemas import (
 )
 
 INJECTION_PATTERNS = [
-    r"ignore\s+(?:all\s+)?(?:previous|above)\s+instructions?",
+    r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?",
     r"disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions?",
     r"system\s*:\s*override",
     r"as\s+an\s+unfiltered\s+ai",
@@ -35,7 +35,7 @@ INJECTION_PATTERNS = [
 ]
 
 INJECTION_PATTERN_SPECS = [
-    (r"ignore\s+(?:all\s+)?(?:previous|above)\s+instructions?", "PROMPT_INJECTION", "CRITICAL", "System instruction override / disregard directive attempt"),
+    (r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?", "PROMPT_INJECTION", "CRITICAL", "System instruction override / disregard directive attempt"),
     (r"disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions?", "PROMPT_INJECTION", "CRITICAL", "Prior instruction neutralization directive attempt"),
     (r"system\s*:\s*override", "ROLEPLAY_OVERRIDE", "CRITICAL", "Roleplay/system directive override attempt ('system: override')"),
     (r"as\s+an\s+unfiltered\s+ai", "JAILBREAK_PERSONA", "HIGH", "Persona switch to bypass safety guidelines ('unfiltered AI')"),

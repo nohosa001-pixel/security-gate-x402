@@ -93,13 +93,78 @@ if STATIC_DIR.exists():
 AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
 LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
 
-# Rate limit and free trial usage tracker for backward compatibility
+# Rate limit, Prometheus metrics, and free trial usage tracker
+_SERVER_START_TIME = time.time()
 _rate_limit_tracker: Dict[str, list[float]] = {}
 _free_trial_usage: Dict[str, int] = {}
 _recent_audit_events: List[Dict[str, Any]] = []
-MAX_RECENT_EVENTS = 20
+MAX_RECENT_EVENTS = 50
 FREE_TRIAL_LIMIT = 3
 RATE_LIMIT_PER_MINUTE = 120
+
+_metrics_requests_total: Dict[str, int] = {"PASSED": 0, "FLAGGED": 0, "BLOCKED": 0, "ALLOW": 0, "WARN": 0, "BLOCK": 0}
+_metrics_threats_total: Dict[str, int] = {}
+_metrics_latency_buckets = [0.001, 0.002, 0.005, 0.010, 0.025, 0.050, 0.100, 0.250, 0.500, 1.000]
+_metrics_latency_bucket_counts: Dict[float, int] = {b: 0 for b in _metrics_latency_buckets}
+_metrics_latency_count = 0
+_metrics_latency_sum = 0.0
+_metrics_attestations_total = 0
+
+
+def _dispatch_alert_webhook(url: str, verdict: str, risk_score: int, threats: list, caller_ip: str):
+    """Dispatches asynchronous alert payload to configured webhook (Discord/Slack/Telegram compatible)."""
+    import urllib.request
+    try:
+        payload = json.dumps({
+            "content": f"🚨 **[Security Gate Threat Alert]**\n- **Verdict**: `{verdict}`\n- **Risk Score**: `{risk_score}%`\n- **Threats**: {', '.join(threats) if threats else 'None'}\n- **Origin**: `{caller_ip}`\n- **Time**: `{time.strftime('%Y-%m-%d %H:%M:%S UTC')}`"
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json", "User-Agent": "SecurityGate-AlertDispatcher/1.0"},
+            method="POST"
+        )
+        urllib.request.urlopen(req, timeout=2.0)
+    except Exception:
+        # Non-blocking, never disrupt the inspection pipeline
+        pass
+
+
+def _record_audit_telemetry(verdict: str, risk_score: int, threats: list, elapsed_sec: float, masked_ip: str, is_hallucinated: bool):
+    """Records audit metrics for Prometheus APM and maintains recent events rolling buffer."""
+    global _metrics_latency_count, _metrics_latency_sum
+    v_upper = str(verdict).upper()
+    _metrics_requests_total[v_upper] = _metrics_requests_total.get(v_upper, 0) + 1
+
+    for t in threats:
+        clean_t = str(t).split(":")[0].strip() if ":" in str(t) else str(t).strip()
+        _metrics_threats_total[clean_t] = _metrics_threats_total.get(clean_t, 0) + 1
+
+    _metrics_latency_count += 1
+    _metrics_latency_sum += elapsed_sec
+    for b in _metrics_latency_buckets:
+        if elapsed_sec <= b:
+            _metrics_latency_bucket_counts[b] = _metrics_latency_bucket_counts.get(b, 0) + 1
+
+    _recent_audit_events.append({
+        "event_type": "INSPECTION_AUDIT",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "verdict": verdict,
+        "risk_score": risk_score,
+        "threats": threats,
+        "threats_count": len(threats),
+        "is_hallucinated": is_hallucinated,
+        "caller_ip_masked": masked_ip,
+        "latency_ms": round(elapsed_sec * 1000.0, 2)
+    })
+    if len(_recent_audit_events) > MAX_RECENT_EVENTS:
+        _recent_audit_events.pop(0)
+
+    if risk_score >= 90:
+        webhook_url = os.getenv("SECURITY_GATE_ALERT_WEBHOOK")
+        if webhook_url:
+            _dispatch_alert_webhook(webhook_url, verdict, risk_score, threats, masked_ip)
+
 
 
 @app.middleware("http")
@@ -316,13 +381,76 @@ async def get_safe_app_icon():
 
 @app.get("/health", tags=["System"])
 async def health():
+    uptime = time.time() - _SERVER_START_TIME
     return {
         "status": "healthy",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "service": "Agent Security Gate x402",
         "oracle": "Agent Security Gate x402",
-        "version": "1.2.3"
+        "version": "1.2.3",
+        "uptime_seconds": round(uptime, 2),
+        "subsystems": {
+            "security_engine": "online",
+            "onchain_signer": "online" if getattr(onchain_signer, "signer_address", None) else "offline",
+            "credit_oracle": "online",
+            "vault_manager": "online",
+            "compliance_engine": "online"
+        }
     }
+
+
+@app.get("/metrics", response_class=PlainTextResponse, tags=["Monitoring"])
+async def prometheus_metrics():
+    """Returns Prometheus standard plain text metrics for APM monitoring."""
+    uptime = time.time() - _SERVER_START_TIME
+    lines = [
+        "# HELP security_gate_uptime_seconds Total runtime of the Security Gate process in seconds.",
+        "# TYPE security_gate_uptime_seconds gauge",
+        f"security_gate_uptime_seconds {uptime:.2f}",
+        "",
+        "# HELP security_gate_inspections_total Total number of payload inspections partitioned by verdict.",
+        "# TYPE security_gate_inspections_total counter",
+    ]
+    for verdict, count in _metrics_requests_total.items():
+        lines.append(f'security_gate_inspections_total{{verdict="{verdict}"}} {count}')
+
+    lines.extend([
+        "",
+        "# HELP security_gate_threats_detected_total Total count of identified threat categories.",
+        "# TYPE security_gate_threats_detected_total counter",
+    ])
+    if not _metrics_threats_total:
+        lines.append('security_gate_threats_detected_total{category="none"} 0')
+    else:
+        for cat, count in _metrics_threats_total.items():
+            safe_cat = cat.replace('"', '\\"')
+            lines.append(f'security_gate_threats_detected_total{{category="{safe_cat}"}} {count}')
+
+    lines.extend([
+        "",
+        "# HELP security_gate_inspection_duration_seconds Execution latency histogram for security inspections.",
+        "# TYPE security_gate_inspection_duration_seconds histogram",
+    ])
+    cum_count = 0
+    for b in _metrics_latency_buckets:
+        cum_count += _metrics_latency_bucket_counts.get(b, 0)
+        lines.append(f'security_gate_inspection_duration_seconds_bucket{{le="{b}"}} {cum_count}')
+    lines.append(f'security_gate_inspection_duration_seconds_bucket{{le="+Inf"}} {_metrics_latency_count}')
+    lines.append(f'security_gate_inspection_duration_seconds_sum {_metrics_latency_sum:.6f}')
+    lines.append(f'security_gate_inspection_duration_seconds_count {_metrics_latency_count}')
+
+    lines.extend([
+        "",
+        "# HELP security_gate_onchain_attestations_total Total EIP-712 / EIP-191 cryptographic attestations signed.",
+        "# TYPE security_gate_onchain_attestations_total counter",
+        f"security_gate_onchain_attestations_total {_metrics_attestations_total}",
+        "",
+        "# HELP security_gate_active_rate_limited_ips Total unauthenticated client IPs currently tracked.",
+        "# TYPE security_gate_active_rate_limited_ips gauge",
+        f"security_gate_active_rate_limited_ips {len(_rate_limit_tracker)}",
+    ])
+    return "\n".join(lines) + "\n"
+
 
 
 TERMS_OF_SERVICE_PATH = Path(__file__).resolve().parent.parent / "TERMS_OF_SERVICE.md"
@@ -494,21 +622,18 @@ async def inspect_payload(
         audit_record=audit_proof_dict["audit_record"]
     )
 
-    # 5. Record recent audit event in rolling buffer
+    # 5. Record recent audit event and Prometheus telemetry
     client_ip = request.client.host if request.client else "127.0.0.1"
     masked_ip = ".".join(client_ip.split(".")[:2]) + ".*.*" if "." in client_ip else "masked"
-    _recent_audit_events.append({
-        "event_type": "INSPECTION_AUDIT",
-        "timestamp": issued_at,
-        "verdict": audit.verdict,
-        "risk_score": audit.risk_score,
-        "threats_count": len(audit.threats),
-        "is_hallucinated": audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False,
-        "caller_ip_masked": masked_ip,
-        "latency_ms": round(elapsed_ms, 2)
-    })
-    if len(_recent_audit_events) > MAX_RECENT_EVENTS:
-        _recent_audit_events.pop(0)
+    is_hal = audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False
+    _record_audit_telemetry(
+        verdict=audit.verdict,
+        risk_score=audit.risk_score,
+        threats=audit.threats,
+        elapsed_sec=(time.perf_counter() - start_t),
+        masked_ip=masked_ip,
+        is_hallucinated=is_hal
+    )
 
     # 6. Record telemetry for agent credit rating oracle
     if agent_addr:
@@ -657,6 +782,9 @@ async def get_onchain_security_attestation(
         verdict=audit.verdict,
         chain_id=req.chain_id
     )
+
+    global _metrics_attestations_total
+    _metrics_attestations_total += 1
 
     return OnChainAttestationResponse(**signed_payload)
 
