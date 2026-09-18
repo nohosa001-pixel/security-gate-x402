@@ -59,6 +59,7 @@ bun add @elizaos/plugin-security-gate
 ```
 
 Add to character JSON (e.g. `characters/trader.json`):
+
 ```json
 {
   "name": "SecureTrader",

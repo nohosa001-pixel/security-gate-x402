@@ -64,15 +64,20 @@ If you manage a multi-signature treasury or require on-chain EIP-712 safety proo
 ## 🧱 3. Core Components in Action
 
 ### 1) `securityGatePreHandler` (Zero-Latency Inbound Interceptor)
+
 The plugin registers a `ChatPreHandler` hook into the ElizaOS message pipeline.
+
 - **Timing**: Executes **before** the message is added to state or sent to LLM generation.
 - **Fail-Closed Guarantee**: If an inbound message matches high-risk prompt injections, jailbreaks, or evasion attempts (such as null-byte or zero-width character obfuscation), it immediately returns an intercept message:
+
   ```text
   🚨 [SECURITY GATE: BLOCKED] Inbound message flagged for prompt injection: Prompt Injection: Instruction Override
   ```
+
 - **Benefit**: The turn is terminated instantly (<1ms), preventing adversarial tokens from entering the agent's context memory or incurring LLM API token costs.
 
 ### 2) `INSPECT_SAFETY` Action
+
 Agents can proactively call `INSPECT_SAFETY` before executing transactions or dynamic scripts.
 
 ```typescript
@@ -96,7 +101,9 @@ if (!audit.success) {
 ```
 
 #### Structured Callback Contract
+
 The callback delivers typed metadata complying with ElizaOS `Content` and `ContentValue`:
+
 ```typescript
 interface CallbackData {
   verdict: "ALLOW" | "WARN" | "BLOCK";
@@ -108,7 +115,9 @@ interface CallbackData {
 ```
 
 ### 3) `securityStatusProvider`
+
 Provides live security posture telemetry into the agent's prompt context:
+
 ```text
 [Security Gate Status: ACTIVE | Engine: Deterministic Local Analyzer | Latency: <1ms | Policy: Fail-Closed]
 ```

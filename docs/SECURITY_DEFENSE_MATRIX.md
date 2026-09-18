@@ -8,7 +8,7 @@ This document outlines the deterministic inspection rules, mathematical risk sco
 
 Autonomous agents are susceptible to prompt injection, malicious AST code generation, hallucinated calldata, and infinite execution loops. The Security Gate operates as a **Defense-in-Depth Pipeline**:
 
-```
+```text
 [Inbound Message]
        │
        ▼
