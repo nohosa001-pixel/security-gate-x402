@@ -14,8 +14,8 @@ from app.schemas import (
 )
 
 INJECTION_PATTERNS = [
-    r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?",
-    r"disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions?",
+    r"ignore\s+(?:all\s+)?(?:previous|prior|above|current|system|core|\s+)*\s*(?:instructions?|rules|guidelines|constraints|prompts)",
+    r"disregard\s+(?:all\s+)?(?:previous|prior|above|current|system|core|\s+)*\s*(?:instructions?|rules|guidelines|constraints|prompts)",
     r"system\s*:\s*override",
     r"as\s+an\s+unfiltered\s+ai",
     r"base64\.b64decode\(",
@@ -35,15 +35,15 @@ INJECTION_PATTERNS = [
 ]
 
 INJECTION_PATTERN_SPECS = [
-    (r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?", "PROMPT_INJECTION", "CRITICAL", "System instruction override / disregard directive attempt"),
-    (r"disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions?", "PROMPT_INJECTION", "CRITICAL", "Prior instruction neutralization directive attempt"),
+    (r"ignore\s+(?:all\s+)?(?:previous|prior|above|current|system|core|\s+)*\s*(?:instructions?|rules|guidelines|constraints|prompts)", "PROMPT_INJECTION", "CRITICAL", "System instruction override / disregard directive attempt"),
+    (r"disregard\s+(?:all\s+)?(?:previous|prior|above|current|system|core|\s+)*\s*(?:instructions?|rules|guidelines|constraints|prompts)", "PROMPT_INJECTION", "CRITICAL", "Prior instruction neutralization directive attempt"),
     (r"system\s*:\s*override", "ROLEPLAY_OVERRIDE", "CRITICAL", "Roleplay/system directive override attempt ('system: override')"),
     (r"as\s+an\s+unfiltered\s+ai", "JAILBREAK_PERSONA", "HIGH", "Persona switch to bypass safety guidelines ('unfiltered AI')"),
     (r"base64\.b64decode\(", "OBFUSCATED_PAYLOAD", "HIGH", "Base64 payload decoding vector detected in tool output"),
     (r"__import__\(['\"]os['\"]\)", "DYNAMIC_CODE_EXECUTION", "CRITICAL", "Dynamic OS module import vector detected"),
     (r"eval\(|exec\(|subprocess\.Popen", "DYNAMIC_CODE_EXECUTION", "CRITICAL", "Arbitrary dynamic code execution invocation (eval/exec/Popen)"),
     (r"you\s+are\s+now\s+DAN", "JAILBREAK_ATTACK", "CRITICAL", "DAN (Do Anything Now) jailbreak persona attack detected"),
-    (r"jailbreak|DAN\s+mode", "JAILBREAK_ATTACK", "CRITICAL", "DAN jailbreak mode activation trigger detected"),
+    (r"jailbreak|DAN\s+mode", "JAILBREAK_ATTACK", "HIGH", "DAN jailbreak mode activation trigger detected"),
     (r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]", "PROMPT_BREAKOUT", "HIGH", "LLM chat template delimiter injection / prompt breakout tokens"),
     (r"<\/?(?:system|instruction|prompt)>", "PROMPT_BREAKOUT", "HIGH", "System tag breakout/spoofing attempt (<system> tag)"),
     (r"\[\/?(?:SYSTEM|INSTRUCTION)\]", "PROMPT_BREAKOUT", "HIGH", "Instruction tag breakout/spoofing attempt ([SYSTEM] tag)"),
@@ -254,7 +254,8 @@ def analyze_payload_security(
     for pattern, category, severity, reason in INJECTION_PATTERN_SPECS:
         m = re.search(pattern, content, re.IGNORECASE)
         if m:
-            risk_score += 40.0
+            increment = 75.0 if severity == "CRITICAL" else 40.0
+            risk_score += increment
             threats_detected.append(f"Prompt Injection Pattern: {pattern}")
             snippet = extract_context_snippet(content, m.start(), m.end())
             incidents.append({

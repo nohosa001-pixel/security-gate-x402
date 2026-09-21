@@ -37,7 +37,7 @@ NETWORKS = {
             "AgentComplianceRegistry": "0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
             "AgentEscrow": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
             "AgentLendingPool": "0xe43a9C368808B2dfF139D27789C40A3C8F2282cF",
-            "AgentInsurancePool": "0x4f115665a2BdE534bb7fC426e89ca0BfE2De3B50",
+            "AgentInsurancePool": "0xE67F4BC75B11dBb3ef2C9Ad1848B4b193c2c69C6",
             "AgentFactoringPool": "0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0",
             "AgentTreasuryVault": "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638",
             "SecurityGateConsumer": "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA"

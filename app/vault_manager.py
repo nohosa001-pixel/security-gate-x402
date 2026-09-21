@@ -5,6 +5,7 @@ Supports unlimited deposit amounts (micro-amounts to millions of USDC) and high-
 """
 
 import json
+import math
 import os
 import secrets
 import threading
@@ -100,8 +101,8 @@ class VaultManager:
         Deposits USDC into an agent's pre-funded vault balance.
         Minimum deposit: $50.00 USDC (unlimited upper ceiling up to millions of USDC).
         """
-        if amount_usdc < 50.0:
-            raise ValueError("Minimum deposit amount is $50.00 USDC.")
+        if not isinstance(amount_usdc, (int, float)) or math.isnan(amount_usdc) or math.isinf(amount_usdc) or amount_usdc < 50.0:
+            raise ValueError("Minimum deposit amount is $50.00 USDC (must be a valid finite number).")
 
         try:
             checksum_addr = to_checksum_address(agent_address)
@@ -141,6 +142,14 @@ class VaultManager:
         Deducts inspection cost from the vault account in sub-millisecond time.
         Returns: (success: bool, reason_or_agent_addr: str, remaining_balance: float)
         """
+        cur_bal = 0.0
+        acc_pre = self.get_account(session_or_addr)
+        if acc_pre:
+            cur_bal = acc_pre.balance_usdc
+
+        if not isinstance(cost_usdc, (int, float)) or math.isnan(cost_usdc) or math.isinf(cost_usdc) or cost_usdc <= 0.0:
+            return False, "Deduction cost must be strictly positive and finite.", cur_bal
+
         now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         with self._lock:
             # Resolve target account
@@ -175,6 +184,85 @@ class VaultManager:
             self._save_state()
 
         return ret
+
+    def withdraw(self, session_or_addr: str, amount_usdc: float) -> Tuple[bool, str, float]:
+        """
+        Withdraws USDC from an agent's pre-funded vault balance during exit or rebalancing.
+        Returns: (success: bool, message: str, remaining_balance: float)
+        """
+        cur_bal = 0.0
+        acc_pre = self.get_account(session_or_addr)
+        if acc_pre:
+            cur_bal = acc_pre.balance_usdc
+
+        if not isinstance(amount_usdc, (int, float)) or math.isnan(amount_usdc) or math.isinf(amount_usdc) or amount_usdc <= 0.0:
+            return False, "Withdrawal amount must be strictly positive and finite.", cur_bal
+
+        now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        with self._lock:
+            agent_addr = None
+            if session_or_addr in self._session_index:
+                agent_addr = self._session_index[session_or_addr]
+            elif session_or_addr in self._accounts:
+                agent_addr = session_or_addr
+            else:
+                try:
+                    c_addr = to_checksum_address(session_or_addr)
+                    if c_addr in self._accounts:
+                        agent_addr = c_addr
+                except Exception:
+                    pass
+
+            if not agent_addr or agent_addr not in self._accounts:
+                return False, "Vault account not found.", 0.0
+
+            acc = self._accounts[agent_addr]
+            if acc.balance_usdc < amount_usdc:
+                return False, f"Insufficient balance ({acc.balance_usdc:.4f} USDC < {amount_usdc} USDC).", acc.balance_usdc
+
+            acc.balance_usdc = round(acc.balance_usdc - amount_usdc, 6)
+            acc.last_active_utc = now_iso
+            remaining = acc.balance_usdc
+
+        self._save_state()
+        return True, f"Successfully withdrew ${amount_usdc:.4f} USDC.", remaining
+
+    def close_account(self, session_or_addr: str) -> Tuple[bool, str, float]:
+        """
+        Closes the vault account, liquidating all remaining funds for agent exit.
+        Invalidates the session key and purges the account from active index.
+        Returns: (success: bool, message: str, refunded_amount: float)
+        """
+        with self._lock:
+            agent_addr = None
+            session_key = None
+            if session_or_addr in self._session_index:
+                agent_addr = self._session_index[session_or_addr]
+                session_key = session_or_addr
+            elif session_or_addr in self._accounts:
+                agent_addr = session_or_addr
+            else:
+                try:
+                    c_addr = to_checksum_address(session_or_addr)
+                    if c_addr in self._accounts:
+                        agent_addr = c_addr
+                except Exception:
+                    pass
+
+            if not agent_addr or agent_addr not in self._accounts:
+                return False, "Vault account not found.", 0.0
+
+            acc = self._accounts[agent_addr]
+            refund_amount = acc.balance_usdc
+            session_to_delete = session_key or acc.session_key
+
+            # Invalidate session and remove account
+            if session_to_delete in self._session_index:
+                del self._session_index[session_to_delete]
+            del self._accounts[agent_addr]
+
+        self._save_state()
+        return True, f"Account closed and liquidated. Refunded ${refund_amount:.4f} USDC.", refund_amount
 
     def get_account(self, session_or_addr: str) -> Optional[AgentVaultAccount]:
         with self._lock:

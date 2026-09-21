@@ -1,0 +1,24 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/SecurityGateConsumer.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n/**\n * @title SecurityGateConsumer\n * @notice Verifies cryptographic EIP-712 Proof-of-Safety attestations issued by Agent Security Gate x402\n *         before executing autonomous on-chain agent actions on Polygon, Base, or Arbitrum.\n */\ncontract SecurityGateConsumer {\n    address public oracleSigner;\n    address public owner;\n\n    bytes32 public constant EIP712_DOMAIN_TYPEHASH = keccak256(\n        \"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)\"\n    );\n\n    bytes32 public constant ATTESTATION_TYPEHASH = keccak256(\n        \"SecurityAttestation(bytes32 payloadHash,uint8 riskScore,string verdict,uint256 expiresAt)\"\n    );\n\n    bytes32 public DOMAIN_SEPARATOR;\n\n    // Events\n    event SecurityAttestationVerified(bytes32 indexed payloadHash, uint8 riskScore, string verdict, address indexed agent);\n    event ActionExecuted(bytes32 indexed payloadHash, address indexed target, bytes data);\n    event OracleSignerUpdated(address indexed oldSigner, address indexed newSigner);\n\n    error InvalidOracleSignature();\n    error AttestationExpired();\n    error ExcessiveRiskScore(uint8 riskScore, uint8 maxAllowed);\n    error Unauthorized();\n\n    modifier onlyOwner() {\n        if (msg.sender != owner) revert Unauthorized();\n        _;\n    }\n\n    constructor(address _oracleSigner) {\n        owner = msg.sender;\n        oracleSigner = _oracleSigner;\n\n        DOMAIN_SEPARATOR = keccak256(\n            abi.encode(\n                EIP712_DOMAIN_TYPEHASH,\n                keccak256(bytes(\"AgentSecurityGateOracle\")),\n                keccak256(bytes(\"1.0.0\")),\n                block.chainid,\n                address(0) // Domain matches oracle zero-verifyingContract default\n            )\n        );\n    }\n\n    function setOracleSigner(address _newSigner) external onlyOwner {\n        emit OracleSignerUpdated(oracleSigner, _newSigner);\n        oracleSigner = _newSigner;\n    }\n\n    /**\n     * @notice Verifies oracle attestation and executes authorized agent target call.\n     */\n    function verifyAndExecute(\n        bytes32 payloadHash,\n        uint8 riskScore,\n        string calldata verdict,\n        uint256 expiresAt,\n        uint8 v,\n        bytes32 r,\n        bytes32 s,\n        address target,\n        bytes calldata callData,\n        uint8 maxRiskScore\n    ) external returns (bytes memory) {\n        if (block.timestamp > expiresAt) revert AttestationExpired();\n        if (riskScore > maxRiskScore) revert ExcessiveRiskScore(riskScore, maxRiskScore);\n\n        bytes32 structHash = keccak256(\n            abi.encode(\n                ATTESTATION_TYPEHASH,\n                payloadHash,\n                riskScore,\n                keccak256(bytes(verdict)),\n                expiresAt\n            )\n        );\n\n        bytes32 digest = keccak256(abi.encodePacked(\"\\x19\\x01\", DOMAIN_SEPARATOR, structHash));\n        address recoveredSigner = ecrecover(digest, v, r, s);\n\n        if (recoveredSigner != oracleSigner) revert InvalidOracleSignature();\n\n        emit SecurityAttestationVerified(payloadHash, riskScore, verdict, msg.sender);\n\n        (bool success, bytes memory result) = target.call(callData);\n        require(success, \"Target execution failed\");\n\n        emit ActionExecuted(payloadHash, target, callData);\n        return result;\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "viaIR": true,
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode"
+        ]
+      }
+    }
+  }
+}

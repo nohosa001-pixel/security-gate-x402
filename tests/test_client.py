@@ -22,10 +22,18 @@ from sdk import (
     SecurityGateTool
 )
 
+import pytest
+
 # Ensure development environment for local mock verification
 os.environ["ENV"] = "development"
 
+@pytest.fixture(autouse=True)
+def isolate_client_test_env(monkeypatch):
+    monkeypatch.setenv("AGRID_SYNC_ENABLED", "false")
+
 client = TestClient(app)
+
+
 
 
 def test_free_trial_and_402_payment_challenge():

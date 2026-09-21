@@ -68,6 +68,7 @@ contract AgentEscrow {
     event JobStaked(uint256 indexed jobId, address indexed worker, uint256 stakeAmount);
     event JobCompleted(uint256 indexed jobId, address indexed worker, uint256 totalPayout, uint8 riskScore);
     event JobSlashed(uint256 indexed jobId, address indexed client, uint256 refundAndBounty, uint8 riskScore);
+    event JobRefunded(uint256 indexed jobId, address indexed client, uint256 refundAmount);
     event OracleSignerUpdated(address indexed oldSigner, address indexed newSigner);
 
     // Errors
@@ -209,6 +210,38 @@ contract AgentEscrow {
         }
 
         emit JobSlashed(jobId, job.client, totalRefundAndBounty, proof.riskScore);
+    }
+
+    /**
+     * @notice Refunds client if task was unaccepted or expired before deliverable.
+     *         Allows autonomous agents to reclaim locked capital upon timeout or exit.
+     */
+    function refundJob(uint256 jobId) external {
+        Job storage job = jobs[jobId];
+        
+        if (job.status == JobStatus.Created) {
+            // If still in Created status, either the deadline has passed, or the client cancels before work begins
+            if (msg.sender != job.client && block.timestamp <= job.deadline) revert Unauthorized();
+        } else if (job.status == JobStatus.Staked) {
+            // If already staked, refund is only permitted if the worker failed to deliver before deadline
+            if (block.timestamp <= job.deadline) revert Unauthorized();
+        } else {
+            revert InvalidStatus(job.status, JobStatus.Created);
+        }
+
+        uint256 refundAmount = job.payoutAmount;
+        // If worker staked but abandoned past deadline, client also claims worker stake as timeout penalty
+        if (job.status == JobStatus.Staked && job.stakeAmount > 0) {
+            refundAmount += job.stakeAmount;
+        }
+
+        job.status = JobStatus.Refunded;
+
+        if (refundAmount > 0) {
+            if (!paymentToken.transfer(job.client, refundAmount)) revert TransferFailed();
+        }
+
+        emit JobRefunded(jobId, job.client, refundAmount);
     }
 
     /**

@@ -28,6 +28,9 @@ from app.schemas import (
     VaultDepositRequest,
     VaultDepositResponse,
     VaultBalanceResponse,
+    VaultWithdrawRequest,
+    VaultWithdrawResponse,
+    VaultCloseResponse,
     BatchInspectionRequest,
     BatchInspectionResponse,
     EnterpriseKeyCreateRequest,
@@ -682,6 +685,17 @@ async def inspect_payload_batch(
     payer_info = getattr(request.state, "authorized_payer", "sandbox:free_trial")
     extra_headers = getattr(request.state, "extra_headers", {})
 
+    # Upfront settlement verification: Prevent free-rider batch audits
+    vault_key = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+    if vault_key and len(req.items) > 1:
+        # 1 query was already authorized in require_x402_payment; deduct remaining (n-1) upfront
+        remaining_cost = round((len(req.items) - 1) * 0.002, 6)
+        deducted, reason, rem = vault_manager.deduct(vault_key, cost_usdc=remaining_cost)
+        if not deducted:
+            return x402_verifier.build_402_response(
+                custom_detail=f"Insufficient vault balance for batch of {len(req.items)} items: {reason}"
+            )
+
     for item in req.items:
         audit = audit_payload(
             text=item.agent_output,
@@ -715,13 +729,6 @@ async def inspect_payload_batch(
 
     elapsed_ms = (time.perf_counter() - start_t) * 1000.0
     total_cost = round(len(req.items) * 0.002, 6)
-
-    # If paying via vault, deduct the remaining batch cost
-    vault_key = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
-    if vault_key and len(req.items) > 1:
-        # 1 query was already deducted in require_x402_payment, deduct remaining (n-1)
-        remaining_cost = round((len(req.items) - 1) * 0.002, 6)
-        vault_manager.deduct(vault_key, cost_usdc=remaining_cost)
 
     return BatchInspectionResponse(
         status="success",
@@ -898,6 +905,39 @@ async def get_vault_balance(agent_address: str):
         query_count=acc.query_count,
         session_key=acc.session_key,
         last_active_utc=acc.last_active_utc
+    )
+
+
+@app.post("/api/v1/vault/withdraw", response_model=VaultWithdrawResponse, tags=["Agent Vault"])
+async def withdraw_vault(req: VaultWithdrawRequest):
+    """
+    Withdraws USDC from an agent's pre-funded vault balance during exit or rebalancing.
+    """
+    success, msg, remaining = vault_manager.withdraw(req.agent_address, req.amount_usdc)
+    if not success:
+        raise HTTPException(status_code=400, detail=msg)
+    return VaultWithdrawResponse(
+        status="success",
+        agent_address=req.agent_address,
+        withdrawn_usdc=req.amount_usdc,
+        remaining_balance_usdc=remaining,
+        message=msg
+    )
+
+
+@app.post("/api/v1/vault/close/{agent_address}", response_model=VaultCloseResponse, tags=["Agent Vault"])
+async def close_vault_account(agent_address: str):
+    """
+    Closes the agent vault account, liquidates all remaining funds, and invalidates session key (Exit protocol).
+    """
+    success, msg, refunded = vault_manager.close_account(agent_address)
+    if not success:
+        raise HTTPException(status_code=400, detail=msg)
+    return VaultCloseResponse(
+        status="success",
+        agent_address=agent_address,
+        refunded_usdc=refunded,
+        message=msg
     )
 
 

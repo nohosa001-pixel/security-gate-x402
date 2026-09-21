@@ -51,7 +51,11 @@ Thumbs.db
 
 # Submodules / Upstream Forks
 eliza-upstream/
+packages/*/node_modules/
+packages/*/dist/
+arbiscan_test.html
 
 # Runtime Data State
 data/*.json
 data/*.tmp
+

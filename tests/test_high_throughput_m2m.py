@@ -11,9 +11,15 @@ from app.vault_manager import vault_manager, VaultManager
 from app.schemas import PricingTier
 
 
+@pytest.fixture(autouse=True)
+def disable_agrid_sync_for_tests(monkeypatch):
+    monkeypatch.setenv("AGRID_SYNC_ENABLED", "false")
+
+
 @pytest.fixture
 def client():
     return TestClient(app)
+
 
 
 def test_uncapped_deposit_limits(client):

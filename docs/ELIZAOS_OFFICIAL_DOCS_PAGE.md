@@ -145,16 +145,28 @@ If you wish to route safety checks through a high-performance remote micro-oracl
 
 Benchmark results running on native Node.js / Bun runtime:
 
-* **Malicious Injection Catch Rate**: `100%` (4/4 test vectors blocked)
+* **Malicious Threat Interception Rate**: `100%` (22/22 regression vectors blocked)
 * **Benign Traffic False Positive Rate**: `0%`
-* **Average Gate Latency**: `0.31 ms`
-* **Compromised LLM Calls**: `0`
-* **Token Spend on Attacks**: `$0.00` (100% short-circuited)
+* **Deterministic Inspection Latency**: `< 1.0 ms` (Local Regex & AST Heuristics)
+* **Compromised LLM Calls**: `0` (100% short-circuited via fail-closed `chatPreHandlers`)
+* **Token Cost on Attack Turns**: `$0.00`
+* **Test Suite Verification**: `22 pass | 0 fail` (Tested against live `AgentRuntime`)
+
+---
+
+## 🎭 Starter Character Template
+
+A production-ready character template is included in [`characters/secure-agent.character.json`](https://github.com/nohosa001-pixel/security-gate-x402/blob/main/characters/secure-agent.character.json):
+
+```bash
+# Run with Eliza CLI
+eliza start --character characters/secure-agent.character.json
+```
 
 ---
 
 ## 🤝 Contributing & Source Code
 
-* **GitHub PR**: [#31451](https://github.com/elizaOS/eliza/pull/31451)
+* **GitHub PR**: [#31451](https://github.com/elizaOS/eliza/pull/31451) (Approved by core maintainer `@mashingaan`)
 * **Upstream Monorepo**: `plugins/plugin-security-gate`
 * **License**: MIT

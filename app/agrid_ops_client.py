@@ -11,7 +11,10 @@ from typing import Optional, Dict, Any
 logger = logging.getLogger("agrid_ops_client")
 
 AGRID_OPS_URL = os.getenv("AGRID_OPS_URL", "http://localhost:8080")
-AGRID_SYNC_ENABLED = os.getenv("AGRID_SYNC_ENABLED", "true").lower() in ("true", "1", "yes")
+
+
+def is_agrid_sync_enabled() -> bool:
+    return os.getenv("AGRID_SYNC_ENABLED", "true").lower() in ("true", "1", "yes")
 
 
 async def report_clearing_event_async(
@@ -28,7 +31,7 @@ async def report_clearing_event_async(
     Sends a clearing event to agrid-ops-agent for central double-entry accounting journal entries.
     Executes with a fast timeout (2.0s) so it never blocks or slows down M2M sub-5ms client requests.
     """
-    if not AGRID_SYNC_ENABLED:
+    if not is_agrid_sync_enabled():
         return None
 
     event_payload = {
@@ -69,6 +72,10 @@ def dispatch_clearing_event_background(
     target_service: Optional[str] = None,
 ):
     """Fire-and-forget background dispatcher for FastAPI endpoints."""
+    if not is_agrid_sync_enabled():
+        return
+
+
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
@@ -83,3 +90,4 @@ def dispatch_clearing_event_background(
             ))
     except Exception as e:
         logger.debug(f"Failed to dispatch background clearing event: {e}")
+

@@ -159,6 +159,27 @@ class VaultBalanceResponse(BaseModel):
     last_active_utc: str
 
 
+class VaultWithdrawRequest(BaseModel):
+    agent_address: str = Field(..., description="Ethereum/Polygon wallet address of the agent or session key")
+    amount_usdc: float = Field(..., gt=0.0, description="Amount in USDC to withdraw from vault")
+    destination_address: Optional[str] = Field(default=None, description="Optional destination address (defaults to agent address)")
+
+
+class VaultWithdrawResponse(BaseModel):
+    status: str = Field(default="success")
+    agent_address: str
+    withdrawn_usdc: float
+    remaining_balance_usdc: float
+    message: str
+
+
+class VaultCloseResponse(BaseModel):
+    status: str = Field(default="success")
+    agent_address: str
+    refunded_usdc: float
+    message: str
+
+
 class EnterpriseKeyCreateRequest(BaseModel):
     organization_name: str = Field(..., description="Company or Agent DAO Organization Name")
     contact_email: str = Field(..., description="Contact email address")

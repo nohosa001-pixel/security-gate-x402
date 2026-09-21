@@ -1,0 +1,24 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/AgentComplianceRegistry.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n/**\n * @title AgentComplianceRegistry\n * @notice On-chain EU AI Act (Articles 50 & 53) Regulatory Compliance Verification Registry.\n *         Ensures that enterprise smart contracts only interact with AI agents holding an active,\n *         cryptographically certified compliance passport.\n */\ncontract AgentComplianceRegistry {\n    address public complianceOracleSigner;\n    address public owner;\n\n    struct CompliancePassport {\n        address agentAddress;\n        string passportId;\n        bool isCertified;\n        uint256 expiresAt;\n        uint8 v;\n        bytes32 r;\n        bytes32 s;\n    }\n\n    bytes32 public constant EIP712_DOMAIN_TYPEHASH = keccak256(\n        \"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)\"\n    );\n\n    bytes32 public constant COMPLIANCE_PASSPORT_TYPEHASH = keccak256(\n        \"CompliancePassport(address agentAddress,string passportId,bool isCertified,uint256 expiresAt)\"\n    );\n\n    bytes32 public immutable DOMAIN_SEPARATOR;\n\n    event ComplianceOracleUpdated(address indexed oldSigner, address indexed newSigner);\n    event ComplianceVerified(address indexed agent, string passportId, bool isCertified);\n\n    error InvalidOracleSignature();\n    error PassportExpired();\n    error AgentNotCertified();\n    error AgentAddressMismatch();\n    error Unauthorized();\n\n    modifier onlyOwner() {\n        if (msg.sender != owner) revert Unauthorized();\n        _;\n    }\n\n    constructor(address _complianceOracleSigner) {\n        owner = msg.sender;\n        complianceOracleSigner = _complianceOracleSigner;\n\n        DOMAIN_SEPARATOR = keccak256(\n            abi.encode(\n                EIP712_DOMAIN_TYPEHASH,\n                keccak256(bytes(\"AgentComplianceRegistry\")),\n                keccak256(bytes(\"1.0.0\")),\n                block.chainid,\n                address(0)\n            )\n        );\n    }\n\n    function setComplianceOracleSigner(address _newSigner) external onlyOwner {\n        emit ComplianceOracleUpdated(complianceOracleSigner, _newSigner);\n        complianceOracleSigner = _newSigner;\n    }\n\n    /**\n     * @notice Verifies an agent's EU AI Act compliance passport.\n     */\n    function verifyPassport(CompliancePassport calldata passport) public view returns (bool) {\n        if (block.timestamp > passport.expiresAt) revert PassportExpired();\n        if (!passport.isCertified) revert AgentNotCertified();\n\n        bytes32 structHash = keccak256(\n            abi.encode(\n                COMPLIANCE_PASSPORT_TYPEHASH,\n                passport.agentAddress,\n                keccak256(bytes(passport.passportId)),\n                passport.isCertified,\n                passport.expiresAt\n            )\n        );\n\n        bytes32 digest = keccak256(abi.encodePacked(\"\\x19\\x01\", DOMAIN_SEPARATOR, structHash));\n        address recovered = ecrecover(digest, passport.v, passport.r, passport.s);\n\n        if (recovered != complianceOracleSigner) revert InvalidOracleSignature();\n        return true;\n    }\n\n    /**\n     * @notice Enforces that a caller or counterparty agent is fully compliant with EU AI Act.\n     */\n    function requireCompliance(address agent, CompliancePassport calldata passport) external view returns (bool) {\n        if (passport.agentAddress != agent) revert AgentAddressMismatch();\n        return verifyPassport(passport);\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "viaIR": true,
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode"
+        ]
+      }
+    }
+  }
+}

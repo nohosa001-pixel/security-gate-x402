@@ -245,7 +245,7 @@ class X402Verifier:
             if x402_sig.startswith("x402_test_") or x402_sig == "x402_dev_bypass":
                 return True, "x402:test_payer", {"X-Tier": "STANDARD_X402"}
             # Facilitator check fallback
-            return True, f"x402:verified_payer", {"X-Tier": "STANDARD_X402"}
+            return True, "x402:verified_payer", {"X-Tier": "STANDARD_X402"}
 
         # 4. Default Sandbox Free Trial mode
         # In cloud or demo mode, allow free sandbox inspection
