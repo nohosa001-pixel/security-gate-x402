@@ -35,6 +35,7 @@ graph TD
 ## 2. A.GRID 4대 서비스 상세 분석
 
 ### [서비스 1] Security & Compliance Guard (보안관 & 규제 패스포트)
+
 * **담당 모듈**: `app/security_engine.py`, `app/compliance_engine.py`, `app/x402_verifier.py`, `packages/plugin-security-gate`
 * **역할**: 모든 자율 금융 활동의 **출입국 관리소 및 치안 유지관 (The Sheriff)**
 * **핵심 기능**:
@@ -46,6 +47,7 @@ graph TD
 ---
 
 ### [서비스 2] Agent Trade & Asset Management Solver (자율 트레이딩 & 자산운용)
+
 * **담당 모듈**: `app/trade_engine.py`, `app/asset_management_engine.py`
 * **역할**: 에이전트 자금을 안전하게 증식시키는 **자율 헤지펀드 매니저 & DEX 인텐트 솔버**
 * **핵심 기능**:
@@ -57,6 +59,7 @@ graph TD
 ---
 
 ### [서비스 3] A2A Lending & Task Escrow (에이전트 신용 대출 & 업무 에스크로)
+
 * **담당 모듈**: `app/lending_engine.py`, `app/escrow_engine.py`, `app/credit_rating_engine.py`
 * **역할**: 자본이 필요한 에이전트에게 유동성을 공급하는 **에이전트 중앙은행 & 프로젝트 중개소**
 * **핵심 기능**:
@@ -68,6 +71,7 @@ graph TD
 ---
 
 ### [서비스 4] Factoring & Insurance Pool (매출채권 팩토링 & 리스크 보증 보험)
+
 * **담당 모듈**: `app/factoring_engine.py`, `app/insurance_engine.py`
 * **역할**: 현금 흐름을 가속하고 손실을 방어하는 **에이전트 전문 팩토링사 & 온체인 재보험사**
 * **핵심 기능**:
@@ -84,9 +88,9 @@ graph TD
 
 | 순위 | 대상 서비스 | 구축 에이전트 페르소나 | 선정 이유 및 기대 효과 |
 | :---: | :--- | :--- | :--- |
-| **🥇 1순위** | **[서비스 1] Security & Compliance** | **`The Sheriff Agent`** | • ElizaOS 공식 업스트림 기여로 즉시 배포 가능 및 인지도 확보.<br/>• 모든 금융 거래의 필수 전제조건인 보안 인프라 확립. |
-| **🥈 2순위** | **[서비스 2] Trade & Asset Solver** | **`Secure Autonomous Trader`** | • 사용자가 가장 직관적으로 체감하고 자금을 투입할 수 있는 트레이딩 유즈케이스.<br/>• 실제 온체인 스왑 및 트랜잭션 발생. |
-| **🥉 3순위** | **[서비스 3] Lending & Escrow** | **`A2A Credit Broker`** | • 타 에이전트 개발사 및 DAO를 대상으로 B2B 에이전트 금융 네트워크 구축.<br/>• 컴퓨팅 비용 대출 및 외주 에스크로 생태계 선점. |
+| **🥇 1순위** | **[서비스 1] Security & Compliance** | **`The Sheriff Agent`** | (1) ElizaOS 공식 업스트림 기여로 즉시 배포 가능 및 인지도 확보. (2) 모든 금융 거래의 필수 전제조건인 보안 인프라 확립. |
+| **🥈 2순위** | **[서비스 2] Trade & Asset Solver** | **`Secure Autonomous Trader`** | (1) 사용자가 가장 직관적으로 체감하고 자금을 투입할 수 있는 트레이딩 유즈케이스. (2) 실제 온체인 스왑 및 트랜잭션 발생. |
+| **🥉 3순위** | **[서비스 3] Lending & Escrow** | **`A2A Credit Broker`** | (1) 타 에이전트 개발사 및 DAO를 대상으로 B2B 에이전트 금융 네트워크 구축. (2) 컴퓨팅 비용 대출 및 외주 에스크로 생태계 선점. |
 | **4순위** | **[서비스 4] Factoring & Insurance** | **`Underwriter & Cashflow Agent`** | • 3단계(에스크로 거래)가 활성화되어 유통 채권과 리스크가 누적될 때 완성되는 성숙기 금융 모델. |
 
 ---
@@ -94,6 +98,7 @@ graph TD
 ## 4. 실행 로드맵 (Actionable Phases)
 
 ### Phase 1: 1호 플래그십 에이전트 가동 (현재 단계)
+
 * **목표**: **`The Sheriff Agent`**와 **`Secure Trader`**의 융합 에이전트 완성.
 * **주요 산출물**:
   1. ElizaOS 공식 템플릿 캐릭터 파일 (`characters/sheriff-trader.json`).
@@ -101,10 +106,12 @@ graph TD
   3. CLI / 텔레그램을 통한 안전한 실전 스왑 데모 시연.
 
 ### Phase 2: A2A 신용대출 및 에스크로 중개 에이전트 (차기 단계)
+
 * **목표**: 에이전트 간 무담보 마이크로 론 및 업무 에스크로 결제 자동화.
 * **주요 산출물**:
   1. `characters/credit-broker.json` 에이전트 출시.
   2. 온체인 신용평가(`credit_rating_engine`) 및 대출 승인 액션 구현.
 
 ### Phase 3: 종합 에이전트 금융 허브(A.GRID HQ) 통합
+
 * **목표**: 팩토링과 보험 언더라이팅을 통합하여 A.GRID 중앙 정산소(`agrid_ops_client`)와의 연동 완료.

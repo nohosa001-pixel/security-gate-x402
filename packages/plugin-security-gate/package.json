@@ -33,8 +33,8 @@
 	"scripts": {
 		"build": "bun build src/index.ts --outdir dist --target node --format esm",
 		"test": "bun test src/standalone.test.ts",
-		"lint": "bunx @biomejs/biome check --write --unsafe .",
-		"format": "bunx @biomejs/biome format --write ."
+		"lint": "bunx @biomejs/biome check --write --unsafe src",
+		"format": "bunx @biomejs/biome format --write src"
 	},
 	"keywords": [
 		"elizaos",

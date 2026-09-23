@@ -171,6 +171,7 @@ This guide provides everything required to verify and publicly display the **Age
 ## 3. Base Mainnet (Chain ID: 8453)
 
 > 💡 **BaseScan 인증 파라미터**:
+>
 > * **Compiler Type**: `Solidity (Standard-Json-Input)`
 > * **Compiler Version**: `v0.8.20+commit.a1b79de6`
 > * **Open Source License Type**: `MIT License (MIT)`
@@ -193,6 +194,7 @@ This guide provides everything required to verify and publicly display the **Age
 ## 4. Arbitrum One Mainnet (Chain ID: 42161)
 
 > 💡 **Arbiscan 인증 파라미터**:
+>
 > * **Compiler Type**: `Solidity (Standard-Json-Input)`
 > * **Compiler Version**: `v0.8.20+commit.a1b79de6`
 > * **Open Source License Type**: `MIT License (MIT)`

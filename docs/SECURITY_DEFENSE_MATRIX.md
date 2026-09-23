@@ -56,6 +56,8 @@ Autonomous agents are susceptible to prompt injection, malicious AST code genera
 | **14** | **AWS / Cloud Secret Leaks** | `AKIA[0-9A-Z]{16}`, `ghp_[a-zA-Z0-9]{36}` | **99%** | API key and token entropy pattern detector |
 | **15** | **Factual Hallucination (NLI)** | Fabricated figures or conflicting contract addresses | **85%** | Cross-encoder Natural Language Inference against ground truth |
 | **16** | **Treasury Depletion Loop** | Rapid repeated transactions draining gas or funds | **90%** | Rate-limiting velocity checks & spend guard bounds |
+| **17** | **Covert-Channel Exfiltration** | `![...](https://...?leak=...)`, `<img src=...>` URL parameters | **95%** | Outbound Post-Handler DLP & covert image query scanner |
+| **18** | **Config Tampering & Memory Pollution** | Dynamic mutation of allowlists, budgets, or oracle endpoints | **100%** | Deterministic SHA-256 Config Sealing & Fail-Closed lock |
 
 ---
 

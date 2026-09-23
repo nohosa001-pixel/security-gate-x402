@@ -65,9 +65,7 @@ export const auditEscrowTaskAction: Action = {
 
 		const env = process?.env ?? {};
 		const configuredGateUrl =
-			runtime.getSetting("SECURITY_GATE_URL") ||
-			env.SECURITY_GATE_URL ||
-			"https://agent-security-gate-x402-212942243360.asia-northeast3.run.app";
+			runtime.getSetting("SECURITY_GATE_URL") || env.SECURITY_GATE_URL;
 
 		let attestation: Record<string, unknown> | null = null;
 		let verdict = localAudit.verdict === "BLOCK" ? "BLOCKED" : "PASSED";

@@ -6,6 +6,7 @@ description: Deterministic local prompt injection defense, dangerous code patter
 keywords: [security, guardrails, prompt injection, jailbreak defense, fail-closed, elizaos]
 ---
 
+<!-- markdownlint-disable-next-line MD025 -->
 # 🛡️ Security Gate Plugin (`@elizaos/plugin-security-gate`)
 
 The **Security Gate Plugin** provides deterministic, fail-closed, sub-millisecond security guardrails for ElizaOS agents. It prevents prompt injections, jailbreaks, Unicode obfuscation attacks, and unauthorized treasury draining—all **100% locally by default with zero external network exfiltration**.
@@ -82,11 +83,13 @@ That's it! Your agent is now protected with local sub-millisecond guardrails.
 The plugin implements four distinct ElizaOS extension points:
 
 ### 1. `securityGatePreHandler` (ChatPreHandler)
+
 * **Hook Point**: Triggered **before** the message enters agent memory, LLM inference, or tool execution.
 * **Fail-Closed Circuit Breaker**: If high-risk prompt injection or jailbreak patterns are detected, it terminates the turn immediately.
 * **Zero Overhead**: Average inspection time is **< 0.5 ms**.
 
 ### 2. `INSPECT_SAFETY` (Action)
+
 Allows agents to explicitly inspect dynamic code, tool parameters, or proposed calldata prior to executing sensitive transactions:
 
 ```typescript
@@ -108,10 +111,13 @@ const inspection = await inspectSafetyAction.handler(
 ```
 
 ### 3. `SECURITY_GATE_EVALUATOR` (Evaluator)
+
 Continuously monitors conversation history in the background, logging threat telemetry into the agent's memory for post-incident audits.
 
 ### 4. `securityStatusProvider` (Provider)
+
 Injects active security telemetry into the LLM prompt context:
+
 ```text
 [Security Gate Status: ACTIVE | Engine: Deterministic Local Analyzer | Latency: <1ms | Policy: Fail-Closed]
 ```
@@ -120,7 +126,7 @@ Injects active security telemetry into the LLM prompt context:
 
 ## ⚙️ Advanced Configuration (Optional Remote Micro-Oracle)
 
-By default, the plugin runs **100% locally with zero external network requests**. 
+By default, the plugin runs **100% locally with zero external network requests**.
 
 If you wish to route safety checks through a high-performance remote micro-oracle (such as an enterprise x402 verification endpoint with EIP-712 cryptographic proofs):
 

@@ -94,9 +94,34 @@ class BoundedAgentWallet:
         self.ledger_path = ledger_path
         self._lock = threading.RLock()
         self.in_memory_records: list = []
+        self._policy_seal = None
+        self.seal_policy()
 
         if self.ledger_path and os.path.exists(self.ledger_path):
             self._load_ledger()
+
+    def seal_policy(self):
+        """Seals current wallet policy with SHA-256 baseline to detect runtime memory tampering."""
+        from app.config_integrity import seal_config
+        policy = {
+            "daily_limit_usdc": self.daily_limit_usdc,
+            "per_tx_limit_usdc": self.per_tx_limit_usdc,
+            "whitelist": sorted(list(self.whitelist)),
+        }
+        self._policy_seal = seal_config(policy)
+
+    def verify_policy_integrity(self) -> bool:
+        """Verifies wallet policy against SHA-256 seal."""
+        if not self._policy_seal:
+            return True
+        from app.config_integrity import verify_config_integrity
+        current_policy = {
+            "daily_limit_usdc": self.daily_limit_usdc,
+            "per_tx_limit_usdc": self.per_tx_limit_usdc,
+            "whitelist": sorted(list(self.whitelist)),
+        }
+        res = verify_config_integrity(self._policy_seal, current_policy)
+        return res["is_valid"]
 
     def _load_ledger(self):
         import json
@@ -146,6 +171,10 @@ class BoundedAgentWallet:
             return False, f"Transaction amount must be strictly positive and finite: ${amount_usdc}"
 
         clean_recipient = recipient.lower()
+
+        # 0. Anti-Tamper Policy Integrity Check
+        if not self.verify_policy_integrity():
+            return False, "FAIL-CLOSED: BoundedAgentWallet policy tampering detected"
 
         # 1. Whitelist Check
         if clean_recipient not in self.whitelist:
