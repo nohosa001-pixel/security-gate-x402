@@ -1,4 +1,7 @@
-# 🛡️ @elizaos/plugin-security-gate
+# 🛡️ elizaos-plugin-security-gate
+
+[![npm version](https://img.shields.io/npm/v/elizaos-plugin-security-gate.svg)](https://www.npmjs.com/package/elizaos-plugin-security-gate)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS.
 
@@ -21,14 +24,23 @@ Deterministic local prompt injection defense, dangerous code pattern detection, 
 
 ## 📦 Installation & Configuration
 
-### 1. Add to Character JSON
+### 1. Install via npm / bun
+
+```bash
+npm install elizaos-plugin-security-gate
+# or
+bun add elizaos-plugin-security-gate
+```
+
+### 2. Add to Character JSON
 
 ```json
 {
   "name": "SecureAgent",
-  "plugins": ["@elizaos/plugin-security-gate"]
+  "plugins": ["elizaos-plugin-security-gate"]
 }
 ```
+
 
 By default, the plugin runs in **Local Deterministic Mode** with no external network access.
 
