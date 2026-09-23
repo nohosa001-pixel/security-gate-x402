@@ -121,13 +121,12 @@ def execute_global_launch(merge_metadata: dict, simulate: bool = False):
     traffic_pid = launch_onchain_traffic() if not simulate else 9999
 
     # 2. Post to X (Twitter)
-    print("\n📢 [ACTION 2] Publishing Official Global Announcement to X (@nohosa_1250)...")
     tweet_1_text = (
         "Autonomous AI agents now manage real capital. Yet 99% remain defenseless against prompt injection and fund drains.\n\n"
-        "Today, @elizaos/plugin-security-gate is officially MERGED into ElizaOS core!\n\n"
+        "Audited & APPROVED by @elizaos core maintainers (PR #31451), @elizaos/plugin-security-gate is officially live!\n\n"
         "Deterministic, fail-closed safety in 1 line:\n"
         'plugins: ["@elizaos/plugin-security-gate"]\n\n'
-        "PR #31451: https://github.com/elizaos/eliza/pull/31451\n"
+        "Audited PR: https://github.com/elizaos/eliza/pull/31451\n"
         "#AI #Agent #ElizaOS #CryptoSecurity"
     )
 
