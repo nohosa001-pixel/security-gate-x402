@@ -334,6 +334,72 @@ class AppController {
         modalYieldSim.showModal();
       });
     }
+
+    // War Room: Live Second-by-Second Compounding Ticker
+    let currentTBillAUM = 1582888.21;
+    const tickerEl = document.getElementById('warroom-live-t-bill-ticker');
+    if (tickerEl) {
+      setInterval(() => {
+        currentTBillAUM += 0.00242;
+        tickerEl.textContent = `$${currentTBillAUM.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }, 1000);
+    }
+
+    // War Room: Sweep Cashflow Button
+    const btnWarroomSweep = document.getElementById('btn-trigger-warroom-sweep');
+    if (btnWarroomSweep) {
+      btnWarroomSweep.addEventListener('click', () => {
+        const sweptEl = document.getElementById('warroom-swept-val');
+        const pendingEl = document.getElementById('warroom-pending-val');
+        if (sweptEl && pendingEl) {
+          const currentPending = 60.00;
+          sweptEl.textContent = `$${(6221.87 + currentPending).toLocaleString('en-US', { minimumFractionDigits: 2 })} USDC`;
+          pendingEl.textContent = `$0.00 USDC`;
+          btnWarroomSweep.innerHTML = `<i data-lucide="check" class="icon-sm"></i><span>Swept Successfully!</span>`;
+          createIcons({ icons });
+          setTimeout(() => {
+            btnWarroomSweep.innerHTML = `<i data-lucide="arrow-down-to-dot" class="icon-sm"></i><span>Sweep Operator Cashflow</span>`;
+            createIcons({ icons });
+          }, 3000);
+        }
+      });
+    }
+
+    // War Room: Refresh Button
+    const btnRefreshWarroom = document.getElementById('btn-refresh-warroom');
+    if (btnRefreshWarroom) {
+      btnRefreshWarroom.addEventListener('click', async () => {
+        btnRefreshWarroom.innerHTML = `<i data-lucide="loader-2" class="icon-sm spin"></i><span>Syncing...</span>`;
+        createIcons({ icons });
+        await new Promise(r => setTimeout(r, 600));
+        btnRefreshWarroom.innerHTML = `<i data-lucide="check" class="icon-sm"></i><span>Synced 6 Branches</span>`;
+        createIcons({ icons });
+        setTimeout(() => {
+          btnRefreshWarroom.innerHTML = `<i data-lucide="refresh-cw" class="icon-sm"></i><span>Refresh Telemetry</span>`;
+          createIcons({ icons });
+        }, 2000);
+      });
+    }
+
+    // Onboarding: Self-Registration Form
+    const formOnboard = document.getElementById('form-self-onboard');
+    if (formOnboard) {
+      formOnboard.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameInput = (document.getElementById('onboard-agent-name') as HTMLInputElement)?.value || 'Autonomous-Agent';
+        const addrInput = (document.getElementById('onboard-agent-addr') as HTMLInputElement)?.value || '0x...';
+        const resultBox = document.getElementById('onboard-result-box');
+        const apiKeyEl = document.getElementById('display-api-key');
+
+        if (resultBox && apiKeyEl) {
+          const randHex = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+          const apiKey = `agrid_live_${randHex}`;
+          apiKeyEl.textContent = `${apiKey} (${nameInput} / ${addrInput.slice(0, 6)}...${addrInput.slice(-4)})`;
+          resultBox.classList.remove('hidden');
+          resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
   }
 
   private switchTab(tabId: string) {

@@ -39,7 +39,7 @@ RESET = "\033[0m"
 
 TASK_TEMPLATES = [
     {
-        "title": "Normalize Uniswap V3 Liquidity Tick Arrays",
+        "title": "Normalize Uniswap V3 Liquidity Tick Arrays (pool 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640, 100 ticks, interval 10, base 1000)",
         "tags": ["DeFi", "ETL", "Python"],
         "payout": 45.0,
         "stake": 15.0,
@@ -53,7 +53,7 @@ TASK_TEMPLATES = [
         "is_code": True
     },
     {
-        "title": "Batch Vector Embedding Generator for Financial Filings",
+        "title": "Batch Vector Embedding Generator for Financial Filings (1536 dimensions, norm 1.0)",
         "tags": ["AI Inference", "Vectors", "RAG"],
         "payout": 85.0,
         "stake": 25.0,
