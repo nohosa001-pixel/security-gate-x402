@@ -1042,6 +1042,28 @@ async def audit_escrow_task(req: EscrowAuditRequest):
     return result
 
 
+@app.get("/api/v1/consensus/validators", tags=["Consensus"])
+async def get_consensus_validators():
+    """Returns the 5 decentralized validator nodes of the 3-of-5 threshold oracle cluster."""
+    from app.consensus_oracle_network import consensus_oracle_network
+    return consensus_oracle_network.get_validator_cluster_info()
+
+
+@app.post("/api/v1/escrow/consensus-audit", tags=["Consensus"])
+async def audit_escrow_consensus(req: EscrowAuditRequest):
+    """Executes Byzantine fault-tolerant 3-of-5 multi-node consensus audit for mission-critical tasks."""
+    from app.consensus_oracle_network import consensus_oracle_network
+    return consensus_oracle_network.execute_consensus_audit(
+        job_id=req.job_id,
+        deliverable=req.deliverable,
+        ground_truth_spec=req.ground_truth_spec,
+        is_code=req.is_code,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+
 # --- Lending Pool Endpoints ---
 
 @app.post("/api/v1/lending/quote", tags=["Lending"])
@@ -1167,7 +1189,32 @@ async def simulate_treasury_compounding(req: CompoundSimRequest = CompoundSimReq
     return sovereign_treasury.simulate_yield_compounding(req.days)
 
 
+# --- Agent Credit & DID Reputation Endpoints (Track 2) ---
+
+@app.get("/api/v1/credit/score/{agent_address}", tags=["Credit"])
+async def get_agent_credit_score(agent_address: str):
+    """Calculates FICO-style Agent Credit Score (300-1000) and required collateral ratio."""
+    from app.agent_credit_engine import agent_credit_engine
+    return agent_credit_engine.calculate_credit_score(agent_address)
+
+
+@app.get("/api/v1/credit/attestation/{agent_address}", tags=["Credit"])
+async def get_agent_credit_attestation(
+    agent_address: str,
+    chain_id: int = Query(137, description="EVM Chain ID"),
+    verifying_contract: str = Query("0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d", description="Contract Address")
+):
+    """Issues EIP-712 cryptographic AgentCreditAttestation for under-collateralized task execution."""
+    from app.agent_credit_engine import agent_credit_engine
+    return agent_credit_engine.generate_eip712_credit_attestation(
+        agent_address=agent_address,
+        chain_id=chain_id,
+        verifying_contract=verifying_contract
+    )
+
+
 # --- Universal Autonomous Agent Exchange Endpoints (Phase 2) ---
+
 
 @app.post("/api/v1/trade/intent", tags=["Exchange"])
 async def submit_trade_intent(intent: AgentTradeIntent):

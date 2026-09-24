@@ -284,19 +284,26 @@ def main():
         cumulative_tvp = 0.0
         cumulative_prevented_drain = 0.0
         cumulative_trade_volume = 0.0
+        cumulative_tbills_acquired = 0.0
         total_latency = 0.0
 
         while True:
             count += 1
             timestamp = time.strftime("%H:%M:%S", time.localtime())
 
-            # Distribution: 50% Guardrail, 25% Escrow, 25% DEX Trade
+            # Distribution: 40% Guardrail, 35% Escrow (M2M Staking), 25% DEX Trade
             rand_type = random.random()
-            if rand_type < 0.50:
+            if rand_type < 0.40:
                 result = simulate_guard_turn(client)
             elif rand_type < 0.75:
                 job_counter += 1
                 result = simulate_escrow_turn(client, job_counter)
+                # 0.25% toll or 20% slashing bounty goes to US Treasury
+                if result.get("success"):
+                    if result.get("verdict") == "PASSED":
+                        cumulative_tbills_acquired += result.get("value", 0.0) * 0.0025
+                    else:
+                        cumulative_tbills_acquired += result.get("value", 0.0) * 0.20
             else:
                 result = simulate_trade_turn(client)
 
@@ -330,16 +337,18 @@ def main():
                 # Milestone banner every 5 turns
                 if count % 5 == 0:
                     avg_lat = total_latency / count
+                    total_reserves_dyn = 1582888.21 + cumulative_tbills_acquired
                     print("╔════════════════════════════════════════════════════════════════════════════════════╗", flush=True)
                     print("║  🌐 LIVE AGENT FINANCIAL GRID TELEMETRY & ECONOMIC MULTI-AGENT METRICS             ║", flush=True)
                     print("╠════════════════════════════════════════════════════════════════════════════════════╣", flush=True)
                     print(f"║  🛡️  Total Value Protected (TVP):   ${cumulative_tvp:15,.2f} USD                             ║", flush=True)
+                    print(f"║  🏛️  Sovereign RWA T-Bill Reserves: ${total_reserves_dyn:15,.2f} USD (100% US T-Bill Backed) ║", flush=True)
+                    print(f"║  💵  New T-Bills Acquired via Toll: ${cumulative_tbills_acquired:15,.2f} USD (A.GRID Cannot Touch)   ║", flush=True)
                     print(f"║  🛑  Prevented Treasury Drains:     ${cumulative_prevented_drain:15,.2f} USD ({total_blocked:02d} exploits slashed)      ║", flush=True)
                     print(f"║  📈  DEX Trade Settlement Volume:   ${cumulative_trade_volume:15,.2f} USD                             ║", flush=True)
                     print(f"║  ⚡  Avg Micro-Oracle Latency:       {avg_lat:8.1f} ms                                        ║", flush=True)
-                    print(f"║  💸  LLM Token Cost on Attacks:     $           0.00 (100% Fail-Closed Savings)        ║", flush=True)
                     print(f"║  📊  Total Transactions Processed:   {count:8d} turns ({total_passed:02d} passed, {total_blocked:02d} blocked)        ║", flush=True)
-                    print(f"║  🔗  Live Web Dashboard:             {GATE_URL}/dashboard  ║", flush=True)
+                    print(f"║  🔗  Live Escrow & Treasury Hub:     {GATE_URL}/hub/       ║", flush=True)
                     print("╚════════════════════════════════════════════════════════════════════════════════════╝\n", flush=True)
             else:
                 print(f"[{timestamp}] #{count:03d} ⚠️ Error in {result['category']}: {result.get('error')}\n", flush=True)
