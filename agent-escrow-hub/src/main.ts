@@ -713,7 +713,17 @@ class AppController {
 }
 
 // Bootstrapping
-window.addEventListener('DOMContentLoaded', () => {
-  new AppController();
-  createIcons({ icons });
-});
+function bootstrap() {
+  try {
+    new AppController();
+    createIcons({ icons });
+  } catch (err) {
+    console.error('Failed to initialize A.GRID AppController:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}
