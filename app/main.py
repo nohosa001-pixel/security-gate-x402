@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 
 from fastapi import FastAPI, Request, Depends, HTTPException, status, Query, Path as FPath
-from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse, Response
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTMLResponse, Response, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -99,7 +99,10 @@ if not HUB_STATIC_DIR.exists():
     if _hub_dist.exists():
         HUB_STATIC_DIR = _hub_dist
 HUB_INDEX_PATH = HUB_STATIC_DIR / "index.html"
+HUB_ASSETS_DIR = HUB_STATIC_DIR / "assets"
 if HUB_STATIC_DIR.exists():
+    if HUB_ASSETS_DIR.exists():
+        app.mount("/assets", StaticFiles(directory=str(HUB_ASSETS_DIR)), name="hub-assets-root")
     app.mount("/hub", StaticFiles(directory=str(HUB_STATIC_DIR), html=True), name="hub")
     app.mount("/escrow", StaticFiles(directory=str(HUB_STATIC_DIR), html=True), name="escrow")
 
@@ -253,6 +256,7 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
         or path.startswith("/static")
         or path.startswith("/hub")
         or path.startswith("/escrow")
+        or path.startswith("/assets")
     ):
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self' https://app.safe.global https://*.safe.global https://*.gnosis-safe.io;"
     else:
@@ -364,13 +368,19 @@ async def get_playground():
     return HTMLResponse("<h2>Playground is loading...</h2>")
 
 
-@app.get("/hub", tags=["Escrow Hub"])
-@app.get("/escrow", tags=["Escrow Hub"])
-@app.get("/clearinghouse", tags=["Escrow Hub"])
-async def get_escrow_hub():
-    if HUB_INDEX_PATH.exists():
-        return FileResponse(HUB_INDEX_PATH, media_type="text/html")
-    return HTMLResponse("<h2>A.GRID Escrow Hub is loading...</h2>")
+@app.get("/hub", tags=["Escrow Hub"], include_in_schema=False)
+async def redirect_hub():
+    return RedirectResponse(url="/hub/", status_code=308)
+
+
+@app.get("/escrow", tags=["Escrow Hub"], include_in_schema=False)
+async def redirect_escrow():
+    return RedirectResponse(url="/escrow/", status_code=308)
+
+
+@app.get("/clearinghouse", tags=["Escrow Hub"], include_in_schema=False)
+async def redirect_clearinghouse():
+    return RedirectResponse(url="/hub/", status_code=308)
 
 
 class AgentChatRequest(BaseModel):
