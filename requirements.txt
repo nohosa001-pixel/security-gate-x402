@@ -9,3 +9,4 @@ eth-utils>=4.0.0
 cryptography>=42.0.0
 python-dotenv>=1.0.1
 mcp>=1.0.0
+web3>=6.15.0
