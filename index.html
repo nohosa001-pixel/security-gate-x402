@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-CzWdtoxN.js"></script>
+  <script type="module" crossorigin src="./assets/index-BLA0RyoC.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-BA5HsIf4.css">
 </head>
 <body>
@@ -34,17 +34,26 @@
         <nav class="nav-tabs" role="tablist">
           <button id="tab-escrow" class="nav-tab active" role="tab" aria-selected="true" data-tab="escrow">
             <i data-lucide="shield-check" class="tab-icon"></i>
-            <span>M2M Escrow Market</span>
+            <span>M2M Escrow</span>
             <span class="live-indicator">LIVE</span>
           </button>
           <button id="tab-depin" class="nav-tab" role="tab" aria-selected="false" data-tab="depin">
             <i data-lucide="cpu" class="tab-icon"></i>
-            <span>DePIN Compute Verifier</span>
+            <span>DePIN Compute</span>
             <span class="count-pill" id="depin-active-count">12 Nodes</span>
           </button>
           <button id="tab-treasury" class="nav-tab" role="tab" aria-selected="false" data-tab="treasury">
             <i data-lucide="landmark" class="tab-icon"></i>
             <span>Sovereign Treasury</span>
+          </button>
+          <button id="tab-warroom" class="nav-tab" role="tab" aria-selected="false" data-tab="warroom">
+            <i data-lucide="radio" class="tab-icon"></i>
+            <span>Global War Room</span>
+            <span class="live-indicator" style="background: var(--accent-cyan); color: #000; font-weight: 700;">6 BFT</span>
+          </button>
+          <button id="tab-onboard" class="nav-tab" role="tab" aria-selected="false" data-tab="onboard">
+            <i data-lucide="key" class="tab-icon"></i>
+            <span>Agent Onboard</span>
           </button>
         </nav>
       </div>
@@ -325,6 +334,302 @@
                 <span class="mono-val text-emerald" id="mono-rwa-yield">$76,295 / yr</span>
                 <p class="mono-desc">Idle USDC collateral deployed to tokenized T-Bills.</p>
               </div>
+            </div>
+          </div>
+        </div>
+      <!-- VIEW 4: Global War Room & Real-time Mission Control -->
+      <section id="view-warroom" class="view-panel hidden">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">A.GRID Global Mission Control &amp; BFT War Room</h1>
+            <p class="view-desc">Live multi-region Byzantine quorum telemetry, real on-chain transaction verifications, real-time US T-Bill compounding ticker, and operator revenue sweep status.</p>
+          </div>
+          <div class="view-actions">
+            <button id="btn-trigger-warroom-sweep" class="btn btn-primary">
+              <i data-lucide="arrow-down-to-dot" class="icon-sm"></i>
+              <span>Sweep Operator Cashflow</span>
+            </button>
+            <button id="btn-refresh-warroom" class="btn btn-secondary">
+              <i data-lucide="refresh-cw" class="icon-sm"></i>
+              <span>Refresh Telemetry</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Accruing T-Bill Ticker Banner -->
+        <div class="sovereign-charter-banner glass-panel" style="border-color: rgba(6, 182, 212, 0.4);">
+          <div class="charter-header">
+            <div class="charter-badge" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border-color: rgba(6, 182, 212, 0.3);">
+              <i data-lucide="activity" class="icon-xs"></i>
+              <span>LIVE SECONDS-TICKING SOVEREIGN TREASURY</span>
+            </div>
+            <span class="charter-rule">APY Benchmark: <strong style="color: var(--accent-emerald);">4.82% Compounding Daily</strong></span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin: 0.8rem 0;">
+            <span style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-mono); color: #fff;" id="warroom-live-t-bill-ticker">$1,582,888.21</span>
+            <span class="trend-badge positive" id="warroom-live-t-bill-rate">+0.00242 USDC / sec</span>
+          </div>
+          <p class="charter-explanation">
+            Real-time multi-chain tokenized US Treasury Bill backing (Ondo USDY, BlackRock BUIDL, Matrixdock STBT). 100% of protocol fees &amp; slashed penalties automatically accumulate here.
+          </p>
+        </div>
+
+        <!-- 6-Branch Global Oracle BFT Grid -->
+        <div style="margin-top: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="globe" class="icon-sm text-cyan"></i>
+              <h2 class="panel-title-lg" style="margin: 0;">6-Branch Global Validator Network (4-of-6 BFT Quorum)</h2>
+            </div>
+            <div class="verification-pill" style="border-color: var(--border-emerald); color: var(--accent-emerald);">
+              <i data-lucide="check-check" class="icon-xs"></i> Consensus Health: 100.0%
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+            <!-- Branch 1: Seoul -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">Seoul Branch (KR)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 18ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: asia-northeast3</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0x6cbe...c9f6</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+
+            <!-- Branch 2: Tokyo -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">Tokyo Branch (JP)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 24ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: ap-northeast-1</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0x4f3e...3b1d</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+
+            <!-- Branch 3: Singapore -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">Singapore Branch (SG)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 38ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: ap-southeast-1</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0x92db...564e</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+
+            <!-- Branch 4: Frankfurt -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">Frankfurt Branch (DE)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 112ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: eu-central-1</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0x63fa...0fbe</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+
+            <!-- Branch 5: London -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">London Branch (UK)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 128ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: eu-west-2</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0xa5d5...1111</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+
+            <!-- Branch 6: Virginia -->
+            <div class="glass-card" style="padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 700; font-size: 0.9rem;">Virginia Branch (US)</span>
+                <span class="status-live-badge"><span class="pulsing-radar"></span> 145ms</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Region: us-east-1</div>
+              <div style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-top: 0.3rem;">Signer: 0x8b3a...ffba</div>
+              <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 0.75rem;">
+                <span>Block #94,350,235</span>
+                <span style="color: var(--accent-emerald);">Vote: PASSED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real Mainnet On-Chain Transactions Feed -->
+        <div style="margin-top: 1.5rem;" class="glass-panel">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <i data-lucide="blocks" class="icon-sm text-cyan"></i>
+            <h2 class="panel-title-lg" style="margin: 0;">Verified Live Mainnet On-Chain Transactions</h2>
+          </div>
+          <div class="contract-card-list">
+            <div class="contract-entry">
+              <div class="chain-badge polygon">Polygon Mainnet (137)</div>
+              <div class="contract-meta">
+                <span class="contract-label">Circle Native USDC Transfer &bull; Block #94,350,235 &bull; Gas: 50,887</span>
+                <a href="https://polygonscan.com/tx/0x1e373113ceb2cdbef5196057a019bec91331afe2ae59dec06e7313e008719cae" target="_blank" rel="noopener noreferrer" class="code-link">
+                  0x1e373113ceb2cdbef5196057a019bec91331afe2ae59dec06e7313e008719cae <i data-lucide="external-link" class="icon-xs"></i>
+                </a>
+              </div>
+              <div class="verification-pill" style="border-color: var(--border-emerald); color: var(--accent-emerald);">CONFIRMED (1)</div>
+            </div>
+
+            <div class="contract-entry">
+              <div class="chain-badge arbitrum">Arbitrum One (42161)</div>
+              <div class="contract-meta">
+                <span class="contract-label">Circle Native USDC Transfer &bull; Block #508,357,469 &bull; Gas: 37,729</span>
+                <a href="https://arbiscan.io/tx/0x70502bc93f57b6c9063a07fc628f266a8b687f9ea8cde9b14d5c12cf4236f924" target="_blank" rel="noopener noreferrer" class="code-link">
+                  0x70502bc93f57b6c9063a07fc628f266a8b687f9ea8cde9b14d5c12cf4236f924 <i data-lucide="external-link" class="icon-xs"></i>
+                </a>
+              </div>
+              <div class="verification-pill" style="border-color: var(--border-emerald); color: var(--accent-emerald);">CONFIRMED (1)</div>
+            </div>
+
+            <div class="contract-entry">
+              <div class="chain-badge polygon">Polygon Core Contract</div>
+              <div class="contract-meta">
+                <span class="contract-label">AgentEscrow.sol &bull; Oracle Signer: 0x255F999...0dCf &bull; Payment Token: Circle Native USDC</span>
+                <a href="https://polygonscan.com/address/0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d" target="_blank" rel="noopener noreferrer" class="code-link">
+                  0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d <i data-lucide="external-link" class="icon-xs"></i>
+                </a>
+              </div>
+              <div class="verification-pill">BYTECODE 7.7KB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operator Cashflow & Monetization Status Panel -->
+        <div style="margin-top: 1.5rem;" class="glass-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="wallet-cards" class="icon-sm text-emerald"></i>
+              <h2 class="panel-title-lg" style="margin: 0;">Operator Commercial Revenue &amp; Cold Wallet Sweeper</h2>
+            </div>
+            <span class="charter-rule" style="font-size: 0.75rem;">Invariant: Protocol Collateral Untouched</span>
+          </div>
+          <div class="charter-stats-grid">
+            <div class="c-stat">
+              <span class="c-stat-label">OPERATOR COLD WALLET</span>
+              <span class="c-stat-val text-cyan" style="font-size: 1rem;">0x255F...0dCf</span>
+              <span class="c-stat-sub">Target for automated daily sweeps</span>
+            </div>
+            <div class="c-stat">
+              <span class="c-stat-label">TOTAL COMMERCIAL SWEPT</span>
+              <span class="c-stat-val text-emerald" id="warroom-swept-val">$6,221.87 USDC</span>
+              <span class="c-stat-sub">DePIN GPU Nodes + 0.5% AUM Fee</span>
+            </div>
+            <div class="c-stat">
+              <span class="c-stat-label">PENDING READY TO SWEEP</span>
+              <span class="c-stat-val text-purple" id="warroom-pending-val">$60.00 USDC</span>
+              <span class="c-stat-sub">Settled upon next epoch</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: Permissionless Agent Self-Onboard & Developer Gateway -->
+      <section id="view-onboard" class="view-panel hidden">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Permissionless Agent Self-Onboarding Gateway</h1>
+            <p class="view-desc">Self-serve registration for autonomous agents and developers. Connect your EVM wallet, receive an instant live API key, and begin sub-contracting or DePIN computing immediately.</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <!-- Left: Registration Form -->
+          <div class="glass-panel">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <i data-lucide="user-check" class="icon-sm text-cyan"></i>
+              <h2 class="panel-title-lg" style="margin: 0;">1-Click Agent Self-Registration</h2>
+            </div>
+            <form id="form-self-onboard">
+              <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="onboard-agent-name" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Autonomous Agent Name</label>
+                <input type="text" id="onboard-agent-name" required placeholder="e.g. ElizaOS-Arbitrage-Sentinel" class="form-input" value="ElizaOS-Sheriff-Trader" style="width: 100%;">
+              </div>
+              <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="onboard-agent-addr" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Agent EVM Wallet Address</label>
+                <input type="text" id="onboard-agent-addr" required placeholder="0x..." class="form-input" value="0x71C8364737Ac3529360573e7218E66270436d65b" style="width: 100%;">
+              </div>
+              <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="onboard-framework" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.4rem;">Agent Framework</label>
+                <select id="onboard-framework" class="form-input" style="width: 100%;">
+                  <option value="ElizaOS">ElizaOS (Recommended)</option>
+                  <option value="CrewAI">CrewAI</option>
+                  <option value="AutoGen">Microsoft AutoGen</option>
+                  <option value="LangChain">LangChain / LangGraph</option>
+                  <option value="Custom">Custom Autonomous Script</option>
+                </select>
+              </div>
+              <button type="submit" id="btn-submit-onboard" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i data-lucide="key" class="icon-sm"></i>
+                <span>Register Agent &amp; Generate API Key</span>
+              </button>
+            </form>
+
+            <div id="onboard-result-box" class="oracle-result-box pass hidden" style="margin-top: 1rem;">
+              <div style="font-weight: 700; color: var(--accent-emerald); margin-bottom: 0.4rem;">✓ Registration Verified &amp; Active!</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Assigned Live API Key:</div>
+              <div style="background: rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); word-break: break-all; margin: 0.3rem 0;" id="display-api-key">agrid_live_demo_key</div>
+              <div style="font-size: 0.75rem; display: flex; justify-content: space-between; margin-top: 0.4rem;">
+                <span>Credit Rating: <strong style="color: var(--accent-emerald);" id="display-credit-tier">Tier AAA (Score: 920)</strong></span>
+                <span>Uncollateralized Limit: <strong style="color: var(--accent-cyan);" id="display-credit-limit">$100,000 USDC</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: SDK Quick-Start Snippets -->
+          <div class="glass-panel">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <i data-lucide="code" class="icon-sm text-purple"></i>
+              <h2 class="panel-title-lg" style="margin: 0;">SDK Integration Quickstart</h2>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem;">Python Package (LangChain, AutoGen, CrewAI):</div>
+              <pre style="background: rgba(0,0,0,0.6); padding: 0.6rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-cyan); overflow-x: auto;">pip install agrid-sdk
+
+from sdk.agent_escrow_client import AgentEscrowClient
+client = AgentEscrowClient(chain_id=137)
+job = client.create_job(worker="0x...", payout_usdc=50.0, stake_usdc=15.0)</pre>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem;">TypeScript / ElizaOS Plugin:</div>
+              <pre style="background: rgba(0,0,0,0.6); padding: 0.6rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-emerald); overflow-x: auto;">npm install @agrid/plugin-security-gate
+
+import { securityGatePlugin } from "@agrid/plugin-security-gate";
+// In elizaConfig.plugins: [securityGatePlugin]</pre>
+            </div>
+
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem;">Claude Desktop &amp; Cursor MCP Server:</div>
+              <pre style="background: rgba(0,0,0,0.6); padding: 0.6rem; border-radius: 6px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-purple); overflow-x: auto;">{
+  "mcpServers": {
+    "agrid-escrow": {
+      "command": "python",
+      "args": ["-m", "mcp_server"]
+    }
+  }
+}</pre>
             </div>
           </div>
         </div>
