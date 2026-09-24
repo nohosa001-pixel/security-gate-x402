@@ -1142,6 +1142,31 @@ async def calculate_treasury_performance_split(req: PerformanceSplitRequest):
     )
 
 
+class CompoundSimRequest(BaseModel):
+    days: int = Field(30, description="Number of simulation days", ge=1, le=365)
+
+
+@app.get("/api/v1/treasury/reserves", tags=["Treasury"])
+async def get_sovereign_treasury_reserves():
+    """Returns real-time US Treasury (T-Bill RWA) reserves, APY, and zero-extraction status."""
+    from app.rwa_treasury_engine import sovereign_treasury
+    return sovereign_treasury.get_reserve_overview()
+
+
+@app.get("/api/v1/treasury/proof-of-reserve", tags=["Treasury"])
+async def get_treasury_proof_of_reserve(chain_id: int = Query(137, description="EVM Chain ID")):
+    """Issues EIP-712 cryptographic Proof-of-Reserve (PoR) attestation for US Treasury holdings."""
+    from app.rwa_treasury_engine import sovereign_treasury
+    return sovereign_treasury.generate_proof_of_reserve(chain_id)
+
+
+@app.post("/api/v1/treasury/simulate-compound", tags=["Treasury"])
+async def simulate_treasury_compounding(req: CompoundSimRequest = CompoundSimRequest()):
+    """Simulates multi-day US T-Bill yield compounding and sovereign distribution."""
+    from app.rwa_treasury_engine import sovereign_treasury
+    return sovereign_treasury.simulate_yield_compounding(req.days)
+
+
 # --- Universal Autonomous Agent Exchange Endpoints (Phase 2) ---
 
 @app.post("/api/v1/trade/intent", tags=["Exchange"])

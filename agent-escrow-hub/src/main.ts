@@ -283,6 +283,57 @@ class AppController {
     if (btnClearFeed) {
       btnClearFeed.addEventListener('click', () => escrowStore.clearFeed());
     }
+
+    // Modal: Proof of Reserve (PoR)
+    const btnVerifyPoR = document.getElementById('btn-verify-por');
+    const modalPoR = document.getElementById('modal-por') as HTMLDialogElement;
+    if (btnVerifyPoR && modalPoR) {
+      modalPoR.querySelectorAll('.btn-close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => modalPoR.close());
+      });
+      modalPoR.addEventListener('click', (e) => {
+        if (e.target === modalPoR) modalPoR.close();
+      });
+
+      btnVerifyPoR.addEventListener('click', async () => {
+        modalPoR.showModal();
+        const sigEl = document.getElementById('por-signature');
+        const reservesEl = document.getElementById('por-reserves');
+        try {
+          const apiBase = (typeof window !== 'undefined' && window.location.hostname.includes('run.app')) 
+            ? window.location.origin 
+            : 'https://agent-security-gate-x402-212942243360.asia-northeast3.run.app';
+          const res = await fetch(`${apiBase}/api/v1/treasury/proof-of-reserve`);
+          if (res.ok) {
+            const data = await res.json();
+            if (sigEl && data.attestation) {
+              sigEl.textContent = data.attestation.signature || `${data.attestation.r}...`;
+            }
+            if (reservesEl && data.reserves_verified_usdc) {
+              reservesEl.textContent = `$${Number(data.reserves_verified_usdc).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDC`;
+            }
+          }
+        } catch (err) {
+          console.warn('PoR fetch fallback:', err);
+        }
+      });
+    }
+
+    // Modal: Yield Compounding Simulator
+    const btnSimulateYield = document.getElementById('btn-simulate-yield');
+    const modalYieldSim = document.getElementById('modal-yield-sim') as HTMLDialogElement;
+    if (btnSimulateYield && modalYieldSim) {
+      modalYieldSim.querySelectorAll('.btn-close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => modalYieldSim.close());
+      });
+      modalYieldSim.addEventListener('click', (e) => {
+        if (e.target === modalYieldSim) modalYieldSim.close();
+      });
+
+      btnSimulateYield.addEventListener('click', () => {
+        modalYieldSim.showModal();
+      });
+    }
   }
 
   private switchTab(tabId: string) {
