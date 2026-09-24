@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "security-gate-x402": {
+      "command": "python",
+      "args": ["-m", "mcp_server"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
