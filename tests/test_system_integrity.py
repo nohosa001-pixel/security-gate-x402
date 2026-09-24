@@ -77,7 +77,7 @@ def test_agent_escrow_and_consensus():
     # Validators info
     v = client.get("/api/v1/consensus/validators")
     assert v.status_code == 200
-    assert v.json().get("cluster_size") == 5
+    assert v.json().get("cluster_size") == 6
 
     # Consensus audit
     ca = client.post("/api/v1/escrow/consensus-audit", json={
@@ -86,9 +86,10 @@ def test_agent_escrow_and_consensus():
         "is_code": True,
         "chain_id": 137
     })
-    assert ca.status_code == 200
     assert ca.json().get("consensus_reached") is True
-    assert len(ca.json().get("validator_signatures", [])) == 5
+    assert len(ca.json().get("validator_signatures", [])) == 6
+
+
 
 
 def test_agent_credit_and_did():

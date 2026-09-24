@@ -14,39 +14,44 @@ from eth_account.messages import encode_typed_data
 import eth_utils
 
 
-# 5 Deterministic Validator Node Seed Keys for P2P Simulation
+# 6 Deterministic Global Branch Validator Node Seed Keys
 VALIDATOR_SEEDS = [
     {
-        "id": "validator-tokyo-01",
-        "region": "ap-northeast-1 (Tokyo)",
-        "key": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
-    },
-    {
-        "id": "validator-seoul-02",
-        "region": "asia-northeast3 (Seoul)",
+        "id": "validator-seoul-01",
+        "region": "asia-northeast3 (Seoul, Korea)",
         "key": "0x6cbed15c793ce57650b9877cf28f598d135cb7795a763113b308cba2cb2fc9f6"
     },
     {
-        "id": "validator-frankfurt-03",
-        "region": "eu-central-1 (Frankfurt)",
+        "id": "validator-tokyo-02",
+        "region": "ap-northeast-1 (Tokyo, Japan)",
+        "key": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+    },
+    {
+        "id": "validator-singapore-03",
+        "region": "ap-southeast-1 (Singapore)",
+        "key": "0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e"
+    },
+    {
+        "id": "validator-frankfurt-04",
+        "region": "eu-central-1 (Frankfurt, Germany)",
         "key": "0x63fa2563637a1e65700ade70d7872240a394fe5299e0deb0ae8e334e2c120fbe"
     },
     {
-        "id": "validator-virginia-04",
-        "region": "us-east-1 (Virginia)",
-        "key": "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba"
+        "id": "validator-london-05",
+        "region": "eu-west-2 (London, UK)",
+        "key": "0xa5d5f2ec3930b8089333934d4204d8095b45a0a33a5cf05b8a6a68393e9a1111"
     },
     {
-        "id": "validator-singapore-05",
-        "region": "ap-southeast-1 (Singapore)",
-        "key": "0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e"
+        "id": "validator-virginia-06",
+        "region": "us-east-1 (Virginia, USA)",
+        "key": "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba"
     }
 ]
 
 
 class ConsensusMultiOracleNetwork:
     """
-    Simulates / coordinates a 3-of-5 threshold validator quorum for mission-critical M2M escrows.
+    Coordinates a 4-of-6 threshold validator quorum across 6 global branch server regions.
     """
 
     def __init__(self):
@@ -60,11 +65,13 @@ class ConsensusMultiOracleNetwork:
                 "address": acc.address,
                 "is_active": True
             })
-        self.quorum_threshold = 3  # Minimum 3 of 5 needed (60%)
+        self.quorum_threshold = 4  # 4-of-6 Quorum (66.7% Byzantine Fault Tolerance)
+
 
     def get_validator_cluster_info(self) -> Dict[str, Any]:
-        """Returns the public metadata and addresses of the 5 consensus validators."""
+        """Returns the public metadata and addresses of the 6 global consensus validators."""
         return {
+
             "cluster_size": len(self.validators),
             "quorum_threshold": self.quorum_threshold,
             "fault_tolerance": "Up to 2 offline or malicious nodes tolerated (BFT)",

