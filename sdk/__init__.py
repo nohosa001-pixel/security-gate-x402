@@ -12,6 +12,10 @@ from .integrations import (
     SecurityGateCallbackHandler,
     SecurityGateTool
 )
+from .agent_escrow_client import (
+    AgentEscrowClient,
+    DEPLOYED_ESCROW_CONTRACTS
+)
 
 __all__ = [
     "SecurityGateClient",
@@ -22,5 +26,8 @@ __all__ = [
     "gate_inspect",
     "verify_attestation",
     "SecurityGateCallbackHandler",
-    "SecurityGateTool"
+    "SecurityGateTool",
+    "AgentEscrowClient",
+    "DEPLOYED_ESCROW_CONTRACTS"
 ]
+

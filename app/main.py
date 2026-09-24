@@ -93,6 +93,16 @@ SITEMAP_XML_PATH = STATIC_DIR / "sitemap.xml"
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+HUB_STATIC_DIR = STATIC_DIR / "hub"
+if not HUB_STATIC_DIR.exists():
+    _hub_dist = Path(__file__).resolve().parent.parent / "agent-escrow-hub" / "dist"
+    if _hub_dist.exists():
+        HUB_STATIC_DIR = _hub_dist
+HUB_INDEX_PATH = HUB_STATIC_DIR / "index.html"
+if HUB_STATIC_DIR.exists():
+    app.mount("/hub", StaticFiles(directory=str(HUB_STATIC_DIR), html=True), name="hub")
+    app.mount("/escrow", StaticFiles(directory=str(HUB_STATIC_DIR), html=True), name="escrow")
+
 AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
 LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
 
@@ -238,7 +248,12 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
 
     response.headers["X-Content-Type-Options"] = "nosniff"
     path = request.url.path
-    if path in ["/", "/dashboard", "/playground", "/manifest.json", "/safe-icon.svg"] or path.startswith("/static"):
+    if (
+        path in ["/", "/dashboard", "/playground", "/hub", "/escrow", "/manifest.json", "/safe-icon.svg"]
+        or path.startswith("/static")
+        or path.startswith("/hub")
+        or path.startswith("/escrow")
+    ):
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self' https://app.safe.global https://*.safe.global https://*.gnosis-safe.io;"
     else:
         response.headers["X-Frame-Options"] = "DENY"
@@ -328,6 +343,7 @@ async def root(request: Request):
             "ap2_manifest": "/.well-known/ap2",
             "mcp_tools": "/mcp/tools",
             "llms_manifest": "/llms.txt",
+            "agent_escrow_hub": "/hub",
             "robots_txt": "/robots.txt",
             "sitemap_xml": "/sitemap.xml"
         }
@@ -346,6 +362,15 @@ async def get_playground():
     if INDEX_HTML_PATH.exists():
         return FileResponse(INDEX_HTML_PATH, media_type="text/html")
     return HTMLResponse("<h2>Playground is loading...</h2>")
+
+
+@app.get("/hub", tags=["Escrow Hub"])
+@app.get("/escrow", tags=["Escrow Hub"])
+@app.get("/clearinghouse", tags=["Escrow Hub"])
+async def get_escrow_hub():
+    if HUB_INDEX_PATH.exists():
+        return FileResponse(HUB_INDEX_PATH, media_type="text/html")
+    return HTMLResponse("<h2>A.GRID Escrow Hub is loading...</h2>")
 
 
 class AgentChatRequest(BaseModel):

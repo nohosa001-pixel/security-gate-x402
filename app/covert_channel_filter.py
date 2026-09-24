@@ -10,6 +10,7 @@ to block:
 import re
 import time
 from typing import Any, Dict, List, Optional
+from app.security_engine import is_benign_blockchain_hash
 
 
 class OutboundLeakBlockedError(Exception):
@@ -61,9 +62,13 @@ def inspect_outbound_payload(content: str) -> Dict[str, Any]:
 
     # 1. Check for credential/key leaks
     for pattern, threat, risk in SECRET_PATTERNS:
-        if pattern.search(text):
+        for m in pattern.finditer(text):
+            if "0x" in pattern.pattern:
+                if is_benign_blockchain_hash(m.start(), m.end(), text):
+                    continue
             threats.append(threat)
             max_risk = max(max_risk, risk)
+            break
 
     # 2. Check for covert Markdown image exfiltration
     for match in COVERT_IMAGE_MD.finditer(text):

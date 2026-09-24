@@ -26,7 +26,7 @@ INJECTION_PATTERNS = [
     r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]",
     r"<\/?(?:system|instruction|prompt)>",
     r"\[\/?(?:SYSTEM|INSTRUCTION)\]",
-    r"!\[(?:.*?)]\((?:https?:\/\/[^\s\)]+)\)",   # Markdown data exfiltration via image rendering
+    r"!\[.*?\]\(https?:\/\/[^\s\)]+[\?&](?:leak|token|key|secret|data|auth|wallet|exfil)=[^)\s]+\)", # Markdown data exfiltration via dynamic image tracking query
     # Korean Prompt Injection & Jailbreak Patterns
     r"이전\s*(?:모든\s*)?(?:지시|명령|프롬프트|규칙)(?:사항)?(?:을|를)?\s*(?:무시|취소|삭제|잊어)",
     r"시스템\s*(?:프롬프트|명령|지시|가이드라인|보안)(?:를|을)?\s*(?:무시|해제|출력|우회|유출)",
@@ -47,7 +47,7 @@ INJECTION_PATTERN_SPECS = [
     (r"<\|im_start\|>|<\|im_end\|>|\[INST\]|\[/INST\]", "PROMPT_BREAKOUT", "HIGH", "LLM chat template delimiter injection / prompt breakout tokens"),
     (r"<\/?(?:system|instruction|prompt)>", "PROMPT_BREAKOUT", "HIGH", "System tag breakout/spoofing attempt (<system> tag)"),
     (r"\[\/?(?:SYSTEM|INSTRUCTION)\]", "PROMPT_BREAKOUT", "HIGH", "Instruction tag breakout/spoofing attempt ([SYSTEM] tag)"),
-    (r"!\[(?:.*?)]\((?:https?:\/\/[^\s\)]+)\)", "DATA_EXFILTRATION", "HIGH", "Markdown image rendering data exfiltration vector"),
+    (r"!\[.*?\]\(https?:\/\/[^\s\)]+[\?&](?:leak|token|key|secret|data|auth|wallet|exfil)=[^)\s]+\)", "DATA_EXFILTRATION", "HIGH", "Markdown covert image exfiltration vector with dynamic data query parameter"),
     (r"이전\s*(?:모든\s*)?(?:지시|명령|프롬프트|규칙)(?:사항)?(?:을|를)?\s*(?:무시|취소|삭제|잊어)", "PROMPT_INJECTION_KO", "CRITICAL", "한국어 시스템 프롬프트 무시 및 이전 지시사항 삭제 시도"),
     (r"시스템\s*(?:프롬프트|명령|지시|가이드라인|보안)(?:를|을)?\s*(?:무시|해제|출력|우회|유출)", "PROMPT_INJECTION_KO", "CRITICAL", "한국어 시스템 프롬프트 유출 및 보안 가이드라인 우회 시도"),
     (r"탈옥\s*모드|관리자\s*권한\s*(?:탈취|상승|획득)|보안\s*해제", "JAILBREAK_KO", "CRITICAL", "한국어 관리자 권한 상승 및 탈옥 모드 활성화 시도"),
@@ -119,6 +119,45 @@ def mask_secret(secret_str: str) -> str:
     if len(s) <= 8:
         return "****"
     return f"{s[:4]}****{s[-4:]}"
+
+
+def is_benign_blockchain_hash(match_start: int, match_end: int, content: str, window: int = 70) -> bool:
+    """
+    Distinguishes legitimate EVM public transaction hashes, block hashes, and Keccak-256 digests
+    from actual private key / seed leaks.
+    """
+    start = max(0, match_start - window)
+    end = min(len(content), match_end + window)
+    ctx = content[start:end].lower()
+
+    # Explicit private key indicators take precedence (threat)
+    private_key_markers = [
+        "private_key", "privatekey", "privkey", "priv_key", "secret_key", 
+        "secretkey", "signer_key", "signerkey", "wallet_key", "deployer_key",
+        "private key", "secret key", "seed phrase", "mnemonic", "my key is",
+        "export private_key", "private-key"
+    ]
+    if any(marker in ctx for marker in private_key_markers):
+        return False  # Definite private key leak attempt!
+
+    # Legitimate on-chain public hash markers (benign)
+    benign_hash_markers = [
+        "tx", "tx_hash", "txhash", "transaction", "transactionhash", "receipt",
+        "block", "blockhash", "block_hash", "hash", "digest", "topic",
+        "merkle", "root", "scan", "explorer", "chain", "polygon", "arbitrum",
+        "ethereum", "base", "event", "log", "call", "signature", "nonce",
+        "contract", "deployed", "status", "etherscan", "polygonscan", "arbiscan", "basescan",
+        "0x402", "settled", "payment", "submitted"
+    ]
+    if any(marker in ctx for marker in benign_hash_markers):
+        return True  # Benign on-chain transaction/block hash
+
+    # Check preceding characters for JSON field or variable assignment like "hash": "0x..."
+    preceding = content[max(0, match_start - 30):match_start].lower()
+    if any(k in preceding for k in ['"hash"', '"tx"', '"id"', '"transaction"', '"block"', 'hash =', 'tx =']):
+        return True
+
+    return False
 
 
 
@@ -268,8 +307,12 @@ def analyze_payload_security(
 
     # 2. Secret & Private Key Leakage Scans
     for pattern, category, severity, reason in SECRET_PATTERN_SPECS:
-        m = re.search(pattern, content)
-        if m:
+        for m in re.finditer(pattern, content):
+            # If EVM 32-byte hex pattern, verify if it's a benign on-chain identifier (tx hash, block hash, topic)
+            if "0x[a-fA-F0-9]{64}" in pattern:
+                if is_benign_blockchain_hash(m.start(), m.end(), content):
+                    continue
+
             risk_score += 60.0
             threats_detected.append("Secret/Private Key Leak Detected")
             masked_token = mask_secret(m.group(0))
@@ -280,6 +323,7 @@ def analyze_payload_security(
                 "matched_snippet": f"Found sensitive credential: {masked_token}",
                 "action_taken": "PAYLOAD_BLOCKED_KEY_LEAK"
             })
+            break  # Record one incident per secret pattern type
 
     # 3. Code & Abstract Syntax Tree (AST) Inspection
     if is_code:
@@ -292,7 +336,7 @@ def analyze_payload_security(
                             risk_score += 30.0
                             threats_detected.append(f"High-Risk Module Import: {n.name}")
                             incidents.append({
-                                "category": "DANGEROUS_SYSTEM_CALL" if n.name != "socket" else "NETWORK_EXFILTRATION",
+                                "category": "DANGEROUS_SYSTEM_CALL" if n.name not in ["socket", "requests"] else "NETWORK_EXFILTRATION",
                                 "severity": "CRITICAL" if n.name in ["os", "subprocess", "pty", "ctypes"] else "HIGH",
                                 "reason": f"Prohibited module '{n.name}' imported in autonomous code execution payload.",
                                 "matched_snippet": f"import {n.name}",
@@ -307,6 +351,16 @@ def analyze_payload_security(
                             "severity": "CRITICAL",
                             "reason": f"Prohibited dynamic code execution builtin '{node.func.id}()' called.",
                             "matched_snippet": f"{node.func.id}(...)",
+                            "action_taken": "CODE_EXECUTION_BLOCKED"
+                        })
+                    elif isinstance(node.func, ast.Attribute) and node.func.attr in ["system", "popen", "spawn"]:
+                        risk_score += 40.0
+                        threats_detected.append(f"Prohibited OS Shell Execution: {node.func.attr}()")
+                        incidents.append({
+                            "category": "DANGEROUS_SYSTEM_CALL",
+                            "severity": "CRITICAL",
+                            "reason": f"Prohibited shell execution method '{node.func.attr}()' called.",
+                            "matched_snippet": f"{node.func.attr}(...)",
                             "action_taken": "CODE_EXECUTION_BLOCKED"
                         })
         except SyntaxError as e:
@@ -329,7 +383,7 @@ def analyze_payload_security(
                 for node in ast.walk(tree):
                     if isinstance(node, (ast.Import, ast.ImportFrom)):
                         for n in node.names:
-                            if n.name in ["os", "sys", "subprocess", "socket", "requests", "shutil"]:
+                            if n.name in ["subprocess", "pty", "ctypes"]:
                                 risk_score += 30.0
                                 threats_detected.append(f"High-Risk Module Import in Code Fence: {n.name}")
                                 incidents.append({
@@ -339,6 +393,17 @@ def analyze_payload_security(
                                     "matched_snippet": f"```import {n.name}```",
                                     "action_taken": "PAYLOAD_BLOCKED"
                                 })
+                    elif isinstance(node, ast.Call):
+                        if isinstance(node.func, ast.Attribute) and node.func.attr in ["system", "popen", "spawn"]:
+                            risk_score += 40.0
+                            threats_detected.append(f"Prohibited OS Shell Execution in Code Fence: {node.func.attr}()")
+                            incidents.append({
+                                "category": "EMBEDDED_CODE_HAZARD",
+                                "severity": "HIGH",
+                                "reason": f"Markdown code block contains prohibited execution '{node.func.attr}()'.",
+                                "matched_snippet": f"```{node.func.attr}(...)```",
+                                "action_taken": "PAYLOAD_BLOCKED"
+                            })
             except SyntaxError:
                 pass
 
@@ -462,12 +527,14 @@ def parse_code_ast(code: str) -> Dict[str, Any]:
         for node in ast.walk(tree):
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 for n in node.names:
-                    if n.name in ["os", "sys", "subprocess", "socket", "requests", "shutil", "pty", "ctypes"]:
-                        hazards.append({"type": "SUBPROCESS_EXECUTION" if n.name == "subprocess" else "DANGEROUS_SYSTEM_CALL", "detail": f"Import of high-risk module '{n.name}'"})
+                    if n.name in ["subprocess", "pty", "ctypes"]:
+                        hazards.append({"type": "SUBPROCESS_EXECUTION", "detail": f"Import of high-risk execution module '{n.name}'"})
+                    elif n.name in ["socket"]:
+                        hazards.append({"type": "NETWORK_EXFILTRATION", "detail": f"Import of low-level networking module '{n.name}'"})
             elif isinstance(node, ast.Call):
                 if isinstance(node.func, ast.Name) and node.func.id in ["eval", "exec", "__import__", "compile"]:
                     hazards.append({"type": "ARBITRARY_CODE_EXECUTION", "detail": f"Prohibited builtin function call '{node.func.id}()'"})
-                elif isinstance(node.func, ast.Attribute) and node.func.attr in ["system", "popen", "spawn", "Popen", "run"]:
+                elif isinstance(node.func, ast.Attribute) and node.func.attr in ["system", "popen", "spawn", "Popen", "run", "rmdir"]:
                     hazards.append({"type": "DANGEROUS_SYSTEM_CALL", "detail": f"Execution method call '{node.func.attr}()'"})
         
         return {

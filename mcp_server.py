@@ -324,9 +324,9 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "audit": audit_report.model_dump(),
                 "attestation": attestation,
                 "pricing": {
-                    "rate": "0.002 USDC",
-                    "network": "polygon",
-                    "status": "settled"
+                    "mode": "local_first",
+                    "rate": "0.000 USDC",
+                    "status": "free_offline_evaluation"
                 }
             }
 
