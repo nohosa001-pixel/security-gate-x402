@@ -75,12 +75,15 @@ describe("securityGatePlugin structure", () => {
 	it("should export valid plugin object with correct fields", () => {
 		expect(securityGatePlugin.name).toBe("security-gate");
 		expect(securityGatePlugin.description).toBeDefined();
-		expect(securityGatePlugin.actions?.length).toBe(2);
+		expect(securityGatePlugin.actions?.length).toBe(3);
 		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
 			"INSPECT_SAFETY",
 		);
 		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
 			"AUDIT_ESCROW_TASK",
+		);
+		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
+			"CREATE_ESCROW_TASK",
 		);
 		expect(securityGatePlugin.evaluators?.length).toBe(1);
 		expect(securityGatePlugin.providers?.length).toBe(1);
@@ -134,7 +137,41 @@ describe("securityGatePlugin structure", () => {
 		expect(attackResult?.success).toBe(false);
 		expect(attackResult?.text).toContain("ESCROW AUDIT: SLASHED");
 	});
+
+	it("should prepare task escrow with CREATE_ESCROW_TASK", async () => {
+		const action = securityGatePlugin.actions?.find(
+			(a) => a.name === "CREATE_ESCROW_TASK",
+		);
+		expect(action).toBeDefined();
+
+		const taskMsg = {
+			content: { text: "Crawl token price feed from 5 DEXs" },
+		};
+		const mockRuntime = {
+			getSetting: () => "",
+		};
+
+		const res = await action?.handler(
+			mockRuntime as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[0],
+			taskMsg as unknown as Parameters<
+				NonNullable<typeof action>["handler"]
+			>[1],
+			undefined,
+			{
+				worker: "0x1234567890123456789012345678901234567890",
+				payout: 75.0,
+				stake: 25.0,
+			},
+		);
+
+		expect(res?.success).toBe(true);
+		expect(res?.text).toContain("Task Escrow Prepared");
+		expect(res?.text).toContain("75 USDC");
+	});
 });
+
 
 describe("Multi-Chain Constants & Contract Registry", () => {
 	it("should have verified contracts for Polygon, Base, and Arbitrum", async () => {

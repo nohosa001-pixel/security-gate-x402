@@ -10,7 +10,9 @@ from .agent_gate_sdk import (
 )
 from .integrations import (
     SecurityGateCallbackHandler,
-    SecurityGateTool
+    SecurityGateTool,
+    AgentEscrowTool,
+    SovereignTreasuryTool
 )
 from .agent_escrow_client import (
     AgentEscrowClient,
@@ -27,7 +29,10 @@ __all__ = [
     "verify_attestation",
     "SecurityGateCallbackHandler",
     "SecurityGateTool",
+    "AgentEscrowTool",
+    "SovereignTreasuryTool",
     "AgentEscrowClient",
     "DEPLOYED_ESCROW_CONTRACTS"
 ]
+
 

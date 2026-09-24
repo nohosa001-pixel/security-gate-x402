@@ -260,3 +260,99 @@ class AgentEscrowClient:
             bytes.fromhex(r.replace("0x", "")),
             bytes.fromhex(s.replace("0x", ""))
         )
+
+    def get_treasury_reserves(self) -> Dict[str, Any]:
+        """
+        Fetches live Sovereign RWA Treasury reserves (US T-Bills backing).
+        """
+        endpoint = f"{self.oracle_url}/api/v1/treasury/reserves"
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(endpoint)
+                if resp.status_code == 200:
+                    return resp.json()
+        except Exception as e:
+            logger.warning(f"Could not reach remote treasury endpoint ({e}), calculating locally...")
+
+        from app.rwa_treasury_engine import rwa_treasury
+        return rwa_treasury.get_reserves_summary()
+
+    def get_proof_of_reserve(self) -> Dict[str, Any]:
+        """
+        Fetches cryptographically signed EIP-712 Proof-of-Reserve (PoR)
+        verifying 100% US Treasury Bill collateralization and zero operator withdrawal.
+        """
+        endpoint = f"{self.oracle_url}/api/v1/treasury/proof-of-reserve"
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(endpoint)
+                if resp.status_code == 200:
+                    return resp.json()
+        except Exception as e:
+            logger.warning(f"Could not reach remote PoR endpoint ({e}), generating locally...")
+
+        from app.rwa_treasury_engine import rwa_treasury
+        return rwa_treasury.generate_proof_of_reserve()
+
+    def simulate_compound_yield(self, days: int = 30) -> Dict[str, Any]:
+        """
+        Simulates US Treasury yield compounding over specified days.
+        """
+        endpoint = f"{self.oracle_url}/api/v1/treasury/simulate-compound?days={days}"
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.post(endpoint)
+                if resp.status_code == 200:
+                    return resp.json()
+        except Exception as e:
+            logger.warning(f"Could not reach remote yield sim ({e}), calculating locally...")
+
+        from app.rwa_treasury_engine import rwa_treasury
+        return rwa_treasury.simulate_yield_compounding(days=days)
+
+    def execute_create_job(
+        self,
+        worker: str,
+        payout_usdc: float,
+        stake_usdc: float,
+        spec_text: str,
+        duration_seconds: int = 86400
+    ) -> Dict[str, Any]:
+        """
+        Executes createJob on-chain if Web3 and private key are configured.
+        Otherwise returns transaction preparation dict.
+        """
+        calldata = self.create_job_calldata(
+            worker=worker,
+            payout_usdc=payout_usdc,
+            stake_usdc=stake_usdc,
+            spec_text=spec_text,
+            duration_seconds=duration_seconds
+        )
+        if not self._w3 or not self.account:
+            return {"status": "PREPARED", "calldata": calldata}
+
+        contract = self._w3.eth.contract(
+            address=self._w3.to_checksum_address(self.contract_address),
+            abi=AGENT_ESCROW_ABI
+        )
+        tx = contract.functions.createJob(
+            self._w3.to_checksum_address(worker),
+            calldata["payout_wei"],
+            calldata["stake_wei"],
+            bytes.fromhex(calldata["spec_hash"].replace("0x", "")),
+            duration_seconds
+        ).build_transaction({
+            "from": self.address,
+            "nonce": self._w3.eth.get_transaction_count(self.address),
+            "gas": 300000,
+            "gasPrice": self._w3.eth.gas_price
+        })
+        signed_tx = self._w3.eth.account.sign_transaction(tx, private_key=self.private_key)
+        tx_hash = self._w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        return {
+            "status": "SUBMITTED",
+            "tx_hash": tx_hash.hex(),
+            "calldata": calldata
+        }
+

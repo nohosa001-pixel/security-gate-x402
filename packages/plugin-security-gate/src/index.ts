@@ -1,5 +1,6 @@
 import type { Plugin } from "@elizaos/core";
 import { auditEscrowTaskAction } from "./actions/auditEscrowTask.js";
+import { createEscrowTaskAction } from "./actions/createEscrowTask.js";
 import { inspectSafetyAction } from "./actions/inspectSafety.js";
 import { securityGateEvaluator } from "./evaluators/securityGateEvaluator.js";
 import { securityGatePostHandler } from "./postHandlers/securityGatePostHandler.js";
@@ -7,6 +8,7 @@ import { securityGatePreHandler } from "./preHandlers/securityGatePreHandler.js"
 import { securityStatusProvider } from "./providers/securityStatusProvider.js";
 
 export * from "./actions/auditEscrowTask.js";
+export * from "./actions/createEscrowTask.js";
 export * from "./actions/inspectSafety.js";
 export * from "./configIntegrity.js";
 export * from "./constants.js";
@@ -25,11 +27,12 @@ export const securityGatePlugin: Plugin = {
 	name: "security-gate",
 	description:
 		"Deterministic inbound prompt injection defense, outbound covert-channel DLP, config tamper detection, dangerous code pattern detection, autonomous task escrow auditing, and agent safety guardrails.",
-	actions: [inspectSafetyAction, auditEscrowTaskAction],
+	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction],
 	evaluators: [securityGateEvaluator],
 	providers: [securityStatusProvider],
 	chatPreHandlers: [securityGatePreHandler],
 	chatPostHandlers: [securityGatePostHandler],
 };
+
 
 export default securityGatePlugin;

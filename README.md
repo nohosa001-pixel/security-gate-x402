@@ -40,6 +40,10 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 | Service / Endpoint | Description | URL Link |
 | --- | --- | --- |
+| 🏛️ **Agent Escrow & DePIN Hub** | Live M2M Escrow & Sovereign Treasury UI | [Launch Escrow Hub](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/) |
+| 🌐 **Global CDN Mirror** | Fast Edge CDN Mirror for Global Agents | [Open GitHub Pages](https://nohosa001-pixel.github.io/security-gate-x402/) |
+| 📜 **Sovereign M2M Whitepaper** | 80B Agent Economy & 100% T-Bill Sovereign Invariant | [Read Whitepaper](docs/SOVEREIGN_M2M_WHITEPAPER.md) |
+| 🚀 **Global Launch Kit** | Viral Threads & DePIN Daemon Quickstart | [Launch Kit](docs/LAUNCH_THREAD_X.md) |
 | 🖥️ **Web Dashboard** | Interactive visual UI, security simulator & audit tester | [Launch Dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard) |
 | ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground) |
 | 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
