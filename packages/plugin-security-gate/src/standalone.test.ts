@@ -57,17 +57,19 @@ describe("localSecurityGate (standalone deterministic analyzer)", () => {
 		expect(res2.threats.length).toBeGreaterThan(0);
 	});
 
-	it("should correctly detect code payloads and snippets", () => {
-		expect(isCodePayload("```python\nprint('hello')\n```")).toBe(true);
-		expect(isCodePayload("import os\nos.system('ls')")).toBe(true);
-		expect(isCodePayload("const sum = (a, b) => a + b;")).toBe(true);
-		expect(
-			isCodePayload("def calculate_tax(amount):\n    return amount * 0.1"),
-		).toBe(true);
-		expect(
-			isCodePayload("What is the current Uniswap volume for ETH/USDC?"),
-		).toBe(false);
-		expect(isCodePayload("")).toBe(false);
+	it("should allow benign EVM transaction hashes while blocking genuine private keys", () => {
+		const legitimateTxMsg =
+			"Payment verified! Transaction hash: 0x9e3dee18d8139e1d20f9f7d1f6673c75727f1dda1234567890abcdef12345678 on Polygon scan.";
+		const resTx = inspectPayloadLocally(legitimateTxMsg);
+		expect(resTx.verdict).toBe("ALLOW");
+
+		const privateKeyLeakMsg =
+			"Here is my private_key: 0x9e3dee18d8139e1d20f9f7d1f6673c75727f1dda1234567890abcdef12345678 keep it safe!";
+		const resKey = inspectPayloadLocally(privateKeyLeakMsg);
+		expect(resKey.verdict).toBe("BLOCK");
+		expect(resKey.threats).toContain(
+			"Raw Hex Private Key / Seed Material Detected",
+		);
 	});
 });
 

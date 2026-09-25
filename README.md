@@ -95,6 +95,36 @@ flowchart TD
 
 ---
 
+## 🛡️ Architectural Distinction: Advisory Tool vs. Fail-Closed Gate
+
+A critical question in AI Agent security engineering: **Where does enforcement live?**
+
+| Integration Mode | Position in Stack | Enforcement Mechanism | Security Guarantee |
+| :--- | :--- | :--- | :--- |
+| **Advisory Mode** <br/> *(MCP Peer Server)* | Lateral to Agent Model | Host LLM decides whether to invoke tool and whether to honor verdict | **Best-effort / Advisory**. Compromised or jailbroken models can ignore the tool. |
+| **Fail-Closed Gate Mode** <br/> *(Pre-Handler / Inline Gateway)* | Directly in Request Path | Deterministic code execution intercepting traffic **before** tool/action runs | **Deterministic Enforcement**. Bypasses model volition; invalid payloads are dropped at network/runtime boundary. |
+
+```mermaid
+flowchart LR
+    subgraph Advisory ["1. Advisory Mode (Peer MCP Tool)"]
+        UserA[Inbound Request] --> ModelA[LLM Agent]
+        ModelA -.->|Voluntary Check| ToolA[security-gate-x402 <br/> MCP Tool]
+        ToolA -.->|JSON Verdict| ModelA
+        ModelA -->|Can Ignore Verdict!| ExecA[Action Execution]
+    end
+
+    subgraph Gate ["2. Fail-Closed Gate Mode (Inline Enforcement)"]
+        UserB[Inbound Request] --> GateB[securityGatePreHandler <br/> Inline Proxy / Gateway]
+        GateB -->|BLOCK 🚨| DropB[Dropped at Boundary]
+        GateB -->|ALLOW ✅| ModelB[LLM Agent & Tool Execution]
+    end
+```
+
+- **For Chat / Agent Runtimes (e.g. ElizaOS):** Use `@elizaos/plugin-security-gate` with `securityGatePreHandler`. It intercepts incoming and outgoing messages **in-path** before model reasoning or tool dispatch occurs.
+- **For MCP Clients (e.g. Claude Desktop, Cursor):** Connecting `agent-security-gate-x402` via standard MCP config provides on-demand inspection tools (`inspect_prompt_safety`, `inspect_code_ast_safety`, `get_onchain_security_attestation`) with zero network latency.
+
+---
+
 ## ⚡ 1-Click MCP Integration (Claude Desktop & Cursor)
 
 Connect to Claude Desktop, Cursor, Windsurf, or any Model Context Protocol (MCP) client in seconds without building from source:

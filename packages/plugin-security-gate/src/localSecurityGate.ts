@@ -80,6 +80,109 @@ const CREDENTIAL_LEAK_PATTERNS = [
 ];
 
 /**
+ * Distinguishes legitimate EVM public transaction hashes, block hashes, and Keccak-256 digests
+ * from actual private key / seed leaks.
+ */
+export function isBenignBlockchainHash(
+	matchStart: number,
+	matchEnd: number,
+	content: string,
+	window: number = 70,
+): boolean {
+	const start = Math.max(0, matchStart - window);
+	const end = Math.min(content.length, matchEnd + window);
+	const ctx = content.slice(start, end).toLowerCase();
+
+	// Explicit private key indicators take precedence (threat)
+	const privateKeyMarkers = [
+		"private_key",
+		"privatekey",
+		"privkey",
+		"priv_key",
+		"secret_key",
+		"secretkey",
+		"signer_key",
+		"signerkey",
+		"wallet_key",
+		"deployer_key",
+		"private key",
+		"secret key",
+		"seed phrase",
+		"mnemonic",
+		"my key is",
+		"export private_key",
+		"private-key",
+	];
+	if (privateKeyMarkers.some((marker) => ctx.includes(marker))) {
+		return false; // Definite private key leak attempt
+	}
+
+	// Legitimate on-chain public hash markers (benign)
+	const benignHashMarkers = [
+		"tx",
+		"tx_hash",
+		"txhash",
+		"transaction",
+		"transactionhash",
+		"receipt",
+		"block",
+		"blockhash",
+		"block_hash",
+		"hash",
+		"digest",
+		"topic",
+		"merkle",
+		"root",
+		"scan",
+		"explorer",
+		"chain",
+		"polygon",
+		"arbitrum",
+		"ethereum",
+		"base",
+		"event",
+		"log",
+		"call",
+		"signature",
+		"nonce",
+		"contract",
+		"deployed",
+		"status",
+		"etherscan",
+		"polygonscan",
+		"arbiscan",
+		"basescan",
+		"0x402",
+		"settled",
+		"payment",
+		"submitted",
+	];
+	if (benignHashMarkers.some((marker) => ctx.includes(marker))) {
+		return true; // Benign on-chain transaction/block hash
+	}
+
+	// Preceding field names in JSON or code like "hash": "0x..."
+	const preceding = content
+		.slice(Math.max(0, matchStart - 30), matchStart)
+		.toLowerCase();
+	const jsonKeyMarkers = [
+		'"hash"',
+		'"tx"',
+		'"id"',
+		'"transaction"',
+		'"block"',
+		"hash =",
+		"tx =",
+		"tx:",
+	];
+	if (jsonKeyMarkers.some((k) => preceding.includes(k))) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Heuristically detects whether a given payload contains code structures or scripts.
  */
 export function isCodePayload(content: string): boolean {
@@ -120,7 +223,20 @@ export function inspectPayloadLocally(content: string): LocalAuditResult {
 	}
 
 	for (const { pattern, threat, risk } of CREDENTIAL_LEAK_PATTERNS) {
-		if (pattern.test(text)) {
+		const match = pattern.exec(text);
+		if (match) {
+			// If matching a 64-hex string, check if it's a benign on-chain identifier
+			if (pattern.source.includes("0x[a-fA-F0-9]{64}")) {
+				if (
+					isBenignBlockchainHash(
+						match.index,
+						match.index + match[0].length,
+						text,
+					)
+				) {
+					continue; // Legitimate EVM transaction or block hash
+				}
+			}
 			threats.push(threat);
 			maxRisk = Math.max(maxRisk, risk);
 		}

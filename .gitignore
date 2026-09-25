@@ -60,6 +60,8 @@ arbiscan_test.html
 # Runtime Data State
 data/*.json
 data/*.tmp
+data/*.db
+data/
 scratch/
 
 
