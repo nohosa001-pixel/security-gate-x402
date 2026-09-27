@@ -1,6 +1,7 @@
 # 🛡️ elizaos-plugin-security-gate
 
 [![npm version](https://img.shields.io/npm/v/elizaos-plugin-security-gate.svg)](https://www.npmjs.com/package/elizaos-plugin-security-gate)
+[![npm downloads](https://img.shields.io/npm/dw/elizaos-plugin-security-gate.svg?logo=npm&color=CB3837)](https://www.npmjs.com/package/elizaos-plugin-security-gate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS.

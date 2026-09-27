@@ -1,4 +1,5 @@
 # 🔌 MCP (Model Context Protocol) Marketplace & Integration Guide
+
 ## Anthropic Claude Desktop, Cursor IDE, Glama.ai & Smithery.ai Setup
 
 A.GRID `agent-security-gate-x402` exposes a high-performance **Model Context Protocol (MCP)** server (`mcp_server.py`), enabling AI models in **Anthropic Claude Desktop** and **Cursor IDE** to deterministically audit code, verify prompt injection defense, check M2M escrow deliverables, and query the Sovereign RWA Treasury.
@@ -10,7 +11,9 @@ A.GRID `agent-security-gate-x402` exposes a high-performance **Model Context Pro
 Cursor natively supports workspace MCP servers via `.cursor/mcp.json`.
 
 #### Option A: Workspace Auto-Discovery (Recommended)
+
 This repository already includes [`.cursor/mcp.json`](file:///c:/Users/nohos/OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/security-gate-x402/.cursor/mcp.json):
+
 ```json
 {
   "mcpServers": {
@@ -26,6 +29,7 @@ This repository already includes [`.cursor/mcp.json`](file:///c:/Users/nohos/One
 ```
 
 #### Option B: Global Cursor Settings
+
 1. Open Cursor Settings: `Ctrl + Shift + J` (Windows) or `Cmd + ,` (Mac).
 2. Navigate to **Features** ➔ **MCP Servers** ➔ **Add New MCP Server**.
 3. Fill in:
@@ -39,12 +43,14 @@ This repository already includes [`.cursor/mcp.json`](file:///c:/Users/nohos/One
 
 Claude Desktop allows Claude 3.5 Sonnet and Claude 3.7 to invoke A.GRID tools directly during conversations.
 
-#### Config File Location:
+#### Config File Location
+
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
   *(Path: `C:\Users\<Username>\AppData\Roaming\Claude\claude_desktop_config.json`)*
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-#### Configuration Snippet:
+#### Configuration Snippet
+
 ```json
 {
   "mcpServers": {
@@ -60,6 +66,7 @@ Claude Desktop allows Claude 3.5 Sonnet and Claude 3.7 to invoke A.GRID tools di
   }
 }
 ```
+
 *Restart Claude Desktop after saving the configuration. A hammer icon (🔨) will appear in the input box indicating active tools.*
 
 ---

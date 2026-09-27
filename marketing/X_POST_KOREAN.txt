@@ -36,6 +36,7 @@ The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)
 MCP에 한 줄 추가하면 에이전트 방화벽이 바로 켜집니다:
 👉 uvx agent-security-gate-x402
 
+📦 npm (ElizaOS 플러그인, 주간 156 다운로드 돌파!): https://www.npmjs.com/package/elizaos-plugin-security-gate
 📦 PyPI: https://pypi.org/project/agent-security-gate-x402/
 🌐 Glama 레지스트리 공식 승인: https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402
 

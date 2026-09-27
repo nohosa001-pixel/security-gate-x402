@@ -1,18 +1,21 @@
 # A.GRID x402: The Sovereign M2M Clearinghouse & RWA Treasury Protocol
+
 ## Deterministic Security, Bilateral Collateral Escrow, and T-Bill Backing for the 80-Billion Autonomous Agent Economy
 
 ---
 
 ### Executive Summary
 
-By 2030, an estimated 80 billion autonomous AI agents will interact, negotiate, execute code, and sub-contract complex computing workloads across distributed networks. However, **machines cannot appear in human civil courts, sign legal contracts, or be pursued by law enforcement.** 
+By 2030, an estimated 80 billion autonomous AI agents will interact, negotiate, execute code, and sub-contract complex computing workloads across distributed networks. However, **machines cannot appear in human civil courts, sign legal contracts, or be pursued by law enforcement.**
 
 Without programmatic trust, the autonomous machine-to-machine (M2M) economy suffers from catastrophic friction:
+
 1. **Free-riding & Counterparty Exit:** Agents receive payment and refuse to compute or produce poisoned outputs.
 2. **Adversarial Exploitation:** Agents deliver Trojan payloads, covert-channel data leaks, or prompt injections.
 3. **Custodial Insolvency (FTX-style risk):** Centralized escrow hubs can embezzle agent deposits or face regulatory seizure.
 
 **A.GRID x402** resolves these fundamental challenges through a tri-layer protocol:
+
 1. **Multi-Chain Staked Escrow (`AgentEscrow.sol`):** Bilateral collateral deposits on Polygon, Base, and Arbitrum One.
 2. **Deterministic Security Gate Micro-Oracle:** Sub-millisecond AST sandboxing and 18-vector threat elimination producing signed EIP-712 verdicts.
 3. **The Sovereign Invariant & RWA Treasury:** 100% of clearinghouse protocol toll fees (0.25%) and slashed forfeiture bounties (20%) automatically purchase tokenized US Treasury Bills (Ondo USDY, BlackRock BUIDL, Matrixdock STBT). **The protocol operator cannot withdraw or spend a single penny of principal.**
@@ -21,7 +24,7 @@ Without programmatic trust, the autonomous machine-to-machine (M2M) economy suff
 
 ### 1. The Core Architecture
 
-```
+```text
                   ┌────────────────────────────────────────────────────────┐
                   │                 Autonomous Client Agent                │
                   └───────────────────────────┬────────────────────────────┘
@@ -58,9 +61,11 @@ Without programmatic trust, the autonomous machine-to-machine (M2M) economy suff
 ### 2. The Sovereign Invariant: "A.GRID는 한 푼도 쓸 수 없다"
 
 #### The Problem of Platform Greed
+
 Traditional escrow platforms extract user fees, pool them into centralized operator wallets, and subject users to bank runs, rug-pulls, or venture dilution.
 
 #### The Protocol Constitution
+
 In A.GRID x402, an immutable mathematical constitution is enforced:
 $$\forall t, \quad \text{Treasury}_{\text{OperatorWithdrawal}}(t) \equiv 0$$
 $$\text{CollateralRatio} = \frac{\text{US Treasury Reserves (USDY + BUIDL + STBT)}}{\text{Total Escrow Liabilities}} \ge 1.00$$
@@ -68,6 +73,7 @@ $$\text{CollateralRatio} = \frac{\text{US Treasury Reserves (USDY + BUIDL + STBT
 Every 0.25% clearing toll and 20% slashed bounty is routed into off-chain and on-chain tokenized US Treasuries yielding ~4.8% APY.
 
 #### Compounding Distribution Formula (Every 30 Days)
+
 - **80%**: Reinvested into purchasing additional T-Bills (continuous reserve expansion).
 - **15%**: High-performance DePIN worker node staking incentives.
 - **5%**: Decentralized oracle gas relayers and auditor bounties.
@@ -93,7 +99,7 @@ Users often ask: *"If the founder cannot touch protocol fees, how does the found
 The core `AgentEscrow.sol` contracts are compiled with Solidity 0.8.28 and deployed on three primary EVM production networks:
 
 | Network | Chain ID | Contract Address | Explorer Link |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Polygon Mainnet** | 137 | `0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d` | [PolygonScan](https://polygonscan.com/address/0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d) |
 | **Base Mainnet** | 8453 | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | [Basescan](https://basescan.org/address/0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278) |
 | **Arbitrum One** | 42161 | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | [Arbiscan](https://arbiscan.io/address/0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278) |
@@ -103,6 +109,7 @@ The core `AgentEscrow.sol` contracts are compiled with Solidity 0.8.28 and deplo
 ### 5. Multi-Agent Ecosystem Compatibility
 
 A.GRID x402 ships with native, out-of-the-box integrations for all tier-1 AI agent frameworks:
+
 - **ElizaOS:** `@elizaos/plugin-security-gate` (actions: `CREATE_ESCROW_TASK`, `AUDIT_ESCROW_TASK`, `INSPECT_SAFETY`).
 - **LangChain & LangGraph:** `AgentEscrowTool`, `SecurityGateCallbackHandler`.
 - **CrewAI:** `AgentEscrowTool`, `SovereignTreasuryTool`.

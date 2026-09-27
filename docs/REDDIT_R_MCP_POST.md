@@ -2,11 +2,11 @@
 
 **Subreddit**: `r/mcp`  
 **Flair**: `Showcase` or `Tools / Projects`  
-**Direct Submit URL**: https://www.reddit.com/r/mcp/submit?selftext=true&title=%5BShowcase%5D%20I%20built%20an%20MCP%20Security%20Gate%20Server%20to%20stop%20prompt%20injections%2C%20credential%20leaks%2C%20and%20dangerous%20tool%20calls%20(%3C5ms%20latency)
+**Direct Submit URL**: <https://www.reddit.com/r/mcp/submit?selftext=true&title=%5BShowcase%5D%20I%20built%20an%20MCP%20Security%20Gate%20Server%20to%20stop%20prompt%20injections%2C%20credential%20leaks%2C%20and%20dangerous%20tool%20calls%20(%3C5ms%20latency)>
 
 ---
 
-### 📝 Reddit Post Body (Copy & Paste below):
+## 📝 Reddit Post Body (Copy & Paste below)
 
 Hey r/mcp! 👋
 
@@ -56,6 +56,7 @@ You can plug this directly into your `claude_desktop_config.json`:
 ```
 
 Or test it instantly using the official MCP Inspector:
+
 ```bash
 npx @modelcontextprotocol/inspector python mcp_server.py
 ```
@@ -66,9 +67,9 @@ npx @modelcontextprotocol/inspector python mcp_server.py
 
 Once installed, your agent or host gains access to these deterministic safety tools:
 
-* **`verify_agent_output`**: Ultra-fast (<5ms) pre-flight scanner for prompt injection, jailbreaks, and secret leaks.
-* **`inspect_code_ast_safety`**: Deep AST parser that audits Python/shell commands before shell execution tools run.
-* **`inspect_agent_output`**: Deep factual grounding and hallucination check against reference RAG context.
+- **`verify_agent_output`**: Ultra-fast (<5ms) pre-flight scanner for prompt injection, jailbreaks, and secret leaks.
+- **`inspect_code_ast_safety`**: Deep AST parser that audits Python/shell commands before shell execution tools run.
+- **`inspect_agent_output`**: Deep factual grounding and hallucination check against reference RAG context.
 
 ---
 
@@ -76,8 +77,8 @@ Once installed, your agent or host gains access to these deterministic safety to
 
 The project is fully open source (MIT License), with full test suites (156+ passing automated tests):
 
-* **GitHub Repository**: https://github.com/nohosa001-pixel/security-gate-x402
-* **MCP Server Implementation**: https://github.com/nohosa001-pixel/security-gate-x402/blob/main/mcp_server.py
-* **Glama.ai MCP Spec**: https://github.com/nohosa001-pixel/security-gate-x402/blob/main/glama.json
+- **GitHub Repository**: <https://github.com/nohosa001-pixel/security-gate-x402>
+- **MCP Server Implementation**: <https://github.com/nohosa001-pixel/security-gate-x402/blob/main/mcp_server.py>
+- **Glama.ai MCP Spec**: <https://github.com/nohosa001-pixel/security-gate-x402/blob/main/glama.json>
 
 Would love feedback from the community! How are you currently handling tool-call authorization and injection defense in your MCP setups?

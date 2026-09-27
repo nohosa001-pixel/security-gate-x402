@@ -23,6 +23,10 @@ interface ITransactionGuard {
     function checkAfterExecution(bytes32 txHash, bool success) external;
 }
 
+interface IERC165 {
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
+}
+
 /**
  * @title SafeSecurityGateGuard
  * @notice On-Chain Capital Defense Guard for Autonomous Agent Gnosis Safe Wallets.
@@ -30,7 +34,7 @@ interface ITransactionGuard {
  *         Any transaction attempting to move capital or call external DeFi contracts
  *         MUST carry a valid EIP-712 cryptographic attestation from the Security Gate Oracle.
  */
-contract SafeSecurityGateGuard is ITransactionGuard {
+contract SafeSecurityGateGuard is ITransactionGuard, IERC165 {
     address public oracleSigner;
     address public owner;
     uint8 public maxAllowedRiskScore = 30; // Default max risk score (out of 100)
@@ -112,6 +116,11 @@ contract SafeSecurityGateGuard is ITransactionGuard {
             abi.encode(to, value, keccak256(data), operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver)
         );
 
+        // Allow Safe self-management transactions (e.g. changing owners, threshold, modules, guards)
+        if (to == msg.sender) {
+            return;
+        }
+
         // For simulation and verification, we require an active attestation
         // If data is smaller than attestation payload overhead, it reverts
         if (data.length < 65) {
@@ -156,5 +165,18 @@ contract SafeSecurityGateGuard is ITransactionGuard {
 
     function checkAfterExecution(bytes32 txHash, bool success) external override {
         // Post-execution telemetry hook
+    }
+
+    /**
+     * @notice ERC-165 interface detection required by Gnosis Safe v1.3.0 and v1.4.1
+     *         Safe v1.3.0 uses 0xe6d7a83a (type(Guard).interfaceId)
+     *         Safe v1.4.1 uses 0xd827d096
+     *         ERC-165 uses 0x01ffc9a7
+     */
+    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
+        return
+            interfaceId == 0xe6d7a83a || // Safe v1.3.0 ITransactionGuard
+            interfaceId == 0xd827d096 || // Safe v1.4.1 Guard
+            interfaceId == 0x01ffc9a7;   // ERC-165
     }
 }

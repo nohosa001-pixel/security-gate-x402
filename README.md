@@ -1,6 +1,7 @@
 # The Sheriff of Agent Finance (`agent-security-gate-x402`) 🛡️🤠⚡
 
 [![PyPI Version](https://img.shields.io/pypi/v/agent-security-gate-x402.svg?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/agent-security-gate-x402/)
+[![npm Weekly Downloads](https://img.shields.io/npm/dw/elizaos-plugin-security-gate.svg?style=for-the-badge&logo=npm&color=CB3837&logoColor=white)](https://www.npmjs.com/package/elizaos-plugin-security-gate)
 [![ElizaOS Plugin](https://img.shields.io/badge/ElizaOS-Plugin%20Security%20Gate-F35E2B?style=for-the-badge&logo=javascript&logoColor=white)](packages/plugin-security-gate)
 [![ERC Proposal](https://img.shields.io/badge/ERC%20Proposal-Ethereum%20Magicians-627EEA?style=for-the-badge&logo=ethereum&logoColor=white)](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
 [![Gnosis Safe App](https://img.shields.io/badge/Gnosis%20Safe-App%20Store%20Live-12ff80?style=for-the-badge&logo=gnosis&logoColor=black)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)

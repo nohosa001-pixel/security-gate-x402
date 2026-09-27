@@ -41,7 +41,7 @@ export const SECURITY_GATE_REGISTRY: Record<
 		chainName: "Polygon Mainnet",
 		explorerUrl: "https://polygonscan.com",
 		contracts: {
-			safeSecurityGateGuard: "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+			safeSecurityGateGuard: "0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
 			agentCreditOracle: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
 			agentComplianceRegistry: "0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
 			agentEscrow: "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
