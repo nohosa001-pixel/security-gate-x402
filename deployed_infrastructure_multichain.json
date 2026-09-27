@@ -1,18 +1,27 @@
 {
+  "polygon": {
+    "chain_id": 137,
+    "safe_wallet_address": "0x06db5A847F24d0feC5151a01937700E221d55e19",
+    "safe_guard_address": "0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
+    "safe_guard_attach_tx": "0xeb961c2e2fbdb5fdc1568286681cd6f4d38a558c7c6b1821a0c02c6a595f9685",
+    "status": "ACTIVE_AND_GUARDED"
+  },
   "base": {
-    "safe_guard_address": "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
-    "safe_guard_tx": "303bf30f035ce502a9734872c55fe27f694980c2425968339b5458b632eae2a0",
-    "credit_oracle_address": "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
-    "credit_oracle_tx": "bbdbd7f47dd5778327677977f4ffa92b5623758474925676326e4ff0cacdb586",
-    "vault_contract_address": "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
-    "vault_contract_tx": "1a3fe6eb1613be5031396460b7629cbd949a4adb5207a8407180ce768d9ee773"
+    "chain_id": 8453,
+    "safe_wallet_address": "0x81fB233670dDe83eb87022fF40A3868dCF0AAfE7",
+    "safe_wallet_create_tx": "0x44eb0161307e19af608f6c189bd37d385585bbb2409db0609ec83740a1d0e5e0",
+    "safe_guard_address": "0xb44Bc2Acdd156cE08b549A00a3102e4B01276654",
+    "safe_guard_deploy_tx": "0x84a8587d604d33dddaf0c40ec5687098ffdaff99ced950d10dfc7ade4d8003ae",
+    "safe_guard_attach_tx": "0xa7bbec58588c9ca85f96ea9bb8f7b66b3cfa79adfee8cc8c3ccd39b1d0f860a1",
+    "status": "ACTIVE_AND_GUARDED"
   },
   "arbitrum": {
-    "safe_guard_address": "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
-    "safe_guard_tx": "66b1ca62fb57a9962eccac14af0b39bae10dd86f18e3af50d321ed1430f8f04e",
-    "credit_oracle_address": "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
-    "credit_oracle_tx": "3bb95e70e31bdd7d9c6c774acac01e1321575a6931b987a415a51d84e760abf0",
-    "vault_contract_address": "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
-    "vault_contract_tx": "2d0953d4cd449518cd8642927241a28c972bc6b8a609f66d331e6fefca42b919"
+    "chain_id": 42161,
+    "safe_wallet_address": "0x321468d9674cD4C52A0Dc9E7999285FF6c8EEe67",
+    "safe_wallet_create_tx": "0xf8a4271113c64b21c732bb51d14d17c8eb9c9ce31156740cad1e130711cbf957",
+    "safe_guard_address": "0x835D01534A5d2E63D52636FAFB1019F889D1E66B",
+    "safe_guard_deploy_tx": "0x69a6c08cb9d7b138d09332759536dd378af29ff3aa68c2a304916d17940f084e",
+    "safe_guard_attach_tx": "0x3b75296710c2173e34523954a38fb35a8016b4f2b86c5bcff03293da6d85e47e",
+    "status": "ACTIVE_AND_GUARDED"
   }
 }
