@@ -64,4 +64,9 @@ data/*.db
 data/
 scratch/
 
+# Confidential / Strategic Documents
+private/
+specs/AGENT_NATIVE_VAULT_BLUEPRINT.md
+
+
 
