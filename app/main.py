@@ -610,36 +610,20 @@ async def get_mcp_server_card():
 @app.post("/mcp", tags=["MCP"])
 @app.post("/mcp/v1", tags=["MCP"])
 async def mcp_jsonrpc_root_handler(request: Request):
-    """Handles JSON-RPC 2.0 initialization and tools/list for MCP clients."""
+    """Handles standard JSON-RPC 2.0 protocol (initialize, tools/list, tools/call) for Glama MCP Inspector & remote clients."""
     try:
         body = await request.json()
-        req_id = body.get("id")
-        method = body.get("method")
-        if method == "initialize":
-            return JSONResponse(content={
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "result": {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {"tools": {}},
-                    "serverInfo": {
-                        "name": "security-gate-x402",
-                        "version": "1.2.3"
-                    }
-                }
-            })
-        elif method == "tools/list":
-            import mcp_server
-            return JSONResponse(content={
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "result": {"tools": mcp_server.TOOLS}
-            })
-        elif method == "notifications/initialized":
-            return Response(status_code=200)
-        return JSONResponse(content={"jsonrpc": "2.0", "id": req_id, "result": {}})
-    except Exception:
-        return JSONResponse(content={"jsonrpc": "2.0", "id": None, "result": {"status": "ok"}})
+        import mcp_server
+        resp = await mcp_server.handle_rpc_request(body)
+        if resp is not None:
+            return JSONResponse(content=resp)
+        return Response(status_code=200)
+    except Exception as e:
+        return JSONResponse(content={
+            "jsonrpc": "2.0",
+            "id": None,
+            "error": {"code": -32700, "message": f"Parse error: {str(e)}"}
+        }, status_code=200)
 
 
 @app.get("/robots.txt", tags=["SEO"])
