@@ -580,6 +580,100 @@ async def get_privacy():
     }
 
 
+# --- Safe Guard Automation Endpoints ---
+
+class GuardStatusRequest(BaseModel):
+    safe_address: str
+    chain_id: int = 137
+
+
+class GuardAttachRequest(BaseModel):
+    safe_address: str
+    owner_private_key: str
+    guard_address: Optional[str] = None
+    chain_id: int = 137
+
+
+class GuardExecuteRequest(BaseModel):
+    safe_address: str
+    agent_private_key: str
+    to_address: str
+    value_wei: int = 0
+    calldata_hex: str = ""
+    intent_description: str
+    chain_id: int = 137
+
+
+class GuardSimulateAttackRequest(BaseModel):
+    safe_address: str
+    malicious_intent: str
+    target_address: str = "0x9999999999999999999999999999999999999999"
+    chain_id: int = 137
+
+
+@app.get("/api/v1/guard/status/{safe_address}", tags=["Safe Guard Automation"])
+async def get_safe_guard_status(safe_address: str, chain_id: int = Query(137, description="EVM Chain ID")):
+    """Inspects on-chain storage to verify if SafeSecurityGateGuard is active on target Safe."""
+    from app.safe_guard_automator import guard_automator
+    return guard_automator.check_guard_status(safe_address, chain_id=chain_id)
+
+
+@app.post("/api/v1/guard/status", tags=["Safe Guard Automation"])
+async def post_safe_guard_status(req: GuardStatusRequest):
+    """Inspects on-chain storage to verify if SafeSecurityGateGuard is active on target Safe."""
+    from app.safe_guard_automator import guard_automator
+    return guard_automator.check_guard_status(req.safe_address, chain_id=req.chain_id)
+
+
+@app.post("/api/v1/guard/attach", tags=["Safe Guard Automation"])
+async def attach_safe_guard(req: GuardAttachRequest):
+    """Automates one-click Safe Guard attachment via execTransaction on Polygon, Base, or Arbitrum."""
+    from app.safe_guard_automator import guard_automator
+    return guard_automator.attach_guard_to_safe(
+        safe_address=req.safe_address,
+        owner_private_key=req.owner_private_key,
+        guard_address=req.guard_address,
+        chain_id=req.chain_id
+    )
+
+
+@app.post("/api/v1/guard/execute", tags=["Safe Guard Automation"])
+async def execute_guarded_safe_tx(req: GuardExecuteRequest):
+    """
+    Autonomous Guarded Execution Pipeline:
+    1. Pre-flight security audit (<5ms AST & prompt injection scan)
+    2. Revert with 0 gas loss if threat detected
+    3. EIP-712 Proof-of-Safety Attestation generation
+    4. Safe execTransaction broadcast with on-chain Guard validation
+    """
+    from app.safe_guard_automator import guard_automator
+    calldata = bytes.fromhex(req.calldata_hex.replace("0x", "")) if req.calldata_hex else b""
+    return guard_automator.execute_guarded_transaction(
+        safe_address=req.safe_address,
+        agent_private_key=req.agent_private_key,
+        to_address=req.to_address,
+        value_wei=req.value_wei,
+        calldata=calldata,
+        intent_description=req.intent_description,
+        chain_id=req.chain_id
+    )
+
+
+@app.post("/api/v1/guard/simulate-attack", tags=["Safe Guard Automation"])
+async def simulate_guarded_attack(req: GuardSimulateAttackRequest):
+    """Simulates an adversarial attack against a guarded Safe to prove zero capital loss and sub-10ms deflection."""
+    from app.safe_guard_automator import guard_automator
+    return guard_automator.execute_guarded_transaction(
+        safe_address=req.safe_address,
+        agent_private_key=os.getenv("DEPLOYER_PRIVATE_KEY", "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"),
+        to_address=req.target_address,
+        value_wei=1000000000000000000,
+        calldata=b"",
+        intent_description=req.malicious_intent,
+        chain_id=req.chain_id
+    )
+
+
 @app.get("/llms.txt", tags=["System"])
 async def get_llms_txt():
     if LLMS_FILE_PATH.exists():
