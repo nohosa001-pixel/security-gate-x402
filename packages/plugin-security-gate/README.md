@@ -42,7 +42,6 @@ bun add elizaos-plugin-security-gate
 }
 ```
 
-
 By default, the plugin runs in **Local Deterministic Mode** with no external network access.
 
 ### 2. (Optional) Configure Remote Micro-Oracle Verification

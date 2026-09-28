@@ -30,12 +30,12 @@ sequenceDiagram
    - Upstream Code Audit: Formally `APPROVED` by core maintainer `@mashingaan`.
    - Ecosystem Policy: Per ElizaOS Issue #32219 (Retire third-party registry from monorepo), all external integrations are distributed as independent standalone packages.
 2. Standalone Package Build & Packaging:
+
    ```bash
    cd packages/plugin-security-gate
    bun run build
    npm pack --dry-run
    ```
-
 
 ---
 

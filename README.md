@@ -7,6 +7,7 @@
 [![Gnosis Safe App](https://img.shields.io/badge/Gnosis%20Safe-App%20Store%20Live-12ff80?style=for-the-badge&logo=gnosis&logoColor=black)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)
 [![Prometheus Metrics](https://img.shields.io/badge/Prometheus-Metrics%20Live-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/metrics)
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
+[![Smithery.ai](https://img.shields.io/badge/Smithery.ai-Verified_Server-FF5601?style=for-the-badge&logo=web&logoColor=white)](https://smithery.ai/server/nohosa001-pixel/security-gate-x402)
 [![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
 [![CI Test Suite](https://github.com/nohosa001-pixel/security-gate-x402/actions/workflows/ci.yml/badge.svg)](https://github.com/nohosa001-pixel/security-gate-x402/actions)
@@ -50,8 +51,42 @@ Explore the full consumer and enterprise visual interface directly in your brows
 | 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
 | 📜 **On-Chain Calldata** | EIP-712 smart contract attestation calldata endpoint | [`/api/v1/gate/attestation/onchain`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/gate/attestation/onchain) |
 | 📊 **Prometheus Metrics** | Real-time APM telemetry & security counters | [`/metrics`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/metrics) |
+| 🔌 **Smithery MCP Registry** | One-Click Claude & Cursor Agent Installation | [Open on Smithery](https://smithery.ai/server/nohosa001-pixel/security-gate-x402) |
+| 🛡️ **Glama MCP Directory** | Verified MCP Server with JSON Tool Schemas | [Open on Glama](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402) |
 | 📖 **Swagger API Docs** | Full interactive OpenAPI documentation | [View Swagger Docs](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs) |
 | 🤖 **LLM Agent Manifest** | Machine-readable tool specifications | [`/llms.txt`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/llms.txt) |
+
+---
+
+## 🔌 Model Context Protocol (MCP) Integration (Claude Desktop & Cursor)
+
+Connect `agent-security-gate-x402` to **Claude Desktop**, **Cursor IDE**, or any MCP runtime in 1 click via Smithery:
+
+### One-Click Install via Smithery CLI
+
+```bash
+# Install to Anthropic Claude Desktop
+npx -y @smithery/cli install nohosa001-pixel/security-gate-x402 --client claude
+
+# Install to Cursor IDE
+npx -y @smithery/cli install nohosa001-pixel/security-gate-x402 --client cursor
+```
+
+### Manual Configuration (`claude_desktop_config.json`)
+
+```json
+{
+  "mcpServers": {
+    "security-gate-x402": {
+      "command": "python",
+      "args": ["-m", "mcp_server"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
+```
 
 ---
 
