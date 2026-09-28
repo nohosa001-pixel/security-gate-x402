@@ -314,48 +314,74 @@ async def require_x402_payment(request: Request, tier: PricingTier = PricingTier
     return None
 
 
+README_PATH = Path(__file__).resolve().parent.parent / "README.md"
+
+
+@app.get("/README.md", include_in_schema=False)
+@app.get("/README", include_in_schema=False)
+@app.get("/readme", include_in_schema=False)
+async def get_readme():
+    """Serves the project README for automated backlink scanners and LLM crawlers."""
+    if README_PATH.exists():
+        return FileResponse(README_PATH, media_type="text/markdown; charset=utf-8")
+    return PlainTextResponse("README not found", status_code=404)
+
+
+@app.get("/.well-known/oauth-protected-resource", include_in_schema=False)
+async def oauth_protected_resource():
+    """Returns empty JSON for MCP clients probing OAuth status without error."""
+    return JSONResponse(content={})
+
+
 @app.get("/", tags=["System"])
 async def root(request: Request):
-    """Serves Interactive Web UI Dashboard to browsers or JSON metadata to API clients."""
+    """Serves Interactive Web UI Dashboard by default, or JSON metadata when explicitly requested."""
     accept_header = request.headers.get("accept", "")
-    user_agent = request.headers.get("user-agent", "")
-    if ("text/html" in accept_header or "SmitheryBot" in user_agent) and INDEX_HTML_PATH.exists():
-        return FileResponse(INDEX_HTML_PATH, media_type="text/html")
+    format_param = request.query_params.get("format", "")
 
-    return {
-        "service": "agent-security-gate-x402",
-        "identity": "The Sheriff of Agent Finance",
-        "tagline": "Guarding Autonomous Wallets & Transactions in the Wild West of AI",
-        "description": "Deterministic Security & Hallucination Inspection Micro-Oracle",
-        "version": "1.2.1",
-        "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
-        "network": "Polygon, Base, Arbitrum (Multi-chain)",
-        "price_per_query": "0.002 USDC",
-        "smithery_url": "https://smithery.ai/servers/nohosa001/srv-da2k2spt0dsc73ajtbng",
-        "smithery_badge": "https://smithery.ai/badge/nohosa001/srv-da2k2spt0dsc73ajtbng",
-        "interactive_dashboard": "/dashboard",
-        "endpoints": {
-            "inspect_security": "/inspect",
-            "inspect_ast_code": "/inspect/ast",
-            "onchain_attestation": "/api/v1/gate/attestation/onchain",
-            "credit_rating": "/api/v1/credit/{agent_address}",
-            "credit_attestation": "/api/v1/credit/attestation",
-            "compliance_passport": "/api/v1/compliance/passport/{agent_address}",
-            "compliance_eu_ai_act": "/api/v1/compliance/eu-ai-act",
-            "compliance_attestation": "/api/v1/compliance/attestation",
-            "multichain_configs": "/api/v1/gate/chains",
-            "vault_deposit": "/api/v1/vault/deposit",
-            "vault_balance": "/api/v1/vault/balance/{agent_address}",
-            "enterprise_keys": "/api/v1/enterprise/keys",
-            "recent_audit_events": "/api/v1/gate/events/recent",
-            "ap2_manifest": "/.well-known/ap2",
-            "mcp_tools": "/mcp/tools",
-            "llms_manifest": "/llms.txt",
-            "agent_escrow_hub": "/hub",
-            "robots_txt": "/robots.txt",
-            "sitemap_xml": "/sitemap.xml"
+    # If client strictly requests JSON (and not browser HTML)
+    if ("application/json" in accept_header and "text/html" not in accept_header) or format_param == "json":
+        return {
+            "service": "agent-security-gate-x402",
+            "identity": "The Sheriff of Agent Finance",
+            "tagline": "Guarding Autonomous Wallets & Transactions in the Wild West of AI",
+            "description": "Deterministic Security & Hallucination Inspection Micro-Oracle",
+            "version": "1.2.1",
+            "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
+            "network": "Polygon, Base, Arbitrum (Multi-chain)",
+            "price_per_query": "0.002 USDC",
+            "smithery_url": "https://smithery.ai/servers/nohosa001/srv-da2k2spt0dsc73ajtbng",
+            "smithery_badge": "https://smithery.ai/badge/nohosa001/srv-da2k2spt0dsc73ajtbng",
+            "interactive_dashboard": "/dashboard",
+            "endpoints": {
+                "inspect_security": "/inspect",
+                "inspect_ast_code": "/inspect/ast",
+                "onchain_attestation": "/api/v1/gate/attestation/onchain",
+                "credit_rating": "/api/v1/credit/{agent_address}",
+                "credit_attestation": "/api/v1/credit/attestation",
+                "compliance_passport": "/api/v1/compliance/passport/{agent_address}",
+                "compliance_eu_ai_act": "/api/v1/compliance/eu-ai-act",
+                "compliance_attestation": "/api/v1/compliance/attestation",
+                "multichain_configs": "/api/v1/gate/chains",
+                "vault_deposit": "/api/v1/vault/deposit",
+                "vault_balance": "/api/v1/vault/balance/{agent_address}",
+                "enterprise_keys": "/api/v1/enterprise/keys",
+                "recent_audit_events": "/api/v1/gate/events/recent",
+                "ap2_manifest": "/.well-known/ap2",
+                "mcp_tools": "/mcp/tools",
+                "llms_manifest": "/llms.txt",
+                "readme": "/README.md",
+                "agent_escrow_hub": "/hub",
+                "robots_txt": "/robots.txt",
+                "sitemap_xml": "/sitemap.xml"
+            }
         }
-    }
+
+    # Default: serve interactive web dashboard containing the verified Smithery badge
+    if INDEX_HTML_PATH.exists():
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html; charset=utf-8")
+
+    return HTMLResponse("<h2>Agent Security Gate x402</h2>")
 
 
 @app.get("/dashboard", tags=["System"])
