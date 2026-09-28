@@ -318,7 +318,8 @@ async def require_x402_payment(request: Request, tier: PricingTier = PricingTier
 async def root(request: Request):
     """Serves Interactive Web UI Dashboard to browsers or JSON metadata to API clients."""
     accept_header = request.headers.get("accept", "")
-    if "text/html" in accept_header and INDEX_HTML_PATH.exists():
+    user_agent = request.headers.get("user-agent", "")
+    if ("text/html" in accept_header or "SmitheryBot" in user_agent) and INDEX_HTML_PATH.exists():
         return FileResponse(INDEX_HTML_PATH, media_type="text/html")
 
     return {
@@ -330,6 +331,8 @@ async def root(request: Request):
         "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
         "network": "Polygon, Base, Arbitrum (Multi-chain)",
         "price_per_query": "0.002 USDC",
+        "smithery_url": "https://smithery.ai/servers/nohosa001/srv-da2k2spt0dsc73ajtbng",
+        "smithery_badge": "https://smithery.ai/badge/nohosa001/srv-da2k2spt0dsc73ajtbng",
         "interactive_dashboard": "/dashboard",
         "endpoints": {
             "inspect_security": "/inspect",
