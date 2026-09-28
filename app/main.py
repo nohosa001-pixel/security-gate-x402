@@ -41,6 +41,7 @@ from app.schemas import (
     MCPToolCallRequest,
     MCPToolCallResponse,
     EscrowAuditRequest,
+    M2MEscrowSettleRequest,
     LoanQuoteRequest,
     InsuranceQuoteRequest,
     InsuranceClaimRequest,
