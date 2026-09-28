@@ -350,8 +350,6 @@ async def root(request: Request):
             "protocol": "x402 (HTTP 402 Monetized & Free Sandbox)",
             "network": "Polygon, Base, Arbitrum (Multi-chain)",
             "price_per_query": "0.002 USDC",
-            "smithery_url": "https://smithery.ai/servers/nohosa001/srv-da2k2spt0dsc73ajtbng",
-            "smithery_badge": "https://smithery.ai/badge/nohosa001/srv-da2k2spt0dsc73ajtbng",
             "interactive_dashboard": "/dashboard",
             "endpoints": {
                 "inspect_security": "/inspect",
@@ -377,7 +375,7 @@ async def root(request: Request):
             }
         }
 
-    # Default: serve interactive web dashboard containing the verified Smithery badge
+    # Default: serve interactive web dashboard
     if INDEX_HTML_PATH.exists():
         return FileResponse(INDEX_HTML_PATH, media_type="text/html; charset=utf-8")
 
@@ -601,7 +599,7 @@ async def get_ap2_manifest():
 @app.get("/.well-known/mcp/server-card.json", tags=["MCP"])
 @app.get("/.well-known/mcp.json", tags=["MCP"])
 async def get_mcp_server_card():
-    """Smithery.ai & standard MCP server card metadata to skip auto-scanning and advertise capabilities."""
+    """Standard Model Context Protocol (MCP) server card metadata advertising tools and capabilities."""
     if SERVER_CARD_PATH.exists():
         with open(SERVER_CARD_PATH, "r", encoding="utf-8") as f:
             return JSONResponse(content=json.load(f))
@@ -612,7 +610,7 @@ async def get_mcp_server_card():
 @app.post("/mcp", tags=["MCP"])
 @app.post("/mcp/v1", tags=["MCP"])
 async def mcp_jsonrpc_root_handler(request: Request):
-    """Handles JSON-RPC 2.0 initialization and tools/list for Smithery.ai remote scanner."""
+    """Handles JSON-RPC 2.0 initialization and tools/list for MCP clients."""
     try:
         body = await request.json()
         req_id = body.get("id")

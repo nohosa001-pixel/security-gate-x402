@@ -1,6 +1,6 @@
 # 🔌 MCP (Model Context Protocol) Marketplace & Integration Guide
 
-## Anthropic Claude Desktop, Cursor IDE, Glama.ai & Smithery.ai Setup
+## Anthropic Claude Desktop, Cursor IDE & Glama.ai Setup
 
 A.GRID `agent-security-gate-x402` exposes a high-performance **Model Context Protocol (MCP)** server (`mcp_server.py`), enabling AI models in **Anthropic Claude Desktop** and **Cursor IDE** to deterministically audit code, verify prompt injection defense, check M2M escrow deliverables, and query the Sovereign RWA Treasury.
 
@@ -82,21 +82,7 @@ Developers can discover and install our server with 1 click directly from the Gl
 
 ---
 
-### 4. ⚡ Smithery.ai Marketplace (1-Line CLI Install)
-
-Smithery is the global CLI package manager for MCP tools:
-
-```bash
-# Run directly via npx
-npx -y @smithery/cli run agent-security-gate-x402 --client claude
-
-# Or install globally for Cursor
-npx -y @smithery/cli install agent-security-gate-x402 --client cursor
-```
-
----
-
-### 5. 🛠️ Available MCP Tools
+### 4. 🛠️ Available MCP Tools
 
 Once connected, Claude or Cursor can execute the following actions:
 

@@ -1,5 +1,4 @@
 {
-  "$schema": "https://smithery.ai/docs/build/server-card.schema.json",
   "serverInfo": {
     "name": "security-gate-x402",
     "version": "1.2.3"
@@ -7,7 +6,6 @@
   "description": "Zero-trust safety & settlement rail for autonomous AI agents. Sub-10ms deterministic guardrails, secret leak defense, bounded wallet controls, and on-chain Proof-of-Safety attestations via x402 on Base ($0.002).",
   "homepage": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
   "repository": "https://github.com/nohosa001-pixel/security-gate-x402",
-  "smithery": "https://smithery.ai/servers/nohosa001/srv-da2k2spt0dsc73ajtbng",
   "tools": [
     {
       "name": "verify_agent_output",
