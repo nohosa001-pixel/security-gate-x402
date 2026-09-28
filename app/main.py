@@ -108,6 +108,7 @@ if HUB_STATIC_DIR.exists():
 
 AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
 LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
+SERVER_CARD_PATH = Path(__file__).parent.parent / ".well-known" / "mcp" / "server-card.json"
 
 # Rate limit, Prometheus metrics, and free trial usage tracker
 _SERVER_START_TIME = time.time()
@@ -566,6 +567,52 @@ async def get_ap2_manifest():
         with open(AP2_FILE_PATH, "r", encoding="utf-8") as f:
             return JSONResponse(content=json.load(f))
     return JSONResponse({"error": "AP2 manifest not configured"}, status_code=404)
+
+
+@app.get("/.well-known/mcp/server-card.json", tags=["MCP"])
+@app.get("/.well-known/mcp.json", tags=["MCP"])
+async def get_mcp_server_card():
+    """Smithery.ai & standard MCP server card metadata to skip auto-scanning and advertise capabilities."""
+    if SERVER_CARD_PATH.exists():
+        with open(SERVER_CARD_PATH, "r", encoding="utf-8") as f:
+            return JSONResponse(content=json.load(f))
+    return JSONResponse({"error": "server-card.json not found"}, status_code=404)
+
+
+@app.post("/", tags=["MCP"])
+@app.post("/mcp", tags=["MCP"])
+@app.post("/mcp/v1", tags=["MCP"])
+async def mcp_jsonrpc_root_handler(request: Request):
+    """Handles JSON-RPC 2.0 initialization and tools/list for Smithery.ai remote scanner."""
+    try:
+        body = await request.json()
+        req_id = body.get("id")
+        method = body.get("method")
+        if method == "initialize":
+            return JSONResponse(content={
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {
+                        "name": "security-gate-x402",
+                        "version": "1.2.3"
+                    }
+                }
+            })
+        elif method == "tools/list":
+            import mcp_server
+            return JSONResponse(content={
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"tools": mcp_server.TOOLS}
+            })
+        elif method == "notifications/initialized":
+            return Response(status_code=200)
+        return JSONResponse(content={"jsonrpc": "2.0", "id": req_id, "result": {}})
+    except Exception:
+        return JSONResponse(content={"jsonrpc": "2.0", "id": None, "result": {"status": "ok"}})
 
 
 @app.get("/robots.txt", tags=["SEO"])
