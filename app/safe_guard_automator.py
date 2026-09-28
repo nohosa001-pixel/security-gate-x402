@@ -18,7 +18,7 @@ from app.onchain_signer import onchain_signer
 
 
 # Standard Safe storage slot for Guard address (keccak256("guard_manager.guard.address"))
-SAFE_GUARD_STORAGE_SLOT = "0x4a204f620c8c5ccdca3fd54d003b799ba82d82afd266163c202d2d86c244ddc0"
+SAFE_GUARD_STORAGE_SLOT = "0x4a204f620c8c5ccdca3fd54d003badd85ba500436a431f0cbda4f558c93c34c8"
 
 # Default Polygon RPC & Deployed Safe Guard Addresses
 DEFAULT_RPC_URLS = {
@@ -29,9 +29,9 @@ DEFAULT_RPC_URLS = {
 }
 
 DEFAULT_DEPLOYED_GUARDS = {
-    137: "0x5d7CbDb7347DEe5Af8b8B64A298f3B5553cd851e",  # Official Verified Polygon SafeSecurityGateGuard
-    8453: "0x5d7CbDb7347DEe5Af8b8B64A298f3B5553cd851e",
-    42161: "0x5d7CbDb7347DEe5Af8b8B64A298f3B5553cd851e"
+    137: "0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",   # Official Deployed Polygon SafeSecurityGateGuard
+    8453: "0xb44Bc2Acdd156cE08b549A00a3102e4B01276654",  # Base SafeSecurityGateGuard
+    42161: "0x835D01534A5d2E63D52636FAFB1019F889D1E66B"  # Arbitrum SafeSecurityGateGuard
 }
 
 

@@ -1,5 +1,4 @@
-"""Agent Output Security and Hallucination Gate (x402) package."""
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 from app.spend_guard import (
     spend_guard,

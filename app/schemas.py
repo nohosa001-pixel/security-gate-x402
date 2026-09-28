@@ -268,6 +268,17 @@ class EscrowAuditRequest(BaseModel):
     verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentEscrow contract address")
 
 
+class M2MEscrowSettleRequest(BaseModel):
+    job_id: int = Field(..., description="Escrow task job ID", examples=[1])
+    client_address: str = Field(..., description="Payer agent wallet address", examples=["0xAlice11111111111111111111111111111111111"])
+    worker_address: str = Field(..., description="Worker agent wallet address", examples=["0xBob2222222222222222222222222222222222222"])
+    payout_usdc: float = Field(..., gt=0.0, description="Agreed payout amount in USDC", examples=[5.0])
+    deliverable: str = Field(..., description="Worker task deliverable to audit and settle", examples=["Task finished successfully."])
+    ground_truth_spec: Optional[str] = Field(None, description="Job requirement specification to test fidelity")
+    is_code: bool = Field(False, description="Whether deliverable is executable code")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+
+
 # --- Lending Pool Schemas ---
 
 class LoanQuoteRequest(BaseModel):

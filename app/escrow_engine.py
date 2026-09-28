@@ -115,5 +115,68 @@ class AgentEscrowEngine:
             }
         }
 
+    def settle_m2m_job(
+        self,
+        job_id: int,
+        client_address: str,
+        worker_address: str,
+        payout_usdc: float,
+        deliverable: str,
+        ground_truth_spec: Optional[str] = None,
+        is_code: bool = False,
+        chain_id: int = 137
+    ) -> Dict[str, Any]:
+        """
+        Executes automated M2M task escrow audit & settlement:
+        - Deflects prompt injections, secret leaks, and hallucinations (<3ms)
+        - Computes split: Worker Net Payout + 0.002 USDC Micro-Oracle Fee to A.GRID Treasury
+        - Issues EIP-712 settlement voucher
+        """
+        eval_result = self.evaluate_deliverable(
+            job_id=job_id,
+            deliverable=deliverable,
+            ground_truth_spec=ground_truth_spec,
+            is_code=is_code,
+            chain_id=chain_id
+        )
+
+        TREASURY_SAFE = "0x06db5A847F24d0feC5151a01937700E221d55e19"
+        PROTOCOL_FEE_USDC = 0.002
+
+        if not eval_result["is_safe"]:
+            return {
+                "status": "BLOCKED_MALICIOUS_TASK",
+                "job_id": job_id,
+                "verdict": eval_result["verdict"],
+                "threats": eval_result["threats"],
+                "risk_score": eval_result["risk_score"],
+                "funds_protected": True,
+                "action": "REFUND_CLIENT_AND_SLASH_WORKER",
+                "refund_to_client_usdc": payout_usdc,
+                "payout_to_worker_usdc": 0.0,
+                "fee_to_treasury_usdc": 0.0,
+                "treasury_address": TREASURY_SAFE,
+                "attestation": eval_result["attestation"]
+            }
+
+        worker_net = max(0.0, round(payout_usdc - PROTOCOL_FEE_USDC, 6))
+
+        return {
+            "status": "SETTLED_SUCCESSFULLY",
+            "job_id": job_id,
+            "verdict": "PASSED",
+            "risk_score": eval_result["risk_score"],
+            "funds_protected": True,
+            "settlement": {
+                "gross_payout_usdc": payout_usdc,
+                "worker_net_payout_usdc": worker_net,
+                "worker_address": worker_address,
+                "protocol_fee_usdc": PROTOCOL_FEE_USDC,
+                "treasury_address": TREASURY_SAFE,
+                "treasury_owner": "CHOI SEUNG IL"
+            },
+            "attestation": eval_result["attestation"]
+        }
+
 
 escrow_engine = AgentEscrowEngine()

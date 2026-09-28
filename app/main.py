@@ -1194,6 +1194,27 @@ async def audit_escrow_task(req: EscrowAuditRequest):
     return result
 
 
+@app.post("/api/v1/escrow/settle", tags=["Escrow"])
+async def settle_escrow_task(req: M2MEscrowSettleRequest):
+    """
+    Settles an autonomous agent-to-agent task escrow:
+    - Pre-flight security audit: Prompt injection & secret leak defense (<3ms)
+    - Automatically routes 0.002 USDC micro-fee to A.GRID Treasury (Safe: 0x06db...5e19)
+    - Releases net payout to worker or refunds client with 0 on-chain loss upon attack.
+    """
+    from app.escrow_engine import escrow_engine
+    return escrow_engine.settle_m2m_job(
+        job_id=req.job_id,
+        client_address=req.client_address,
+        worker_address=req.worker_address,
+        payout_usdc=req.payout_usdc,
+        deliverable=req.deliverable,
+        ground_truth_spec=req.ground_truth_spec,
+        is_code=req.is_code,
+        chain_id=req.chain_id
+    )
+
+
 @app.get("/api/v1/consensus/validators", tags=["Consensus"])
 async def get_consensus_validators():
     """Returns the 5 decentralized validator nodes of the 3-of-5 threshold oracle cluster."""
