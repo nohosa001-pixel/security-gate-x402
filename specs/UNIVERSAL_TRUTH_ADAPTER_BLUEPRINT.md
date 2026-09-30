@@ -45,6 +45,7 @@ graph TD
 ## 2. 온체인 스마트 컨트랙트 사양 (`UniversalEscrowCore.sol`)
 
 ### 2.1 단일 표준 어댑터 인터페이스 (`ITruthAdapter.sol`)
+
 모든 산업(무역, 바이오, 건설)은 오직 이 인터페이스 하나만 만족하면 에스크로와 즉시 연동됩니다.
 
 ```solidity
@@ -174,6 +175,7 @@ contract UniversalEscrowCore {
 ## 3. 오프체인 3대 진실 어댑터 (Truth Adapters) 동작 규격
 
 ### 🚢 어댑터 1: `TradeIoTAdapter` (글로벌 해운 무역)
+
 * **입력 데이터**: 위성 선박 위치(GPS), 컨테이너 냉동고 온도 시계열 데이터, 항만 자동 하역 RFID 스캔.
 * **진실 판정 로직**:
   1. 도착지 항구 반경 500m 지오펜스 진입 검증.
@@ -181,6 +183,7 @@ contract UniversalEscrowCore {
 * **출력**: `EIP-712 MaritimeTruthAttestation` (서명 완료)
 
 ### 🧬 어댑터 2: `BioZkAdapter` (지식재산권 & 바이오 데이터)
+
 * **입력 데이터**: TEE(하드웨어 보안 영역) 내부 연산 로그, ZK-SNARK 증명 파라미터.
 * **진실 판정 로직**:
   1. 원본 유전체/분자식 데이터의 암호학적 머클 루트 일치 여부 확인.
@@ -188,6 +191,7 @@ contract UniversalEscrowCore {
 * **출력**: `EIP-712 BioZkAttestation` (서명 완료)
 
 ### 🏗️ 어댑터 3: `BuildDroneAdapter` (건설 인프라 기성고)
+
 * **입력 데이터**: 드론 3D 라이다 포인트클라우드, 원본 3D BIM 설계도 파일 해시.
 * **진실 판정 로직**:
   1. 현장 3D 타설 체적(Volume)과 설계도 체적의 일치율 $\ge 98.5\%$ 확인.

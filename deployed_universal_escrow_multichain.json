@@ -1,0 +1,53 @@
+{
+  "polygon": {
+    "chain_id": 137,
+    "network": "Polygon Mainnet",
+    "deployer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "treasury": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "universal_escrow_core": "0x4Dbd77F4799816859a595f24a57A786516D2EAa8",
+    "universal_escrow_core_deploy_tx": "9fd5a4a280ea691db511c33c4b4c6d85e94824345472027f634de1c4fc43349e",
+    "truth_adapter": "0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e",
+    "truth_adapter_deploy_tx": "e4dc3edb5b0625f2fcd7a864202a8227e43ae34a19c053e805f926ec7c27c136",
+    "adapter_registration_txs": [
+      "8e688c5f979359cf651dd73a9206143981873cc98f1e65d2ce5903c83e80dabd",
+      "b6184173dae7c620d8e34504d7ad27024d41d24a90b62fb42f932185b1ce3690",
+      "894bea6e8449c723bfa5bedab2cdd4fc46bb6f61407ecc139222d7129a27958d"
+    ],
+    "deployed_at": "2026-09-29T23:19:02Z"
+  },
+  "base": {
+    "chain_id": 8453,
+    "network": "Base Mainnet",
+    "deployer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "treasury": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "universal_escrow_core": "0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+    "universal_escrow_core_deploy_tx": "9b995628dce3be406b5cfe3b38ddfc230357243b24abc1a78e95c206d290f743",
+    "truth_adapter": "0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
+    "truth_adapter_deploy_tx": "d38c44ba7804372f719d8107f5b2efbd4a22ce31fda383ba114176cbafd2dc7f",
+    "adapter_registration_txs": [
+      "dc8dce0a49b9eebd6211fefeefe760d18357b234dba3edf299c828b7f580979b",
+      "274a846483928d1cb296fdc70bb2b6946a8423a5e3133b14eeaf43f1c59e0ace",
+      "fa8ca7e34c26b3076ab7b27cdf515ffc61d8be11a4c5e0b821b77cbf41c84316"
+    ],
+    "deployed_at": "2026-09-29T23:19:51Z"
+  },
+  "arbitrum": {
+    "chain_id": 42161,
+    "network": "Arbitrum One",
+    "deployer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "treasury": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+    "universal_escrow_core": "0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+    "universal_escrow_core_deploy_tx": "c235110cf502825fd9e01573c308eab9632964725feab993bccfa2691109b0e6",
+    "truth_adapter": "0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
+    "truth_adapter_deploy_tx": "4b119a8cff2d65ec304606a3524d3cb0531ab76a03ef2beb4690edee889763bb",
+    "adapter_registration_txs": [
+      "2cb63a0f154a36e41c4c08b58c79bf2007b06c05af87c9bdc330b0be8fb2a9bc",
+      "19eaa50566a4e709c94ca3687cd9be0ad091aba002264830d519a357b00f0db8",
+      "a18fcc804284a475b8cb401ffa247af8c8e3b1e8dad53465d6955734f3ff0321"
+    ],
+    "deployed_at": "2026-09-29T23:20:49Z"
+  }
+}

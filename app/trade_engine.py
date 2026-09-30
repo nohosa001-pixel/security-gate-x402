@@ -152,6 +152,25 @@ class AgentExchangeSolver:
                     timestamp=int(time.time())
                 )
 
+        # Slippage Guardrail: Block toxic orders with excessive slippage (> 500 bps / 5.0%)
+        if intent.max_slippage_bps > 500:
+            intent_id = f"intent_{uuid.uuid4().hex[:12]}"
+            return TradeExecutionResult(
+                intent_id=intent_id,
+                status="REVERTED_EXCESSIVE_SLIPPAGE",
+                pair=pair,
+                direction=direction,
+                amount_usdc=intent.amount_usdc,
+                asset_qty=0.0,
+                matched_price=market_price,
+                price_source=oracle_info["source"],
+                counterparty=DEPLOYED_TREASURY_VAULT,
+                clearing_house=DEPLOYED_CLEARING_HOUSE,
+                gate_fee_usdc=0.0,
+                settlement_signature="0x0",
+                timestamp=int(time.time())
+            )
+
         # Matched price (applying slight DMM spread: 5 bps)
         spread_factor = 1.0005 if direction == "BUY" else 0.9995
         execution_price = market_price * spread_factor

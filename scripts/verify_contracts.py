@@ -32,6 +32,8 @@ NETWORKS = {
         "api_key_env": "POLYGONSCAN_API_KEY",
         "usdc": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
         "contracts": {
+            "UniversalEscrowCore": "0x4Dbd77F4799816859a595f24a57A786516D2EAa8",
+            "TruthAdapter": "0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e",
             "SafeSecurityGateGuard": "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
             "AgentCreditOracle": "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
             "AgentComplianceRegistry": "0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
@@ -51,6 +53,8 @@ NETWORKS = {
         "api_key_env": "BASESCAN_API_KEY",
         "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
         "contracts": {
+            "UniversalEscrowCore": "0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+            "TruthAdapter": "0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
             "SecurityGateConsumer": "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35"
         }
     },
@@ -62,6 +66,8 @@ NETWORKS = {
         "api_key_env": "ARBISCAN_API_KEY",
         "usdc": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
         "contracts": {
+            "UniversalEscrowCore": "0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+            "TruthAdapter": "0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
             "SecurityGateConsumer": "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35"
         }
     }
@@ -73,7 +79,15 @@ def get_constructor_args(contract_name: str, chain: str) -> str:
     net = NETWORKS[chain]
     usdc = net["usdc"]
 
-    if contract_name == "SafeSecurityGateGuard":
+    if contract_name == "UniversalEscrowCore":
+        # constructor(address _oracleSigner, address _treasury)
+        encoded = encode(["address", "address"], [ORACLE_SIGNER, TREASURY])
+        return encoded.hex()
+    elif contract_name == "TruthAdapter":
+        # constructor(address _oracleSigner, IndustryDomain _domain) - domain 0 = TRADE_MARITIME
+        encoded = encode(["address", "uint8"], [ORACLE_SIGNER, 0])
+        return encoded.hex()
+    elif contract_name == "SafeSecurityGateGuard":
         # constructor(address _oracleSigner, uint8 _maxAllowedRiskScore)
         encoded = encode(["address", "uint8"], [ORACLE_SIGNER, 30])
         return encoded.hex()

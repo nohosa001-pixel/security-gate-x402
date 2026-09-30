@@ -1,0 +1,76 @@
+{
+  "version": "0.1.0",
+  "name": "universal_escrow",
+  "metadata": {
+    "address": "AGRIDEscrowUniversalMainnet111111111111111111",
+    "origin": "anchor",
+    "description": "A.GRID Universal Modular Escrow Engine for Solana Mainnet"
+  },
+  "instructions": [
+    {
+      "name": "initializeJob",
+      "docs": ["Initialize a new Universal Escrow Job funded with SPL USDC"],
+      "accounts": [
+        {"name": "job", "isMut": true, "isSigner": false},
+        {"name": "payer", "isMut": true, "isSigner": true},
+        {"name": "tokenMint", "isMut": false, "isSigner": false},
+        {"name": "payerTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "vaultTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "vaultAuthority", "isMut": false, "isSigner": false},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false},
+        {"name": "rent", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "jobId", "type": {"array": ["u8", 32]}},
+        {"name": "domain", "type": "u8"},
+        {"name": "truthHashRequirement", "type": {"array": ["u8", 32]}},
+        {"name": "totalDeposit", "type": "u64"},
+        {"name": "deadline", "type": "i64"}
+      ]
+    },
+    {
+      "name": "settleJob",
+      "docs": ["Settle Escrow Job upon verifying Ed25519 Oracle Attestation and disbursing splits"],
+      "accounts": [
+        {"name": "job", "isMut": true, "isSigner": false},
+        {"name": "oracleSigner", "isMut": false, "isSigner": true},
+        {"name": "vaultTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "ixSysvar", "isMut": false, "isSigner": false},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "truthPayload", "type": "bytes"},
+        {"name": "recipientsHash", "type": {"array": ["u8", 32]}},
+        {"name": "expiresAt", "type": "u64"}
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EscrowJobAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "jobId", "type": {"array": ["u8", 32]}},
+          {"name": "payer", "type": "publicKey"},
+          {"name": "tokenMint", "type": "publicKey"},
+          {"name": "totalDeposit", "type": "u64"},
+          {"name": "domain", "type": "u8"},
+          {"name": "truthHashRequirement", "type": {"array": ["u8", 32]}},
+          {"name": "deadline", "type": "i64"},
+          {"name": "isSettled", "type": "bool"},
+          {"name": "isRefunded", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {"code": 6000, "name": "AlreadySettled", "msg": "Escrow Job already settled"},
+    {"code": 6001, "name": "AlreadyRefunded", "msg": "Escrow Job already refunded"},
+    {"code": 6002, "name": "JobExpired", "msg": "Escrow Job deadline has passed"},
+    {"code": 6003, "name": "AttestationExpired", "msg": "Oracle Attestation has expired"},
+    {"code": 6004, "name": "TruthMismatch", "msg": "Physical truth proof does not match required hash"}
+  ]
+}

@@ -6,13 +6,17 @@ from .agent_gate_sdk import (
     BudgetExceededError,
     BoundedAgentWallet,
     gate_inspect,
-    verify_attestation
+    verify_attestation,
+    IndustryDomain,
+    UniversalEscrowJob,
+    UniversalEscrowClient
 )
 from .integrations import (
     SecurityGateCallbackHandler,
     SecurityGateTool,
     AgentEscrowTool,
-    SovereignTreasuryTool
+    SovereignTreasuryTool,
+    UniversalEscrowTool
 )
 from .agent_escrow_client import (
     AgentEscrowClient,
@@ -27,10 +31,14 @@ __all__ = [
     "BoundedAgentWallet",
     "gate_inspect",
     "verify_attestation",
+    "IndustryDomain",
+    "UniversalEscrowJob",
+    "UniversalEscrowClient",
     "SecurityGateCallbackHandler",
     "SecurityGateTool",
     "AgentEscrowTool",
     "SovereignTreasuryTool",
+    "UniversalEscrowTool",
     "AgentEscrowClient",
     "DEPLOYED_ESCROW_CONTRACTS"
 ]

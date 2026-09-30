@@ -1,0 +1,202 @@
+{
+  "version": "0.1.0",
+  "name": "universal_escrow_core",
+  "metadata": {
+    "address": "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC",
+    "origin": "anchor",
+    "description": "Universal Modular Escrow Core: Zero-Deficit Split Settlement & Ed25519 Attestations"
+  },
+  "instructions": [
+    {
+      "name": "initializeJob",
+      "docs": [
+        "Initializes an escrow job with domain verification requirement"
+      ],
+      "accounts": [
+        {
+          "name": "jobAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "jobId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "domain",
+          "type": "u8"
+        },
+        {
+          "name": "truthHashRequirement",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "totalDeposit",
+          "type": "u64"
+        },
+        {
+          "name": "deadline",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "settleJob",
+      "docs": [
+        "Settles job and disburses SPL USDC according to recipients hash"
+      ],
+      "accounts": [
+        {
+          "name": "jobAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "jobId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "domain",
+          "type": "u8"
+        },
+        {
+          "name": "truthHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "recipientsHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "expiresAt",
+          "type": "i64"
+        },
+        {
+          "name": "signature",
+          "type": {
+            "array": [
+              "u8",
+              64
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EscrowJobAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "jobId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "payer",
+            "type": "pubkey"
+          },
+          {
+            "name": "domain",
+            "type": "u8"
+          },
+          {
+            "name": "truthHashRequirement",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "totalDeposit",
+            "type": "u64"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "isSettled",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

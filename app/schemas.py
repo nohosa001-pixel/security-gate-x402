@@ -145,6 +145,7 @@ class VaultDepositResponse(BaseModel):
     status: str = Field(default="success")
     agent_address: str
     balance_usdc: float
+    new_balance_usdc: Optional[float] = None
     session_key: str = Field(..., description="Zero-latency session key for agent HTTP authorization header 'X-Vault-Key'")
     message: str
 
@@ -222,7 +223,7 @@ class OnChainAttestationResponse(BaseModel):
 
 class MultiChainInfo(BaseModel):
     name: str
-    chain_id: int
+    chain_id: Union[int, str]
     network_slug: Optional[str] = None
     rpc_url: str
     usdc_address: str
@@ -232,7 +233,30 @@ class MultiChainInfo(BaseModel):
     safe_guard_address: Optional[str] = None
     credit_oracle_address: Optional[str] = None
     compliance_registry_address: Optional[str] = None
+    universal_escrow_address: Optional[str] = None
+    truth_adapter_address: Optional[str] = None
     is_active: bool = True
+
+
+class SolanaTruthAttestationRequest(BaseModel):
+    job_id_hex: str
+    domain: int
+    truth_hash_hex: str
+    recipients_hash_hex: str
+    validity_seconds: int = 3600
+
+
+class SolanaTruthAttestationResponse(BaseModel):
+    chain: str = "solana-mainnet"
+    chain_id: int = 501
+    oracle_signer_pubkey: str
+    signature_b58: str
+    signature_hex: str
+    expires_at: int
+    domain: int
+    job_id_hex: str
+    truth_hash_hex: str
+    recipients_hash_hex: str
 
 
 # --- WebSocket & MCP Schemas ---
@@ -277,6 +301,59 @@ class M2MEscrowSettleRequest(BaseModel):
     ground_truth_spec: Optional[str] = Field(None, description="Job requirement specification to test fidelity")
     is_code: bool = Field(False, description="Whether deliverable is executable code")
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+
+
+# --- Universal Modular Truth Adapter Schemas ---
+
+class SplitRecipientItem(BaseModel):
+    recipient: str = Field(..., description="EVM address of beneficiary (laborer, supplier, research team)")
+    amount: float = Field(..., gt=0.0, description="Disbursal amount in USDC")
+
+
+class MaritimeTruthRequest(BaseModel):
+    job_id: str = Field(..., description="Escrow task unique job ID", examples=["job_maritime_101"])
+    current_gps: List[float] = Field(..., min_length=2, max_length=2, description="[Latitude, Longitude] of vessel", examples=[[35.1035, 129.0410]])
+    destination_port_gps: List[float] = Field(..., min_length=2, max_length=2, description="[Latitude, Longitude] of destination port", examples=[[35.1028, 129.0403]])
+    temperature_timeseries_celsius: List[float] = Field(..., min_length=1, description="Container cold-chain temperature logs", examples=[[-20.1, -19.8, -20.2]])
+    rfid_tag: str = Field(..., description="Automated unloading port RFID tag scanned", examples=["RFID-BUSAN-GATE-4402"])
+    expected_rfid_tag: str = Field(..., description="Expected contract RFID tag", examples=["RFID-BUSAN-GATE-4402"])
+    max_geofence_radius_meters: float = Field(500.0, description="Max allowed distance to port in meters")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
+
+
+class BioZkTruthRequest(BaseModel):
+    job_id: str = Field(..., description="Escrow task unique job ID", examples=["job_bio_genomics_201"])
+    genomic_merkle_root: str = Field(..., description="Cryptographic Merkle Root of genomic/molecular sequence", examples=["0x" + "f" * 64])
+    expected_merkle_root: str = Field(..., description="Contract expected Merkle Root", examples=["0x" + "f" * 64])
+    binding_affinity_kd_nm: float = Field(..., gt=0.0, description="Sub-nanomolar binding affinity Kd (lower is tighter)", examples=[3.85])
+    kd_threshold_nm: float = Field(10.0, description="Maximum acceptable Kd threshold in nM")
+    zk_proof_hex: Optional[str] = Field(None, description="Hex-encoded ZK-SNARK proof")
+    tee_enclave_id: Optional[str] = Field("INTEL_SGX_ENCLAVE_V3", description="Confidential compute TEE enclave ID")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
+
+
+class BuildDroneTruthRequest(BaseModel):
+    job_id: str = Field(..., description="Escrow task unique job ID", examples=["job_construction_301"])
+    drone_lidar_volume_m3: float = Field(..., gt=0.0, description="Drone 3D LiDAR point-cloud measured concrete volume in m³", examples=[4960.0])
+    bim_target_volume_m3: float = Field(..., gt=0.0, description="Target design volume from 3D BIM model in m³", examples=[5000.0])
+    concrete_strength_samples_mpa: List[float] = Field(..., min_length=1, description="IoT embedded sensor compressive strength readings in MPa", examples=[[28.5, 30.2, 29.0, 31.4]])
+    min_volumetric_ratio: float = Field(0.985, description="Minimum acceptable volumetric match ratio (0.985 = 98.5%)")
+    min_concrete_strength_mpa: float = Field(24.0, description="Minimum compressive strength in MPa")
+    bim_spec_hash: Optional[str] = Field(None, description="BIM architectural CAD model specification hash")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
+
+
+class UniversalEscrowSettleRequest(BaseModel):
+    job_id: str = Field(..., description="Universal escrow task unique job ID", examples=["job_bridge_milestone_4"])
+    domain: int = Field(..., description="Domain enum (0=Maritime, 1=Bio, 2=Construction)")
+    recipients: List[SplitRecipientItem] = Field(..., min_length=1, description="List of direct split beneficiaries and amounts")
+    truth_payload: str = Field(..., description="Truth payload text or hex proof data")
+    attestation: Dict[str, Any] = Field(..., description="EIP-712 Attestation signed by Oracle")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
 
 
 # --- Lending Pool Schemas ---

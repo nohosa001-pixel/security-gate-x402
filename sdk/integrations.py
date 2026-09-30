@@ -257,3 +257,90 @@ class SovereignTreasuryTool:
         except Exception as e:
             return json.dumps({"status": "error", "message": str(e)})
 
+
+class UniversalEscrowTool:
+    """
+    Modular Universal Escrow Tool for LangChain, CrewAI, AutoGen, and LangGraph.
+    Enables autonomous agents to lock capital for Maritime IoT, Bio-ZK, or Construction LiDAR
+    milestones and atomically disburse split payouts directly to suppliers/laborers.
+    """
+
+    name: str = "universal_truth_escrow"
+    description: str = (
+        "Locks enterprise capital into UniversalEscrowCore and releases atomic direct split "
+        "disbursals to laborers and suppliers upon EIP-712 physical truth verification."
+    )
+
+    def __init__(self, client=None, app=None):
+        from sdk.agent_gate_sdk import UniversalEscrowClient
+        self.client = client or UniversalEscrowClient(app=app)
+
+    def create_escrow(
+        self,
+        domain_name: str,
+        amount_usdc: float,
+        truth_requirement_hash: str,
+        job_id: Optional[str] = None
+    ) -> str:
+        from sdk.agent_gate_sdk import IndustryDomain
+        domain_map = {
+            "TRADE_MARITIME": IndustryDomain.TRADE_MARITIME,
+            "MARITIME": IndustryDomain.TRADE_MARITIME,
+            "BIO_KNOWLEDGE_IP": IndustryDomain.BIO_KNOWLEDGE_IP,
+            "BIO": IndustryDomain.BIO_KNOWLEDGE_IP,
+            "CONSTRUCTION_BUILD": IndustryDomain.CONSTRUCTION_BUILD,
+            "CONSTRUCTION": IndustryDomain.CONSTRUCTION_BUILD
+        }
+        dom = domain_map.get(domain_name.upper(), IndustryDomain.CONSTRUCTION_BUILD)
+        try:
+            job = self.client.create_job(
+                domain=dom,
+                amount_usdc=amount_usdc,
+                truth_requirement_hash=truth_requirement_hash,
+                job_id=job_id
+            )
+            return json.dumps({
+                "status": "DEPOSITED",
+                "job_id": job.job_id,
+                "domain": job.domain.name,
+                "amount_usdc": job.amount_usdc,
+                "deadline_sec": job.deadline_sec
+            }, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "message": str(e)})
+
+    def settle_escrow(
+        self,
+        job_id: str,
+        proof_data: Any,
+        recipients: List[Dict[str, Any]],
+        attestation: Optional[Dict[str, Any]] = None
+    ) -> str:
+        try:
+            res = self.client.settle_with_truth(
+                job_id=job_id,
+                proof_data=proof_data,
+                recipients=recipients,
+                attestation=attestation
+            )
+            return json.dumps(res, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "message": str(e)})
+
+    def run(self, action: str, **kwargs) -> str:
+        if action == "create_escrow":
+            return self.create_escrow(
+                domain_name=kwargs.get("domain", "CONSTRUCTION_BUILD"),
+                amount_usdc=float(kwargs.get("amount_usdc", 1000.0)),
+                truth_requirement_hash=kwargs.get("truth_requirement_hash", "0x" + "0" * 64),
+                job_id=kwargs.get("job_id")
+            )
+        elif action == "settle_escrow":
+            return self.settle_escrow(
+                job_id=kwargs.get("job_id", ""),
+                proof_data=kwargs.get("proof_data", {}),
+                recipients=kwargs.get("recipients", []),
+                attestation=kwargs.get("attestation")
+            )
+        return json.dumps({"error": f"Unknown action: {action}"})
+

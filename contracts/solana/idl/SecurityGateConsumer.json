@@ -1,0 +1,80 @@
+{
+  "version": "0.1.0",
+  "name": "security_gate_consumer",
+  "metadata": {
+    "address": "AGRivmSTXUQFBgnn3zUDt76qjDJW9Q3W6UVXVPsj6siH",
+    "origin": "anchor",
+    "description": "Security Gate Consumer: Consumer contract mixin & protocol client"
+  },
+  "instructions": [
+    {
+      "name": "verifyConsumerGate",
+      "docs": [
+        "Consumer contract mixin & security protocol verification"
+      ],
+      "accounts": [
+        {
+          "name": "consumerRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "consumer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "agentId",
+          "type": "pubkey"
+        },
+        {
+          "name": "proofHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "VerifyConsumerGate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "consumer",
+            "type": "publicKey"
+          },
+          {
+            "name": "agentId",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

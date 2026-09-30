@@ -1,0 +1,273 @@
+{
+  "version": "1.4.0",
+  "name": "agent_security_gate",
+  "metadata": {
+    "address": "AGRIDGateCoreMainnet111111111111111111111111",
+    "origin": "anchor",
+    "description": "Agent Security Gate x402 Suite: All 13 Core Contracts for Solana Mainnet"
+  },
+  "instructions": [
+    {
+      "name": "registerCompliance",
+      "docs": ["1/13 AgentComplianceRegistry: Registers EU AI Act / ISO-42001 proof of compliance"],
+      "accounts": [
+        {"name": "complianceRecord", "isMut": true, "isSigner": false},
+        {"name": "authority", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "agentId", "type": "publicKey"},
+        {"name": "complianceHash", "type": {"array": ["u8", 32]}},
+        {"name": "jurisdiction", "type": "string"},
+        {"name": "riskTier", "type": "u8"}
+      ]
+    },
+    {
+      "name": "updateAgentCredit",
+      "docs": ["2/13 AgentCreditOracle: Records deterministic credit rating & audit history"],
+      "accounts": [
+        {"name": "creditAccount", "isMut": true, "isSigner": false},
+        {"name": "authority", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "agentId", "type": "publicKey"},
+        {"name": "creditScore", "type": "u16"},
+        {"name": "riskScore", "type": "u8"},
+        {"name": "completedAudits", "type": "u32"}
+      ]
+    },
+    {
+      "name": "createM2mEscrow",
+      "docs": ["3/13 AgentEscrow: Traditional M2M autonomous escrow & split settlement"],
+      "accounts": [
+        {"name": "escrowAccount", "isMut": true, "isSigner": false},
+        {"name": "payer", "isMut": true, "isSigner": true},
+        {"name": "payerTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "escrowTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "jobId", "type": {"array": ["u8", 32]}},
+        {"name": "amount", "type": "u64"},
+        {"name": "payee", "type": "publicKey"}
+      ]
+    },
+    {
+      "name": "requestFactoringAdvance",
+      "docs": ["4/13 AgentFactoringPool: Invoice & accounts-receivable factoring advances"],
+      "accounts": [
+        {"name": "factoringAccount", "isMut": true, "isSigner": false},
+        {"name": "borrower", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "invoiceHash", "type": {"array": ["u8", 32]}},
+        {"name": "advanceAmount", "type": "u64"},
+        {"name": "discountFee", "type": "u64"}
+      ]
+    },
+    {
+      "name": "fileInsuranceClaim",
+      "docs": ["5/13 AgentInsurancePool: Underwriting & slashing indemnification claims"],
+      "accounts": [
+        {"name": "claimRecord", "isMut": true, "isSigner": false},
+        {"name": "claimant", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "incidentHash", "type": {"array": ["u8", 32]}},
+        {"name": "claimedPayout", "type": "u64"}
+      ]
+    },
+    {
+      "name": "borrowCreditLoan",
+      "docs": ["6/13 AgentLendingPool: Flash loans & credit-line undercollateralized loans"],
+      "accounts": [
+        {"name": "loanAccount", "isMut": true, "isSigner": false},
+        {"name": "borrower", "isMut": true, "isSigner": true},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "loanAmount", "type": "u64"},
+        {"name": "interestBps", "type": "u16"}
+      ]
+    },
+    {
+      "name": "depositTreasuryToll",
+      "docs": ["7/13 AgentTreasuryVault: Sovereign 100% T-Bill RWA collateral vault"],
+      "accounts": [
+        {"name": "vault", "isMut": true, "isSigner": false},
+        {"name": "payer", "isMut": true, "isSigner": true},
+        {"name": "payerTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "vaultTokenAccount", "isMut": true, "isSigner": false},
+        {"name": "tokenProgram", "isMut": false, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "amount", "type": "u64"}
+      ]
+    },
+    {
+      "name": "guardAccountAccess",
+      "docs": ["8/13 GuardableBySecurityGate: Account access permission guard"],
+      "accounts": [
+        {"name": "guardAuthority", "isMut": false, "isSigner": true}
+      ],
+      "args": [
+        {"name": "targetAccount", "type": "publicKey"},
+        {"name": "actionSelector", "type": {"array": ["u8", 4]}}
+      ]
+    },
+    {
+      "name": "verifyDomainTruth",
+      "docs": ["9&10/13 ITruthAdapter & TruthAdapter: Domain physical/mathematical verification"],
+      "accounts": [
+        {"name": "oracleSigner", "isMut": false, "isSigner": true}
+      ],
+      "args": [
+        {"name": "jobId", "type": {"array": ["u8", 32]}},
+        {"name": "domain", "type": "u8"},
+        {"name": "truthPayload", "type": "bytes"}
+      ]
+    },
+    {
+      "name": "verifyMultisigGuard",
+      "docs": ["11/13 SafeSecurityGateGuard: Multisig transaction risk firewall"],
+      "accounts": [
+        {"name": "guardSigner", "isMut": false, "isSigner": true}
+      ],
+      "args": [
+        {"name": "txHash", "type": {"array": ["u8", 32]}},
+        {"name": "riskScore", "type": "u8"},
+        {"name": "maxAllowedRisk", "type": "u8"}
+      ]
+    },
+    {
+      "name": "verifyConsumerGate",
+      "docs": ["12/13 SecurityGateConsumer: Consumer contract safety verification hook"],
+      "accounts": [
+        {"name": "gateSigner", "isMut": false, "isSigner": true}
+      ],
+      "args": [
+        {"name": "payloadHash", "type": {"array": ["u8", 32]}},
+        {"name": "riskScore", "type": "u8"}
+      ]
+    },
+    {
+      "name": "routeToUniversalEscrow",
+      "docs": ["13/13 UniversalEscrowCore: Cross-program invocation router"],
+      "accounts": [
+        {"name": "authority", "isMut": false, "isSigner": true}
+      ],
+      "args": [
+        {"name": "jobId", "type": {"array": ["u8", 32]}}
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ComplianceRecordAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "agentId", "type": "publicKey"},
+          {"name": "complianceHash", "type": {"array": ["u8", 32]}},
+          {"name": "jurisdiction", "type": "string"},
+          {"name": "riskTier", "type": "u8"},
+          {"name": "registeredAt", "type": "i64"},
+          {"name": "isValid", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "AgentCreditAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "agentId", "type": "publicKey"},
+          {"name": "creditScore", "type": "u16"},
+          {"name": "riskScore", "type": "u8"},
+          {"name": "completedAudits", "type": "u32"},
+          {"name": "lastUpdated", "type": "i64"},
+          {"name": "isBlacklisted", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "M2MEscrowAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "jobId", "type": {"array": ["u8", 32]}},
+          {"name": "payer", "type": "publicKey"},
+          {"name": "payee", "type": "publicKey"},
+          {"name": "amount", "type": "u64"},
+          {"name": "isSettled", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "FactoringAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "invoiceHash", "type": {"array": ["u8", 32]}},
+          {"name": "borrower", "type": "publicKey"},
+          {"name": "advanceAmount", "type": "u64"},
+          {"name": "discountFee", "type": "u64"},
+          {"name": "isFunded", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "InsuranceClaimAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "incidentHash", "type": {"array": ["u8", 32]}},
+          {"name": "claimant", "type": "publicKey"},
+          {"name": "claimedPayout", "type": "u64"},
+          {"name": "isApproved", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "CreditLoanAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "borrower", "type": "publicKey"},
+          {"name": "principal", "type": "u64"},
+          {"name": "interestBps", "type": "u16"},
+          {"name": "borrowedAt", "type": "i64"},
+          {"name": "isActive", "type": "bool"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    },
+    {
+      "name": "TreasuryVaultAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "accumulatedTolls", "type": "u64"},
+          {"name": "rwaTbillNav", "type": "u64"},
+          {"name": "bump", "type": "u8"}
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {"code": 6100, "name": "RiskThresholdExceeded", "msg": "Security Risk Score exceeded maximum permissible threshold"},
+    {"code": 6101, "name": "AgentBlacklisted", "msg": "Agent is blacklisted from autonomous financial execution"},
+    {"code": 6102, "name": "InvalidJobId", "msg": "Invalid zero Job ID supplied"},
+    {"code": 6103, "name": "EmptyTruthPayload", "msg": "Empty physical truth payload supplied"}
+  ]
+}

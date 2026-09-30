@@ -21,6 +21,8 @@ SUPPORTED_CHAINS: Dict[int, MultiChainInfo] = {
         safe_guard_address="0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
         credit_oracle_address="0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
         compliance_registry_address="0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
+        universal_escrow_address="0x4Dbd77F4799816859a595f24a57A786516D2EAa8",
+        truth_adapter_address="0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e",
         is_active=True
     ),
     8453: MultiChainInfo(
@@ -35,6 +37,8 @@ SUPPORTED_CHAINS: Dict[int, MultiChainInfo] = {
         safe_guard_address="0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
         credit_oracle_address="0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
         compliance_registry_address="0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
+        universal_escrow_address="0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+        truth_adapter_address="0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
         is_active=True
     ),
     42161: MultiChainInfo(
@@ -49,6 +53,8 @@ SUPPORTED_CHAINS: Dict[int, MultiChainInfo] = {
         safe_guard_address="0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
         credit_oracle_address="0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
         compliance_registry_address="0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
+        universal_escrow_address="0x745F7FAfFdb626B931Fe769476a09125cbf9d94b",
+        truth_adapter_address="0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6",
         is_active=True
     ),
     84532: MultiChainInfo(
@@ -83,6 +89,22 @@ SUPPORTED_CHAINS: Dict[int, MultiChainInfo] = {
         vault_contract_address="0x7777777254EEB25477B68fb85Ed929f73A960582",
         consumer_contract_address="0x8888888254EEB25477B68fb85Ed929f73A960582",
         is_active=True
+    ),
+    501: MultiChainInfo(
+        name="Solana Mainnet",
+        network_slug="solana",
+        chain_id=501,
+        rpc_url="https://api.mainnet-beta.solana.com",
+        usdc_address="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        explorer_url="https://solscan.io",
+        vault_contract_address="AGRIDGateCoreMainnet111111111111111111111111",
+        consumer_contract_address="AGRIDGateCoreMainnet111111111111111111111111",
+        safe_guard_address="AGRIDGateCoreMainnet111111111111111111111111",
+        credit_oracle_address="AGRIDGateCoreMainnet111111111111111111111111",
+        compliance_registry_address="AGRIDGateCoreMainnet111111111111111111111111",
+        universal_escrow_address="AGRIDEscrowUniversalMainnet111111111111111111",
+        truth_adapter_address="AGRIDTruthAdapterSolanaMainnet11111111111111",
+        is_active=True
     )
 }
 
@@ -96,7 +118,10 @@ SLUG_TO_CHAIN_ID: Dict[str, int] = {
     "base-sepolia": 84532,
     "arbitrum-sepolia": 421614,
     "polygon-amoy": 80002,
-    "amoy": 80002
+    "amoy": 80002,
+    "solana": 501,
+    "solana-mainnet": 501,
+    "sol": 501
 }
 
 

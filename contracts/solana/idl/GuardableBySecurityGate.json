@@ -1,0 +1,77 @@
+{
+  "version": "0.1.0",
+  "name": "guardable_by_security_gate",
+  "metadata": {
+    "address": "AGR2YR7c5JyL6zmEpZA6rduVTTFSftPKXToeTFj6wQRB",
+    "origin": "anchor",
+    "description": "Guardable By Security Gate: Modifiers & gating enforcement hooks"
+  },
+  "instructions": [
+    {
+      "name": "guardAccountAccess",
+      "docs": [
+        "Modifiers & gating enforcement hooks"
+      ],
+      "accounts": [
+        {
+          "name": "guardAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetContract",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "proofHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GuardAccess",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isEnforced",
+            "type": "bool"
+          },
+          {
+            "name": "targetContract",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

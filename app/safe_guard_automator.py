@@ -236,7 +236,7 @@ class GuardAutomationEngine:
         payload_repr = f"{to_address}:{value_wei}:{calldata.hex()}"
         attestation = onchain_signer.generate_eip712_signature(
             action_payload=payload_repr,
-            risk_score=float(audit.risk_score / 100.0),
+            risk_score=float(audit.risk_score),
             verdict=audit.verdict,
             chain_id=chain_id,
             validity_seconds=300
@@ -251,13 +251,15 @@ class GuardAutomationEngine:
         safe_nonce = int.from_bytes(w3.eth.call({"to": safe_checksum, "data": bytes.fromhex("affed0e0")}), 'big')
 
         # Combine payload with attestation proof bytes (v, r, s, expiresAt, riskScore)
-        proof_bytes = (
-            bytes.fromhex(attestation["v"][2:].zfill(2)) +
-            bytes.fromhex(attestation["r"][2:].zfill(64)) +
-            bytes.fromhex(attestation["s"][2:].zfill(64)) +
-            int(attestation["expires_at"]).to_bytes(8, 'big') +
-            int(attestation["risk_score"]).to_bytes(1, 'big')
-        )
+        v_int = int(attestation["v"]) if not isinstance(attestation["v"], str) else int(attestation["v"], 16)
+        v_byte = v_int.to_bytes(1, 'big')
+        r_bytes = bytes.fromhex(attestation["r"].replace("0x", "").zfill(64))
+        s_bytes = bytes.fromhex(attestation["s"].replace("0x", "").zfill(64))
+        expires_bytes = int(attestation["expires_at"]).to_bytes(8, 'big')
+        risk_score_int = int(round(audit.risk_score * 100)) if audit.risk_score <= 1.0 else int(round(audit.risk_score))
+        risk_score_byte = min(max(risk_score_int, 0), 100).to_bytes(1, 'big')
+
+        proof_bytes = v_byte + r_bytes + s_bytes + expires_bytes + risk_score_byte
         guarded_calldata = calldata + proof_bytes
 
         # Compute SafeTxHash
@@ -350,7 +352,8 @@ class GuardAutomationEngine:
             "risk_score": audit.risk_score,
             "verdict": audit.verdict,
             "eip712_attestation": {
-                "signer": attestation["signer"],
+                "signer": attestation.get("signer") or attestation.get("signer_address"),
+                "signer_address": attestation.get("signer_address") or attestation.get("signer"),
                 "expires_at": attestation["expires_at"],
                 "v": attestation["v"],
                 "r": attestation["r"],

@@ -1,0 +1,103 @@
+{
+  "version": "0.1.0",
+  "name": "truth_adapter",
+  "metadata": {
+    "address": "AGRCVvz3oYrsPC5vfuWHFPNy9nSqZF54BUXDvRVRhbT",
+    "origin": "anchor",
+    "description": "Truth Adapter: Domain-specific truth & AI attestation verification adapter"
+  },
+  "instructions": [
+    {
+      "name": "verifyDomainTruth",
+      "docs": [
+        "Modular multi-domain truth verification & adapter binding"
+      ],
+      "accounts": [
+        {
+          "name": "truthAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oracleSigner",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "domain",
+          "type": "u8"
+        },
+        {
+          "name": "jobId",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "truthHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "VerifyDomainTruth",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "domain",
+            "type": "u8"
+          },
+          {
+            "name": "jobId",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "truthHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

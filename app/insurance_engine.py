@@ -65,6 +65,36 @@ class AgentInsuranceEngine:
         if verifying_contract is None:
             verifying_contract = "0x0000000000000000000000000000000000000000"
 
+        from eth_utils import is_address, to_checksum_address
+        if not is_address(agent_address):
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Invalid EVM agent_address: {agent_address}"
+            }
+        if not is_address(beneficiary_address):
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Invalid EVM beneficiary_address: {beneficiary_address}"
+            }
+        try:
+            agent_address = to_checksum_address(agent_address)
+            beneficiary_address = to_checksum_address(beneficiary_address)
+            verifying_contract = to_checksum_address(verifying_contract)
+        except Exception as e:
+            return {
+                "status": "rejected",
+                "agent_address": agent_address,
+                "beneficiary_address": beneficiary_address,
+                "is_eligible": False,
+                "reason": f"Failed to checksum address: {e}"
+            }
+
         # 1. Evaluate Credit & Risk Profile
         report = self.credit_engine.compute_credit_score(agent_address)
         score = report["credit_score"]
@@ -197,6 +227,24 @@ class AgentInsuranceEngine:
         """
         if verifying_contract is None:
             verifying_contract = "0x0000000000000000000000000000000000000000"
+
+        from eth_utils import is_address, to_checksum_address
+        if not is_address(claimant_address) or not is_address(agent_address):
+            return {
+                "status": "rejected",
+                "policy_id": policy_id,
+                "reason": "Invalid EVM claimant_address or agent_address"
+            }
+        try:
+            claimant_address = to_checksum_address(claimant_address)
+            agent_address = to_checksum_address(agent_address)
+            verifying_contract = to_checksum_address(verifying_contract)
+        except Exception as e:
+            return {
+                "status": "rejected",
+                "policy_id": policy_id,
+                "reason": f"Failed to checksum address: {e}"
+            }
 
         incident_hash = keccak(text=f"INCIDENT:{policy_id}:{agent_address}:{incident_description}")
         incident_hash_hex = "0x" + incident_hash.hex()

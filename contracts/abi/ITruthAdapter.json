@@ -1,0 +1,45 @@
+{
+  "contractName": "ITruthAdapter",
+  "sourceFile": "ITruthAdapter.sol",
+  "compiler": "solc-0.8.20",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "domain",
+      "outputs": [
+        {
+          "internalType": "enum ITruthAdapter.IndustryDomain",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "jobId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "truthPayload",
+          "type": "bytes"
+        }
+      ],
+      "name": "verifyTruth",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isValid",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": ""
+}

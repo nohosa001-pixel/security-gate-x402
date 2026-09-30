@@ -12,7 +12,9 @@
     "AgentInsurancePool": "0xE67F4BC75B11dBb3ef2C9Ad1848B4b193c2c69C6",
     "AgentFactoringPool": "0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0",
     "AgentTreasuryVault": "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638",
-    "SecurityGateConsumer": "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA"
+    "SecurityGateConsumer": "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA",
+    "UniversalEscrowCore": "0x4Dbd77F4799816859a595f24a57A786516D2EAa8",
+    "TruthAdapter": "0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e"
   },
-  "updated_at": "2026-09-20T10:05:55Z"
+  "updated_at": "2026-09-30T08:21:00Z"
 }

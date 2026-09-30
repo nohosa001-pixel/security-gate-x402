@@ -19,7 +19,83 @@ This guide provides everything required to verify and publicly display the **Age
 
 ---
 
-## 2. Polygon Mainnet (Chain ID: 137)
+## 🏛️ A.GRID Universal Escrow & Truth Adapter Verification (Polygon, Base, Arbitrum)
+
+> 🌟 **Standard-Json-Input 1-Click Verification**:
+> `UniversalEscrowCore` and `TruthAdapter` were compiled with **`solc 0.8.20` + `viaIR: true` + `optimizer: 200 runs`**.
+> The easiest, 100% foolproof way to verify is:
+> 1. Select **Compiler Type**: `Solidity (Standard-Json-Input)`
+> 2. Select **Compiler Version**: `v0.8.20+commit.a1b79de6`
+> 3. Upload **`contracts/verification/UniversalEscrowCore.standard.json`** or **`contracts/verification/TruthAdapter.standard.json`**
+> 4. Paste Constructor Arguments Hex (if prompted).
+
+### 1. Polygon Mainnet (Chain ID: 137)
+
+#### 🔹 `UniversalEscrowCore.sol`
+* **Deployed Address**: [`0x4Dbd77F4799816859a595f24a57A786516D2EAa8`](https://polygonscan.com/address/0x4Dbd77F4799816859a595f24a57A786516D2EAa8#code)
+* **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x4Dbd77F4799816859a595f24a57A786516D2EAa8](https://polygonscan.com/verifyContract?a=0x4Dbd77F4799816859a595f24a57A786516D2EAa8)
+* **Standard JSON**: [`contracts/verification/UniversalEscrowCore.standard.json`](UniversalEscrowCore.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf
+```
+
+#### 🔹 `TruthAdapter.sol`
+* **Deployed Address**: [`0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e`](https://polygonscan.com/address/0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e#code)
+* **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e](https://polygonscan.com/verifyContract?a=0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e)
+* **Standard JSON**: [`contracts/verification/TruthAdapter.standard.json`](TruthAdapter.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf0000000000000000000000000000000000000000000000000000000000000000
+```
+
+---
+
+### 2. Base Mainnet (Chain ID: 8453)
+
+#### 🔹 `UniversalEscrowCore.sol`
+* **Deployed Address**: [`0x745F7FAfFdb626B931Fe769476a09125cbf9d94b`](https://basescan.org/address/0x745F7FAfFdb626B931Fe769476a09125cbf9d94b#code)
+* **Direct Verification URL**: [https://basescan.org/verifyContract?a=0x745F7FAfFdb626B931Fe769476a09125cbf9d94b](https://basescan.org/verifyContract?a=0x745F7FAfFdb626B931Fe769476a09125cbf9d94b)
+* **Standard JSON**: [`contracts/verification/UniversalEscrowCore.standard.json`](UniversalEscrowCore.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf
+```
+
+#### 🔹 `TruthAdapter.sol`
+* **Deployed Address**: [`0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6`](https://basescan.org/address/0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6#code)
+* **Direct Verification URL**: [https://basescan.org/verifyContract?a=0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6](https://basescan.org/verifyContract?a=0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6)
+* **Standard JSON**: [`contracts/verification/TruthAdapter.standard.json`](TruthAdapter.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf0000000000000000000000000000000000000000000000000000000000000000
+```
+
+---
+
+### 3. Arbitrum One (Chain ID: 42161)
+
+#### 🔹 `UniversalEscrowCore.sol`
+* **Deployed Address**: [`0x745F7FAfFdb626B931Fe769476a09125cbf9d94b`](https://arbiscan.io/address/0x745F7FAfFdb626B931Fe769476a09125cbf9d94b#code)
+* **Direct Verification URL**: [https://arbiscan.io/verifyContract?a=0x745F7FAfFdb626B931Fe769476a09125cbf9d94b](https://arbiscan.io/verifyContract?a=0x745F7FAfFdb626B931Fe769476a09125cbf9d94b)
+* **Standard JSON**: [`contracts/verification/UniversalEscrowCore.standard.json`](UniversalEscrowCore.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf
+```
+
+#### 🔹 `TruthAdapter.sol`
+* **Deployed Address**: [`0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6`](https://arbiscan.io/address/0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6#code)
+* **Direct Verification URL**: [https://arbiscan.io/verifyContract?a=0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6](https://arbiscan.io/verifyContract?a=0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6)
+* **Standard JSON**: [`contracts/verification/TruthAdapter.standard.json`](TruthAdapter.standard.json)
+* **Constructor Arguments (Hex)**:
+```text
+000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf0000000000000000000000000000000000000000000000000000000000000000
+```
+
+---
+
+## 2. Legacy / Classic Vault Contracts
 
 ### Contract 1: `SafeSecurityGateGuard.sol` (Core ERC-712 Guard)
 

@@ -1,0 +1,80 @@
+{
+  "version": "0.1.0",
+  "name": "agent_treasury_vault",
+  "metadata": {
+    "address": "AGRUfTxpEKMbG9yxasuoGxGFPp2y3PYEBwEpDUSqpfXQ",
+    "origin": "anchor",
+    "description": "Agent Treasury Vault: Sovereign 100% T-Bill RWA collateral vault"
+  },
+  "instructions": [
+    {
+      "name": "depositTreasuryToll",
+      "docs": [
+        "Sovereign 100% T-Bill RWA collateral vault toll deposits"
+      ],
+      "accounts": [
+        {
+          "name": "treasuryAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "depositor",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "destinationTreasury",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "TreasuryVaultAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "totalTollCollected",
+            "type": "u128"
+          },
+          {
+            "name": "vaultAuthority",
+            "type": "pubkey"
+          },
+          {
+            "name": "lastDepositAt",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

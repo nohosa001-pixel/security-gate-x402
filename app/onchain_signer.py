@@ -57,7 +57,12 @@ class OnchainSecuritySigner:
 
         now = int(time.time())
         expires_at = now + validity_seconds
-        risk_score_int = int(round(risk_score * 100))  # 0 to 100 integer basis
+        # Safely normalize risk score to integer 0-100 basis (uint8 range [0, 100])
+        if risk_score <= 1.0:
+            risk_score_int = int(round(risk_score * 100))
+        else:
+            risk_score_int = int(round(risk_score))
+        risk_score_int = min(max(risk_score_int, 0), 100)
 
         domain_data = {
             "name": "AgentSecurityGateOracle",
@@ -118,6 +123,7 @@ class OnchainSecuritySigner:
             "is_safe": verdict == "PASSED",
             "chain_id": chain_id,
             "signer_address": self.signer_address,
+            "signer": self.signer_address,
             "v": v,
             "r": r_hex,
             "s": s_hex,
@@ -150,11 +156,13 @@ def generate_eip712_attestation(
     return {
         "status": "attested",
         "payload_hash": sig_res["action_payload_hash"],
-        "risk_score": int(round(risk_score * 100)),
+        "risk_score": int(round(risk_score * 100)) if risk_score <= 1.0 else int(round(risk_score)),
         "verdict": verdict,
         "expires_at": sig_res["expires_at"],
         "chain_id": chain_id,
         "oracle_signer": sig_res["signer_address"],
+        "signer": sig_res["signer_address"],
+        "signer_address": sig_res["signer_address"],
         "v": sig_res["v"],
         "r": sig_res["r"],
         "s": sig_res["s"],

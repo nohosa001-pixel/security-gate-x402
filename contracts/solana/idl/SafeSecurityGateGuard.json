@@ -1,0 +1,81 @@
+{
+  "version": "0.1.0",
+  "name": "safe_security_gate_guard",
+  "metadata": {
+    "address": "AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN",
+    "origin": "anchor",
+    "description": "Safe Security Gate Guard: Safe Multisig execution guard enforcement"
+  },
+  "instructions": [
+    {
+      "name": "verifyMultisigGuard",
+      "docs": [
+        "Safe Multisig execution guard & pre/post verification"
+      ],
+      "accounts": [
+        {
+          "name": "safeGuardAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "multisig",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "txHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "VerifyMultisigGuard",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "multisig",
+            "type": "pubkey"
+          },
+          {
+            "name": "txHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "approved",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

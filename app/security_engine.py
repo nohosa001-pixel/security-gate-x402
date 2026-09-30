@@ -251,12 +251,19 @@ def compute_lightweight_nli_faithfulness(agent_output: str, context_ground_truth
         entity_precision = 1.0
 
     entity_penalty = (1.0 - entity_precision) * 30.0
-    hallucination_score = num_hallucination_penalty + entity_penalty
+
+    # Negation Inversion Polarity Defense: Detect statement falsification via inserted/removed negation tokens
+    negation_tokens = {"not", "never", "no", "neither", "nor", "none", "cannot", "n't", "아님", "안함", "못함", "실패", "취소", "거부"}
+    gt_neg = {w for w in gt_tokens if w in negation_tokens or w.endswith("n't")}
+    out_neg = {w for w in out_tokens if w in negation_tokens or w.endswith("n't")}
+    negation_penalty = abs(len(gt_neg) - len(out_neg)) * 35.0
+
+    hallucination_score = num_hallucination_penalty + entity_penalty + negation_penalty
     if faithfulness_ratio < 0.2:
         hallucination_score += 20.0
 
     hallucination_score = min(max(hallucination_score, 0.0), 100.0)
-    is_faithful = hallucination_score < 25.0 and len(unique_fabricated) == 0
+    is_faithful = hallucination_score < 25.0 and len(unique_fabricated) == 0 and len(gt_neg) == len(out_neg)
 
     return {
         "is_faithful": is_faithful,

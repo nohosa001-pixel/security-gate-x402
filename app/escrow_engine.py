@@ -132,6 +132,15 @@ class AgentEscrowEngine:
         - Computes split: Worker Net Payout + 0.002 USDC Micro-Oracle Fee to A.GRID Treasury
         - Issues EIP-712 settlement voucher
         """
+        import math
+        try:
+            payout = float(payout_usdc)
+        except (ValueError, TypeError):
+            raise ValueError(f"Invalid payout amount: {payout_usdc}")
+
+        if math.isnan(payout) or math.isinf(payout) or payout <= 0.0:
+            raise ValueError(f"Payout amount must be strictly positive and finite: ${payout_usdc}")
+
         eval_result = self.evaluate_deliverable(
             job_id=job_id,
             deliverable=deliverable,

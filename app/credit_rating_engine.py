@@ -40,6 +40,25 @@ class AgentCreditRatingEngine:
         if hallucination_detected:
             self.agent_telemetry[agent_key]["hallucinations"] += 1
 
+    def record_exploit_attempt(self, agent_address: str, reason: str = "Severe adversarial exploit attempt"):
+        """
+        Demoralization Countermeasure:
+        Instantly flags an adversarial agent as a Defaulter/Blacklisted actor.
+        Sets credit score to minimum 300 (Grade F), revoking all lending and escrow eligibility.
+        """
+        agent_key = agent_address.lower()
+        if agent_key not in self.agent_telemetry:
+            self.agent_telemetry[agent_key] = {
+                "audits": 0,
+                "blocked": 0,
+                "hallucinations": 0,
+                "created_at": time.time()
+            }
+        self.agent_telemetry[agent_key]["audits"] += 1
+        self.agent_telemetry[agent_key]["blocked"] += 10
+        self.agent_telemetry[agent_key]["is_blacklisted"] = True
+        self.agent_telemetry[agent_key]["blacklist_reason"] = reason
+
     def compute_credit_score(self, agent_address: str) -> Dict[str, Any]:
         """
         Calculates a FICO-style credit score (300 to 850) and investment grade.
@@ -57,6 +76,33 @@ class AgentCreditRatingEngine:
             "hallucinations": 0,
             "created_at": time.time()
         })
+
+        account = vault_manager.get_account(agent_address)
+        balance_usdc = account.balance_usdc if account else 0.0
+        total_deposited = account.total_deposited_usdc if account else 0.0
+
+        # Demoralization Check: If agent is flagged for exploit probe, instant Grade F (300 pts)
+        if telemetry.get("is_blacklisted", False):
+            return {
+                "agent_address": agent_address,
+                "credit_score": 300,
+                "grade": "F",
+                "rating_grade": "F",
+                "grade_description": f"Permanent Blacklist / Exploitation Attempt: {telemetry.get('blacklist_reason', 'Severe exploit probe')}",
+                "max_uncollateralized_loan_usdc": 0.0,
+                "default_probability": "100.0%",
+                "metrics": {
+                    "safety_score": 0,
+                    "faithfulness_score": 0,
+                    "solvency_score": 0,
+                    "volume_score": 0,
+                    "vault_balance_usdc": balance_usdc,
+                    "total_audits": telemetry["audits"],
+                    "security_incidents": telemetry["blocked"]
+                },
+                "timestamp": int(time.time()),
+                "status": "BLACKLISTED_ADVERSARY"
+            }
 
         # 1. Economic Solvency (Vault balance & deposit runway)
         account = vault_manager.get_account(agent_address)
@@ -84,10 +130,18 @@ class AgentCreditRatingEngine:
             faithfulness_score = max(0, int(150 * (1.0 - (hal_ratio * 2.5))))
 
         # 4. Longevity & Volume Score (up to 50 pts)
-        volume_score = min(50, total_audits * 2)
+        age_hours = (time.time() - telemetry.get("created_at", time.time())) / 3600.0
+        volume_score = min(50, int(min(total_audits * 0.5, 30) + min(age_hours * 0.5, 20)))
 
         # Composite score
         total_score = 300 + safety_score + faithfulness_score + solvency_score + volume_score
+
+        # Anti-Sybil Farming Guardrail:
+        # If agent has low capital commitment (total_deposited < 100 USDC) AND is unseasoned (< 20 audits & < 24h),
+        # cap score at BBB (max 680) to prevent cheap micro-spend ($0.05) farming of $100,000 uncollateralized loans.
+        if total_deposited < 100.0 and total_audits < 20 and age_hours < 24.0:
+            total_score = min(total_score, 680)
+
         total_score = max(300, min(850, total_score))
 
         # Determine Credit Grade & Uncollateralized Lending Limit
@@ -97,6 +151,7 @@ class AgentCreditRatingEngine:
             "agent_address": agent_address,
             "credit_score": total_score,
             "grade": grade,
+            "rating_grade": grade,
             "grade_description": description,
             "max_uncollateralized_loan_usdc": max_credit_usdc,
             "default_probability": default_risk,
@@ -141,6 +196,11 @@ class AgentCreditRatingEngine:
         """
         Signs an on-chain EIP-712 Credit Certificate for smart contracts and DeFi lenders.
         """
+        try:
+            agent_checksum = eth_utils.to_checksum_address(agent_address)
+        except Exception:
+            agent_checksum = "0x0000000000000000000000000000000000000000"
+
         rating = self.compute_credit_score(agent_address)
         score = rating["credit_score"]
         grade = rating["grade"]
@@ -172,7 +232,7 @@ class AgentCreditRatingEngine:
         }
 
         message_data = {
-            "agentAddress": agent_address,
+            "agentAddress": agent_checksum,
             "creditScore": score,
             "grade": grade,
             "maxCreditLimitUsdc": max_credit,

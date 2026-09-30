@@ -1,0 +1,96 @@
+{
+  "version": "0.1.0",
+  "name": "agent_credit_oracle",
+  "metadata": {
+    "address": "AGRrNBZUAG2CxcxxQW7SGtWY3EMT3JAcVyqwV8ft5GxL",
+    "origin": "anchor",
+    "description": "Agent Credit Oracle: Deterministic AI credit rating & audit records"
+  },
+  "instructions": [
+    {
+      "name": "updateAgentCredit",
+      "docs": [
+        "Records deterministic credit rating & audit history"
+      ],
+      "accounts": [
+        {
+          "name": "creditAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "agentId",
+          "type": "pubkey"
+        },
+        {
+          "name": "creditScore",
+          "type": "u16"
+        },
+        {
+          "name": "riskScore",
+          "type": "u8"
+        },
+        {
+          "name": "completedAudits",
+          "type": "u32"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AgentCreditAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "agentId",
+            "type": "pubkey"
+          },
+          {
+            "name": "creditScore",
+            "type": "u16"
+          },
+          {
+            "name": "riskScore",
+            "type": "u8"
+          },
+          {
+            "name": "completedAudits",
+            "type": "u32"
+          },
+          {
+            "name": "lastUpdated",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

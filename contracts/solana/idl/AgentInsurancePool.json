@@ -1,0 +1,94 @@
+{
+  "version": "0.1.0",
+  "name": "agent_insurance_pool",
+  "metadata": {
+    "address": "AGRE6ojRp1pbnYT8QEJ34reGstETHeYGdLncoBc34hQh",
+    "origin": "anchor",
+    "description": "Agent Insurance Pool: Autonomous risk underwriting & slashing protection"
+  },
+  "instructions": [
+    {
+      "name": "fileInsuranceClaim",
+      "docs": [
+        "Underwriting & slashing indemnification claims"
+      ],
+      "accounts": [
+        {
+          "name": "claimRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimant",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "incidentHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "claimedPayout",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "InsuranceClaimAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "incidentHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "claimant",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimedPayout",
+            "type": "u64"
+          },
+          {
+            "name": "approved",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

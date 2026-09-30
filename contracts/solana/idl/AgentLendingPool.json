@@ -1,0 +1,84 @@
+{
+  "version": "0.1.0",
+  "name": "agent_lending_pool",
+  "metadata": {
+    "address": "AGRuKsgaKpqacjcPvKehAFyfxVQhD3mBUsjfTqL7yGaT",
+    "origin": "anchor",
+    "description": "Agent Lending Pool: Flash loans & credit-line undercollateralized loans"
+  },
+  "instructions": [
+    {
+      "name": "borrowCreditLoan",
+      "docs": [
+        "Flash loans & credit-line undercollateralized loans"
+      ],
+      "accounts": [
+        {
+          "name": "loanAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "borrower",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "loanAmount",
+          "type": "u64"
+        },
+        {
+          "name": "interestBps",
+          "type": "u16"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CreditLoanAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "borrower",
+            "type": "pubkey"
+          },
+          {
+            "name": "loanAmount",
+            "type": "u64"
+          },
+          {
+            "name": "interestBps",
+            "type": "u16"
+          },
+          {
+            "name": "dueDate",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

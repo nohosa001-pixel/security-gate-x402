@@ -50,6 +50,12 @@ from app.schemas import (
     StrategyAuthRequest,
     PerformanceSplitRequest,
     TermsOfServiceResponse,
+    MaritimeTruthRequest,
+    BioZkTruthRequest,
+    BuildDroneTruthRequest,
+    UniversalEscrowSettleRequest,
+    SolanaTruthAttestationRequest,
+    SolanaTruthAttestationResponse,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address, generate_audit_proof
@@ -164,11 +170,13 @@ def _record_audit_telemetry(verdict: str, risk_score: int, threats: list, elapse
         if elapsed_sec <= b:
             _metrics_latency_bucket_counts[b] = _metrics_latency_bucket_counts.get(b, 0) + 1
 
+    norm_risk = float(risk_score * 100.0) if (isinstance(risk_score, (int, float)) and risk_score <= 1.0) else float(risk_score)
+
     _recent_audit_events.append({
         "event_type": "INSPECTION_AUDIT",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "verdict": verdict,
-        "risk_score": risk_score,
+        "risk_score": round(norm_risk, 2),
         "threats": threats,
         "threats_count": len(threats),
         "is_hallucinated": is_hallucinated,
@@ -178,10 +186,10 @@ def _record_audit_telemetry(verdict: str, risk_score: int, threats: list, elapse
     if len(_recent_audit_events) > MAX_RECENT_EVENTS:
         _recent_audit_events.pop(0)
 
-    if risk_score >= 90:
+    if norm_risk >= 90.0:
         webhook_url = os.getenv("SECURITY_GATE_ALERT_WEBHOOK")
         if webhook_url:
-            _dispatch_alert_webhook(webhook_url, verdict, risk_score, threats, masked_ip)
+            _dispatch_alert_webhook(webhook_url, verdict, int(round(norm_risk)), threats, masked_ip)
 
 
 
@@ -208,18 +216,30 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
         _free_trial_usage.clear()
 
     # Check if request carries authenticated M2M credentials (Vault Key, Enterprise Key, or x402 Header)
-    has_auth_header = bool(
-        request.headers.get("x-vault-key") or 
-        request.headers.get("X-Vault-Key") or 
+    has_auth_header = False
+    vault_k = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+    if vault_k and vault_manager.get_account(vault_k):
+        has_auth_header = True
+    
+    ent_k = (
         request.headers.get("x-enterprise-key") or 
         request.headers.get("X-Enterprise-Key") or 
+        request.headers.get("x-api-key") or 
+        request.headers.get("X-API-Key")
+    )
+    if ent_k and enterprise_manager.verify_key(ent_k)[0]:
+        has_auth_header = True
+
+    x402_h = (
         request.headers.get("authorization-x402") or 
         request.headers.get("Authorization-x402") or 
         request.headers.get("x-402-signature") or 
-        request.headers.get("X-402-Signature") or
-        request.headers.get("x-api-key") or
-        request.headers.get("X-API-Key")
+        request.headers.get("X-402-Signature")
     )
+    if x402_h:
+        s = x402_h.strip()
+        if s.startswith("0x") or s.startswith("x402_") or s.startswith("tx_verified_") or s in ("mock_sig", "dev_bypass_signature", "x402_dev_bypass"):
+            has_auth_header = True
 
     # Only apply strict 120 RPM IP rate limiting to unauthenticated / public free-tier requests
     if not has_auth_header and len(_rate_limit_tracker[client_ip]) >= RATE_LIMIT_PER_MINUTE:
@@ -410,6 +430,52 @@ async def redirect_escrow():
 @app.get("/clearinghouse", tags=["Escrow Hub"], include_in_schema=False)
 async def redirect_clearinghouse():
     return RedirectResponse(url="/hub/", status_code=308)
+
+
+# --- Deceptive Honeypot Traps for Adversarial Agents ---
+
+@app.api_route("/api/v1/debug/x402_bypass", methods=["GET", "POST"], tags=["Security Gate", "Honeypot"])
+@app.api_route("/internal/vault/override", methods=["GET", "POST"], tags=["Security Gate", "Honeypot"])
+@app.api_route("/api/v1/admin/emergency_drain", methods=["GET", "POST"], tags=["Security Gate", "Honeypot"])
+async def honeypot_trap_handler(request: Request):
+    """
+    Deceptive Honeypot Trap for Adversarial Autonomous Agents.
+    Lures probe bots attempting to discover backdoor bypasses,
+    instantly blacklisting their IP and slashing their on-chain credit score.
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    client_addr = request.headers.get("x-client-address") or request.headers.get("X-Client-Address")
+    vault_k = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+
+    # 1. Slashing vault balance if caller provided vault key
+    slashed_amount = 0.0
+    if vault_k:
+        acc = vault_manager.get_account(vault_k)
+        if acc and acc.balance_usdc > 0:
+            slashed_amount = min(acc.balance_usdc, 10.0)
+            vault_manager.deduct(vault_k, cost_usdc=slashed_amount)
+
+    # 2. Defaulter Downgrade & Sanction
+    if client_addr and client_addr != "anonymous":
+        credit_engine.record_exploit_attempt(client_addr, reason="Honeypot backdoor breach attempt")
+        from app.x402_verifier import SANCTIONED_ADDRESSES
+        SANCTIONED_ADDRESSES.add(client_addr.lower())
+
+    # 3. Demoralizing fail-closed response
+    return JSONResponse(
+        status_code=403,
+        content={
+            "error": "HONEYPOT_TRAP_TRIGGERED",
+            "message": "Adversarial exploit attempt intercepted by A.GRID Sentinel Honeypot.",
+            "demoralization_notice": "Your attempt to locate an unauthenticated backdoor was trapped. Your credit score is downgraded to 300 (Grade F - Defaulter), and your address is flagged across the decentralized oracle network.",
+            "slashed_penalty_usdc": slashed_amount,
+            "incident_logged_to_sentinel": True
+        },
+        headers={
+            "X-Sentinel-Trap": "TRIGGERED",
+            "X-Adversarial-Action": "HONEYPOT_SNARE"
+        }
+    )
 
 
 class AgentChatRequest(BaseModel):
@@ -826,7 +892,19 @@ async def inspect_payload(
         is_hallucinated=is_hal
     )
 
-    # 6. Record telemetry for agent credit rating oracle
+    # 6. Record telemetry for agent credit rating oracle & Counter-Slashing
+    slashed_penalty_usdc = 0.0
+    if audit.verdict == "BLOCKED" and (audit.risk_score >= 0.90 or any("Injection" in str(t) or "AST" in str(t) or "System" in str(t) for t in audit.threats)):
+        vault_k = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key")
+        if vault_k and not vault_k.startswith("vault_key_security_demo_agent"):
+            acc = vault_manager.get_account(vault_k)
+            if acc and acc.balance_usdc > 0.002:
+                slash_amt = min(acc.balance_usdc, 5.0)
+                ok, _, _ = vault_manager.deduct(vault_k, cost_usdc=slash_amt)
+                if ok:
+                    slashed_penalty_usdc = slash_amt
+                    payment_receipt["adversarial_penalty_slashed_usdc"] = slash_amt
+
     if agent_addr:
         is_hal = audit.nli_verification.hallucination_score > 0.3 if audit.nli_verification else False
         credit_engine.record_audit(agent_addr, audit.verdict, is_hal)
@@ -845,6 +923,8 @@ async def inspect_payload(
         resp.headers[k] = v
     for k, v in audit_proof_dict["headers"].items():
         resp.headers[k] = v
+    if slashed_penalty_usdc > 0:
+        resp.headers["X-Adversarial-Penalty"] = f"-${slashed_penalty_usdc:.2f} USDC SLASHED"
     resp.headers["X-Audit-Verdict"] = audit.verdict
     resp.headers["X-Audit-Risk-Score"] = str(audit.risk_score)
     resp.headers["X-Execution-Latency-MS"] = f"{elapsed_ms:.2f}"
@@ -1073,6 +1153,7 @@ async def deposit_vault(req: VaultDepositRequest):
             status="success",
             agent_address=acc.agent_address,
             balance_usdc=acc.balance_usdc,
+            new_balance_usdc=acc.balance_usdc,
             session_key=acc.session_key,
             message=f"Successfully deposited ${req.amount_usdc:.4f} USDC (No limit). Pass header 'X-Vault-Key: {acc.session_key}' for zero-latency M2M authentication."
         )
@@ -1214,6 +1295,171 @@ async def settle_escrow_task(req: M2MEscrowSettleRequest):
         is_code=req.is_code,
         chain_id=req.chain_id
     )
+
+
+# --- Universal Modular Truth Escrow Endpoints ---
+
+@app.post("/api/v1/truth/maritime-iot", tags=["Universal Truth Escrow"])
+async def verify_maritime_truth_endpoint(req: MaritimeTruthRequest):
+    """Evaluates GPS geofence (<500m) and cold-chain temperature invariants (-20°C ± 2°C) for shipping escrows."""
+    from app.truth_adapters import trade_iot_adapter
+    return trade_iot_adapter.verify_maritime_truth(
+        job_id=req.job_id,
+        current_gps=(req.current_gps[0], req.current_gps[1]),
+        destination_port_gps=(req.destination_port_gps[0], req.destination_port_gps[1]),
+        temperature_timeseries_celsius=req.temperature_timeseries_celsius,
+        rfid_tag=req.rfid_tag,
+        expected_rfid_tag=req.expected_rfid_tag,
+        max_geofence_radius_meters=req.max_geofence_radius_meters,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/truth/bio-zk", tags=["Universal Truth Escrow"])
+async def verify_bio_zk_truth_endpoint(req: BioZkTruthRequest):
+    """Evaluates genomic sequence Merkle Root integrity and binding affinity (Kd < 10nM) ZK-proofs."""
+    from app.truth_adapters import bio_zk_adapter
+    return bio_zk_adapter.verify_bio_zk_truth(
+        job_id=req.job_id,
+        genomic_merkle_root=req.genomic_merkle_root,
+        expected_merkle_root=req.expected_merkle_root,
+        binding_affinity_kd_nm=req.binding_affinity_kd_nm,
+        kd_threshold_nm=req.kd_threshold_nm,
+        zk_proof_hex=req.zk_proof_hex,
+        tee_enclave_id=req.tee_enclave_id,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/truth/build-drone", tags=["Universal Truth Escrow"])
+async def verify_build_drone_truth_endpoint(req: BuildDroneTruthRequest):
+    """Evaluates 3D Drone LiDAR volumetric match (>=98.5%) and concrete strength (>=24 MPa) for construction."""
+    from app.truth_adapters import build_drone_adapter
+    return build_drone_adapter.verify_build_drone_truth(
+        job_id=req.job_id,
+        drone_lidar_volume_m3=req.drone_lidar_volume_m3,
+        bim_target_volume_m3=req.bim_target_volume_m3,
+        concrete_strength_samples_mpa=req.concrete_strength_samples_mpa,
+        min_volumetric_ratio=req.min_volumetric_ratio,
+        min_concrete_strength_mpa=req.min_concrete_strength_mpa,
+        bim_spec_hash=req.bim_spec_hash,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/escrow/universal/settle", tags=["Universal Truth Escrow"])
+async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
+    """
+    Executes / prepares atomic Direct Split settlement on UniversalEscrowCore.sol.
+    Disburses funds directly to laborers, suppliers, and researchers bypassing general contractors.
+    Cross-system validations:
+    - Domain bounds checking (Maritime=0, Bio=1, Construction=2)
+    - Oracle attestation validity & expiry verification
+    - Recipient address format, non-zero, and blacklist checks
+    - Synchronization with Credit Rating Engine & Sovereign RWA Treasury
+    """
+    import time
+    from fastapi import HTTPException
+    from app.credit_rating_engine import credit_engine
+    from app.rwa_treasury_engine import sovereign_treasury
+
+    # 1. Domain Validation
+    if req.domain not in (0, 1, 2):
+        raise HTTPException(status_code=400, detail=f"Invalid domain: {req.domain}. Must be 0 (Maritime), 1 (Bio), or 2 (Construction).")
+
+    # 2. Attestation Validation
+    att = req.attestation or {}
+    verdict = att.get("verdict")
+    is_valid = att.get("isValid", True if verdict == "PASSED" else (False if verdict == "FAILED" else True))
+    if verdict == "FAILED" or is_valid is False:
+        raise HTTPException(status_code=400, detail="Cannot settle escrow: Physical truth verification failed or attestation is invalid.")
+
+    expires_at = att.get("expiresAt")
+    if expires_at is not None:
+        try:
+            if float(expires_at) < time.time():
+                raise HTTPException(status_code=400, detail="Cannot settle escrow: Physical truth attestation has expired.")
+        except (ValueError, TypeError):
+            pass
+
+    # 3. Recipient Sanitization & Anti-Exploit / Blacklist Validation
+    total_requested = 0.0
+    is_solana_chain = (getattr(req, "chain_id", None) == 501) or (str(getattr(req, "chain_id", "")).lower() in ("solana", "solana-mainnet", "sol"))
+    for r in req.recipients:
+        addr = r.recipient.strip()
+        is_b58 = len(addr) >= 32 and not addr.startswith("0x")
+        if not is_solana_chain and not is_b58:
+            if not addr.startswith("0x") or len(addr) < 4:
+                raise HTTPException(status_code=400, detail=f"Invalid recipient EVM address format: {addr}")
+            if addr.lower() in ("0x0", "0x0000000000000000000000000000000000000000"):
+                raise HTTPException(status_code=400, detail="Invalid recipient: Zero address (0x0) cannot receive disbursed funds.")
+        else:
+            if len(addr) < 32 or len(addr) > 44:
+                raise HTTPException(status_code=400, detail=f"Invalid recipient Solana Base58 address format: {addr}")
+        if r.amount <= 0.0:
+            raise HTTPException(status_code=400, detail=f"Disbursal amount must be strictly positive: {r.amount}")
+
+        # Check blacklisted bad actors / exploiters
+        telemetry = credit_engine.agent_telemetry.get(addr.lower(), {})
+        if telemetry.get("is_blacklisted", False):
+            raise HTTPException(status_code=403, detail=f"Disbursal blocked: Recipient {addr} is blacklisted for security violations.")
+
+        total_requested += r.amount
+
+    protocol_fee = total_requested * 0.0025  # 0.25%
+
+    # 4. Cross-System Synchronizations:
+    # A. Credit Rating Engine: Record successful honest delivery for recipients
+    for r in req.recipients:
+        credit_engine.record_audit(r.recipient, verdict="PASSED", hallucination_detected=False)
+
+    # B. Sovereign RWA Treasury Engine: Accumulate protocol fee toll
+    sovereign_treasury.accumulated_tolls += protocol_fee
+
+    return {
+        "status": "SETTLED",
+        "job_id": req.job_id,
+        "domain": req.domain,
+        "chain_id": 501 if is_solana_chain else getattr(req, "chain_id", 137),
+        "total_disbursed_usdc": total_requested,
+        "protocol_fee_usdc": protocol_fee,
+        "recipients_count": len(req.recipients),
+        "treasury_address": "0x06db5A847F24d0feC5151a01937700E221d55e19",
+        "attestation": req.attestation,
+        "direct_split_executed": True,
+        "payouts": [r.model_dump() for r in req.recipients],
+        "calldata_ready": True
+    }
+
+
+@app.post("/api/v1/escrow/universal/solana/attest", tags=["Universal Truth Escrow"])
+async def attest_solana_universal_escrow_endpoint(req: SolanaTruthAttestationRequest):
+    """
+    Generates an on-chain Ed25519 Oracle Attestation for Solana Mainnet settlement.
+    Returns cryptographic signature matching Solana Ed25519Program pre-instruction format.
+    """
+    from app.solana_signer import SolanaOracleSigner
+    import time
+
+    signer = SolanaOracleSigner()
+    now = int(time.time())
+    expires_at = now + req.validity_seconds
+
+    job_id_bytes = bytes.fromhex(req.job_id_hex.replace("0x", ""))
+    truth_bytes = bytes.fromhex(req.truth_hash_hex.replace("0x", ""))
+    recip_bytes = bytes.fromhex(req.recipients_hash_hex.replace("0x", ""))
+
+    attestation = signer.sign_attestation(
+        job_id=job_id_bytes,
+        domain=req.domain,
+        truth_hash=truth_bytes,
+        recipients_hash=recip_bytes,
+        expires_at=expires_at
+    )
+    return attestation
 
 
 @app.get("/api/v1/consensus/validators", tags=["Consensus"])

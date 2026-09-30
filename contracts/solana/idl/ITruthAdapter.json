@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0",
+  "name": "i_truth_adapter",
+  "metadata": {
+    "address": "AGReYJAsoJJA7N4wE8oZNgqzhcu6LNnSyBRUMhG8mP7A",
+    "origin": "anchor",
+    "description": "ITruthAdapter Standard Interface: Common traits and domain types"
+  },
+  "instructions": [
+    {
+      "name": "verifyTruthInterface",
+      "docs": [
+        "Standard domain truth verification interface check"
+      ],
+      "accounts": [
+        {
+          "name": "truthAccount",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "domain",
+          "type": "u8"
+        },
+        {
+          "name": "truthHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "TruthInterfaceAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "domain",
+            "type": "u8"
+          },
+          {
+            "name": "isRegistered",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

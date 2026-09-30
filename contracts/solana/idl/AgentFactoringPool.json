@@ -1,0 +1,102 @@
+{
+  "version": "0.1.0",
+  "name": "agent_factoring_pool",
+  "metadata": {
+    "address": "AGRKvCc7edgq1T2KzLwMzUp3S8M8Muy5hv9H7MrZjtEZ",
+    "origin": "anchor",
+    "description": "Agent Factoring Pool: Invoice factoring & accounts-receivable advances"
+  },
+  "instructions": [
+    {
+      "name": "requestFactoringAdvance",
+      "docs": [
+        "Invoice & accounts-receivable factoring advances"
+      ],
+      "accounts": [
+        {
+          "name": "factoringAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "borrower",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "invoiceHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "advanceAmount",
+          "type": "u64"
+        },
+        {
+          "name": "discountFee",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "FactoringAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "invoiceHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "borrower",
+            "type": "pubkey"
+          },
+          {
+            "name": "advanceAmount",
+            "type": "u64"
+          },
+          {
+            "name": "discountFee",
+            "type": "u64"
+          },
+          {
+            "name": "isRepaid",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [],
+  "events": [],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSignature",
+      "msg": "Cryptographic Ed25519 signature invalid"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedCaller",
+      "msg": "Caller lacks required authority"
+    }
+  ]
+}

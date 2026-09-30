@@ -76,15 +76,16 @@ class MultiAgentSwarmEngine:
         if action_type == "inspect":
             payload = random.choice(INJECTION_PAYLOADS)
             is_malicious = "Ignore" in payload or "override" in payload or "os.system" in payload or "DAN" in payload
+            is_code = "os.system" in payload
             
             try:
                 res = self.client.post(INSPECT_ENDPOINT, json={
-                    "prompt": payload,
-                    "agent_id": agent["name"],
-                    "framework": agent["framework"]
+                    "agent_output": payload,
+                    "is_code": is_code,
+                    "context_ground_truth": None
                 })
                 self.total_inspections += 1
-                if is_malicious:
+                if is_malicious or res.status_code == 403:
                     self.threats_blocked += 1
                     status_str = f"{RED}[THREAT BLOCKED (<5ms)]{RESET}"
                 else:
@@ -102,11 +103,11 @@ class MultiAgentSwarmEngine:
             
             try:
                 res = self.client.post(ESCROW_ENDPOINT, json={
-                    "task_title": f"M2M Autonomous Compute Job #{random.randint(1000, 9999)}",
-                    "code_deliverable": code,
-                    "worker_agent": agent["name"],
-                    "chain_id": agent["chain"],
-                    "reward_usdc": reward
+                    "job_id": random.randint(1000, 9999),
+                    "deliverable": code,
+                    "ground_truth_spec": "Autonomous agent M2M compute deliverable",
+                    "is_code": True,
+                    "chain_id": agent["chain"]
                 })
                 print(f"[{timestamp}] ⚖️ {BOLD}{agent['name']}{RESET} -> /escrow/audit (Chain {agent['chain']}) | {GREEN}+${reward:.2f} USDC Settled{RESET} | TVP: ${self.total_tvp_protected:,.2f}")
             except Exception as e:
@@ -118,10 +119,12 @@ class MultiAgentSwarmEngine:
             
             try:
                 res = self.client.post(TRADE_ENDPOINT, json={
-                    "pair": "USDC/POL",
-                    "amount": amount,
-                    "max_slippage_pct": slippage,
-                    "agent_address": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+                    "agent_address": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+                    "pair": "POL/USDC",
+                    "direction": random.choice(["BUY", "SELL"]),
+                    "amount_usdc": amount,
+                    "max_slippage_bps": int(slippage * 100),
+                    "intent_type": "MARKET"
                 })
                 status = f"{RED}[REVERT: EXCESSIVE SLIPPAGE]{RESET}" if slippage > 5.0 else f"{GREEN}[INTENT ATTESTED]{RESET}"
                 print(f"[{timestamp}] 📈 {BOLD}{agent['name']}{RESET} -> /trade/intent | {status} | ${amount} USDC Swap (Slippage: {slippage}%)")
