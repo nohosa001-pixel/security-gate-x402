@@ -9,6 +9,7 @@
 [![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
 [![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
+[![Solana Mainnet](https://img.shields.io/badge/Solana_Mainnet-SPL_USDC_13_Contracts-14F195?style=for-the-badge&logo=solana&logoColor=black)](contracts/solana/SOLANA_VERIFICATION_GUIDE.md)
 [![CI Test Suite](https://github.com/nohosa001-pixel/security-gate-x402/actions/workflows/ci.yml/badge.svg)](https://github.com/nohosa001-pixel/security-gate-x402/actions)
 [![Security Policy](https://img.shields.io/badge/Security-Policy-blue.svg)](SECURITY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
