@@ -5,7 +5,7 @@ import functools
 import inspect
 import os
 import time
-from typing import Any, Callable, Dict, Optional, List
+from typing import Any, Callable, Dict, Optional, List, Union
 import httpx
 from eth_account import Account
 from eth_account.messages import encode_defunct
