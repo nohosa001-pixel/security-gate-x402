@@ -20,7 +20,7 @@ if (Test-Path ".env") {
 
 $SERVICE_NAME = "agent-security-gate-x402"
 $REGION = if ($env:GCP_REGION) { $env:GCP_REGION } else { "asia-northeast3" }
-$SERVER_WALLET = if ($env:SERVER_WALLET_ADDRESS) { $env:SERVER_WALLET_ADDRESS } else { "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf" }
+$SERVER_WALLET = if ($env:SERVER_WALLET_ADDRESS) { $env:SERVER_WALLET_ADDRESS } else { "0xA185B43fDD19619f99952AAed6eabf1029bF36a1" }
 $SERVER_ENV = if ($env:ENV) { $env:ENV } else { "production" }
 
 Write-Host "🚀 [GCP Deployment] Starting deployment for $SERVICE_NAME to region $REGION..." -ForegroundColor Cyan

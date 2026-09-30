@@ -54,7 +54,7 @@ class SolanaUniversalEscrowEngine:
         self.rpc_url = rpc_url
         self.signer = SolanaOracleSigner()
         self.jobs: Dict[bytes, SolanaEscrowJob] = {}
-        self.treasury_pubkey = os.getenv("SOLANA_WALLET_ADDRESS", "12CrubUwRKLZAcDsuF3Crh4AfsHtknDcC8RXYXudH4Pd")
+        self.treasury_pubkey = os.getenv("SOLANA_WALLET_ADDRESS", "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp")
 
     def create_deposit(
         self,

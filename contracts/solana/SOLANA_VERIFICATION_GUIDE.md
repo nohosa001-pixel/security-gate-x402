@@ -36,7 +36,7 @@ All 13 original EVM smart contracts (`contracts/*.sol`) have their own **dedicat
 * **Network**: Solana Mainnet Beta (`chain_id: 501`)
 * **RPC Endpoint**: `https://api.mainnet-beta.solana.com`
 * **Native SPL USDC Mint**: `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-* **Deployer / Owner / Treasury Wallet (User Public Key)**: `12CrubUwRKLZAcDsuF3Crh4AfsHtknDcC8RXYXudH4Pd`
+* **Deployer / Owner / Treasury Wallet (User Public Key)**: `411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp`
 * **Oracle Attestation Verifier (Gate Public Key)**: `CG25522QKt3D1K3aSL2fEddj1uq34T3XkPFkZGh4h7ec`
 
 ---
@@ -45,7 +45,7 @@ All 13 original EVM smart contracts (`contracts/*.sol`) have their own **dedicat
 
 ### Method A: SolanaFM Developer Portal & Solscan Web UI (1-Click Safe Registration)
 1. Open **[SolanaFM Developer Portal](https://portal.solana.fm)** or **[Solscan.io](https://solscan.io)**
-2. Connect your wallet (e.g. Phantom) with your Public Key: `12CrubUwRKLZAcDsuF3Crh4AfsHtknDcC8RXYXudH4Pd`
+2. Connect your wallet (e.g. Phantom) with your Public Key: `411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp`
 3. Enter each of the **13 Solana Program IDs** from the table above
 4. Upload the matching IDL file from `contracts/solana/idl/` (e.g., `UniversalEscrowCore.json`, `AgentComplianceRegistry.json`, etc.)
 5. Once uploaded, the explorer immediately parses instructions and displays interactive verification sandboxes!

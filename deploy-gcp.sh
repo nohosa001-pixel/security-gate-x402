@@ -15,7 +15,7 @@ fi
 # Configuration
 SERVICE_NAME="agent-security-gate-x402"
 REGION="${GCP_REGION:-asia-northeast3}"
-SERVER_WALLET="${SERVER_WALLET_ADDRESS:-0x255F9991233f86B29dB847c8d5b8CB9915e80dCf}"
+SERVER_WALLET="${SERVER_WALLET_ADDRESS:-0xA185B43fDD19619f99952AAed6eabf1029bF36a1}"
 SERVER_ENV="${ENV:-production}"
 
 echo "🚀 [GCP Deployment] Starting deployment for $SERVICE_NAME to region $REGION..."
