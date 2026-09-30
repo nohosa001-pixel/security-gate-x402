@@ -22,14 +22,16 @@ load_dotenv()
 
 # Polygon Mainnet Native USDC Contract (Circle Native)
 POLYGON_USDC_CONTRACT = os.getenv("USDC_CONTRACT_ADDRESS", "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359")
-DEFAULT_PAY_TO = os.getenv("GATE_PAY_TO_ADDRESS", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
+DEFAULT_PAY_TO = (os.getenv("GATE_PAY_TO_ADDRESS") or os.getenv("SERVER_WALLET_ADDRESS") or "0x1234567890123456789012345678901234567890").strip()
+if not DEFAULT_PAY_TO:
+    DEFAULT_PAY_TO = "0x1234567890123456789012345678901234567890"
 POLYGON_CHAIN_ID = int(os.getenv("POLYGON_CHAIN_ID", os.getenv("CHAIN_ID", "137")))
 MICRO_USDC_AMOUNT = 2000  # $0.002 USDC (6 decimals: 0.002 * 10^6 = 2000)
 EXPECTED_AMOUNT_USD = "0.002"
 QUOTE_TTL_SECONDS = 300   # 5 minutes quote validity
 FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://facilitator.x402.org/v2/verify")
 
-# Known OFAC Sanctioned & Malicious Mixer Addresses (EVM / Polygon)
+# Known OFAC Sanctioned & Malicious Mixer/Attacker Addresses (EVM / Polygon)
 SANCTIONED_ADDRESSES: Set[str] = {
     addr.lower() for addr in [
         # Tornado Cash Routers & Core Contracts
@@ -43,7 +45,11 @@ SANCTIONED_ADDRESSES: Set[str] = {
         # Ronin Hacker / Lazarus Associated Addresses
         "0x098B716B8Aaf21512996dC57EB0615e2383E2f96",
         "0xa0e1c89Ef1a489c9C7dE96311eD5Ce5D32c20E4B",
-        "0x9414B7086083DD726Da54aA0644407829876D742"
+        "0x9414B7086083DD726Da54aA0644407829876D742",
+        # Malicious Sweeper / Exploiter Addresses
+        "0xdd90000891a37165ad1dd6cdb2d77256355af056",
+        # Compromised Legacy Dev Address
+        "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
     ]
 }
 
@@ -76,7 +82,7 @@ class X402Verifier:
     ) -> PaymentDemand402:
         now = int(time.time())
         q_id = quote_id or f"quote_{uuid.uuid4().hex[:12]}"
-        recipient = pay_to or os.getenv("SERVER_WALLET_ADDRESS", DEFAULT_PAY_TO)
+        recipient = pay_to or (os.getenv("SERVER_WALLET_ADDRESS") or "").strip() or DEFAULT_PAY_TO
         amt = amount_usdc or EXPECTED_AMOUNT_USD
         try:
             micro_units = int(float(amt) * 1_000_000)

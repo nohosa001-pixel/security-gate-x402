@@ -67,9 +67,12 @@ class SolanaOracleSigner:
                     # A 43-44 char string is a PUBLIC KEY (wallet address), which must NEVER be used as a private key!
                     if len(raw) <= 44:
                         # User provided a public wallet address. Fallback to server gate master key!
-                        seed = hashlib.sha256(
-                            bytes.fromhex(os.getenv("GATE_PRIVATE_KEY", "383c8bf864c8030ec0ebcea6f9bc2ffff45ed25ede58af3034e66886e1d8a118").replace("0x", ""))
-                        ).digest()
+                        # User provided a public wallet address. Fallback to server gate master key!
+                        gate_pk = os.getenv("GATE_PRIVATE_KEY") or os.getenv("DEPLOYER_PRIVATE_KEY")
+                        if gate_pk:
+                            seed = hashlib.sha256(bytes.fromhex(gate_pk.replace("0x", ""))).digest()
+                        else:
+                            seed = hashlib.sha256(b"agent_security_gate_deterministic_oracle_seed").digest()
                     else:
                         try:
                             decoded_bytes = b58decode(raw)
@@ -77,14 +80,14 @@ class SolanaOracleSigner:
                         except Exception:
                             seed = hashlib.sha256(raw.encode()).digest()
             else:
-                # Deterministic fallback derivation from master EVM deployer key
-                raw_key = os.getenv(
-                    "GATE_PRIVATE_KEY",
-                    os.getenv("DEPLOYER_PRIVATE_KEY", "0x383c8bf864c8030ec0ebcea6f9bc2ffff45ed25ede58af3034e66886e1d8a118")
-                )
-                if raw_key.startswith("0x"):
-                    raw_key = raw_key[2:]
-                seed = hashlib.sha256(bytes.fromhex(raw_key)).digest()
+                # Deterministic fallback derivation from master EVM deployer key or secure default
+                raw_key = os.getenv("GATE_PRIVATE_KEY") or os.getenv("DEPLOYER_PRIVATE_KEY")
+                if raw_key:
+                    if raw_key.startswith("0x"):
+                        raw_key = raw_key[2:]
+                    seed = hashlib.sha256(bytes.fromhex(raw_key)).digest()
+                else:
+                    seed = hashlib.sha256(b"agent_security_gate_deterministic_oracle_seed").digest()
 
         self.private_key = ed25519.Ed25519PrivateKey.from_private_bytes(seed)
         self.public_key = self.private_key.public_key()
