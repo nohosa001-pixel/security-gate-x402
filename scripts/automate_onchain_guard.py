@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--action", choices=["status", "attach", "execute", "simulate-attack", "full-pipeline"], default="status", help="Automation action to run")
     parser.add_argument("--safe", default=os.getenv("SAFE_ADDRESS", "0x06db5A847F24d0feC5151a01937700E221d55e19"), help="Target Gnosis Safe address")
     parser.add_argument("--chain-id", type=int, default=137, help="EVM Chain ID (137=Polygon, 8453=Base, 42161=Arbitrum)")
-    parser.add_argument("--recipient", default="0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", help="Recipient for guarded transfer")
+    parser.add_argument("--recipient", default="0xA185B43fDD19619f99952AAed6eabf1029bF36a1", help="Recipient for guarded transfer")
     parser.add_argument("--value-wei", type=int, default=0, help="Value in wei to send")
 
     args = parser.parse_args()

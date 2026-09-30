@@ -10,7 +10,7 @@
       "nli_verification": null
     },
     "attestation": {
-      "issuer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "issuer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
       "subject_hash": "caa9278774ffcc802b42311f6ba7d25694592c32bdd0a84d7b3be76d0c5916ad",
       "verdict": "PASSED",
       "risk_score": 0.0,
@@ -39,7 +39,7 @@
       "nli_verification": null
     },
     "attestation": {
-      "issuer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "issuer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
       "subject_hash": "dfb4555bdad0958f5b385ef8b603bdcff96034f91738584418ef31b91abd199c",
       "verdict": "FLAGGED",
       "risk_score": 0.4,
@@ -127,7 +127,7 @@
     },
     "issuer": {
       "organization": "Agent Security Gate x402 Compliance Authority",
-      "oracle_signer": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+      "oracle_signer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
       "protocol": "x402 / AP2"
     }
   }

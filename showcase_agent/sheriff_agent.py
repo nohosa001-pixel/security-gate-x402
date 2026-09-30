@@ -48,7 +48,7 @@ class SheriffAgent:
                 "0x1111111254fb6c44bac0bed2854e76f90643097d",  # 1inch Router
                 "0x794a61358d6845594f94dc1db02a252b5b4814ad",  # Aave V3 Pool
                 "0x5cc5afa2a97599d492a3e408fdd95fd0b520f173",  # Safe Guard
-                "0x255f9991233f86b29db847c8d5b8cb9915e80dcf"   # Oracle Treasury
+                "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"   # Oracle Treasury
             ]
         )
         self.conversation_history: List[Dict[str, str]] = []

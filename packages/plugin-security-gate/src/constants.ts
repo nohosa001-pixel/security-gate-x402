@@ -29,7 +29,7 @@ export interface SecurityGateContractAddresses {
 }
 
 export const OFFICIAL_ORACLE_SIGNER =
-	"0x255F9991233f86B29dB847c8d5b8CB9915e80dCf";
+	"0xA185B43fDD19619f99952AAed6eabf1029bF36a1";
 
 export const SECURITY_GATE_REGISTRY: Record<
 	number,

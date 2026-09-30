@@ -119,7 +119,7 @@ class MultiAgentSwarmEngine:
             
             try:
                 res = self.client.post(TRADE_ENDPOINT, json={
-                    "agent_address": "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+                    "agent_address": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
                     "pair": "POL/USDC",
                     "direction": random.choice(["BUY", "SELL"]),
                     "amount_usdc": amount,

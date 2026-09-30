@@ -383,7 +383,7 @@ The core micro-oracle signers and security consumer contracts are live on Polygo
 | 🔄 **`AgentFactoringPool`** | `0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0` | [PolygonScan](https://polygonscan.com/address/0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0) |
 | 🏛️ **`AgentTreasuryVault`** | `0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638` | [PolygonScan](https://polygonscan.com/address/0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638) |
 | 🌐 **`UniversalEscrowCore`** | `0x5555555555555555555555555555555555555555` | [Contracts](contracts/UniversalEscrowCore.sol) |
-| 🔑 **Oracle Signer / Treasury** | `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf` | [PolygonScan](https://polygonscan.com/address/0x255F9991233f86B29dB847c8d5b8CB9915e80dCf) |
+| 🔑 **Oracle Signer / Treasury** | `0xA185B43fDD19619f99952AAed6eabf1029bF36a1` | [PolygonScan](https://polygonscan.com/address/0xA185B43fDD19619f99952AAed6eabf1029bF36a1) |
 
 ### 🛠️ Solidity Integration Example (`SecurityGateConsumer.sol`)
 

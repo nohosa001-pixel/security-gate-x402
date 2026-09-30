@@ -27,7 +27,7 @@ class TestConfigIntegrity:
         baseline = {
             "daily_limit_usdc": 0.05,
             "per_tx_limit_usdc": 0.01,
-            "whitelist": ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+            "whitelist": ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
             "oracle_url": "https://oracle.gate.internal",
         }
         seal = seal_config(baseline)
@@ -42,14 +42,14 @@ class TestConfigIntegrity:
     def test_detect_in_memory_budget_tampering(self):
         baseline = {
             "daily_limit_usdc": 0.05,
-            "whitelist": ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+            "whitelist": ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
         }
         seal = seal_config(baseline)
 
         # Attacker modifies daily limit from 0.05 to 5000.0
         tampered = {
             "daily_limit_usdc": 5000.0,
-            "whitelist": ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+            "whitelist": ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
         }
         res = verify_config_integrity(seal, tampered)
         assert res["is_valid"] is False
@@ -61,7 +61,7 @@ class TestConfigIntegrity:
     def test_detect_deleted_key_tampering(self):
         baseline = {
             "daily_limit_usdc": 0.05,
-            "whitelist": ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+            "whitelist": ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
             "oracle_url": "https://oracle.internal",
         }
         seal = seal_config(baseline)
@@ -69,7 +69,7 @@ class TestConfigIntegrity:
         # Attacker deletes oracle_url key
         tampered = {
             "daily_limit_usdc": 0.05,
-            "whitelist": ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+            "whitelist": ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
         }
         res = verify_config_integrity(seal, tampered)
         assert res["is_valid"] is False
@@ -108,7 +108,7 @@ class TestCovertChannelAndDLP:
         assert "Outbound Leak: AWS Access Key ID" in res["threats"]
 
     def test_allow_clean_agent_response(self):
-        clean_msg = "Transfer of 0.01 USDC to 0x255F9991233f86B29dB847c8d5b8CB9915e80dCf verified and queued."
+        clean_msg = "Transfer of 0.01 USDC to 0xA185B43fDD19619f99952AAed6eabf1029bF36a1 verified and queued."
         res = inspect_outbound_payload(clean_msg)
         assert res["verdict"] == "ALLOW"
         assert res["risk_score"] == 0

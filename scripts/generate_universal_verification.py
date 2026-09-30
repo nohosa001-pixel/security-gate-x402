@@ -12,7 +12,7 @@ CONTRACTS_DIR = ROOT_DIR / "contracts"
 VERIFY_DIR = CONTRACTS_DIR / "verification"
 VERIFY_DIR.mkdir(parents=True, exist_ok=True)
 
-DEPLOYER = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+DEPLOYER = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
 
 def generate_standard_json():
     itruth_src = (CONTRACTS_DIR / "ITruthAdapter.sol").read_text(encoding="utf-8")

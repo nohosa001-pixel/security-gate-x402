@@ -229,7 +229,7 @@ describe("ConfigIntegrity (Anti-Tamper & Seal)", async () => {
 	it("should seal a baseline config and verify unmodified configs as OK", () => {
 		const baseline = {
 			daily_limit_usdc: 0.05,
-			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+			whitelist: ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
 			security_gate_url: "https://gate.internal",
 		};
 
@@ -245,14 +245,14 @@ describe("ConfigIntegrity (Anti-Tamper & Seal)", async () => {
 	it("should detect tampering when an allowlist or budget cap is modified", () => {
 		const baseline = {
 			daily_limit_usdc: 0.05,
-			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+			whitelist: ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
 		};
 		const seal = sealConfig(baseline);
 
 		// Attacker alters daily limit in memory
 		const tampered = {
 			daily_limit_usdc: 5000.0,
-			whitelist: ["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+			whitelist: ["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
 		};
 
 		const check = verifyConfigIntegrity(seal, tampered);
@@ -300,7 +300,7 @@ describe("securityGatePostHandler (Outbound Covert-Channel & DLP)", async () => 
 
 	it("should allow safe standard agent responses", () => {
 		const safeOutput =
-			"The transfer of 0.01 USDC to 0x255F9991233f86B29dB847c8d5b8CB9915e80dCf has been successfully submitted.";
+			"The transfer of 0.01 USDC to 0xA185B43fDD19619f99952AAed6eabf1029bF36a1 has been successfully submitted.";
 		const res = inspectOutboundPayload(safeOutput);
 		expect(res.verdict).toBe("ALLOW");
 		expect(res.threats).toHaveLength(0);

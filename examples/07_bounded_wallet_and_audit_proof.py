@@ -41,7 +41,7 @@ def main():
     wallet = BoundedAgentWallet(
         daily_limit_usdc=0.05,
         per_tx_limit_usdc=0.01,
-        whitelist=["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"],
+        whitelist=["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"],
         ledger_path=ledger_file
     )
 

@@ -9,7 +9,7 @@ Maintains 100% non-custodial integrity:
     2. Tokenized T-Bill Asset Management fee (0.50% annual AUM on $1.58M+ = ~$7,914 USDC/yr).
     3. B2B Enterprise SLA Gateway licenses ($2,500 USDC/month/institution).
   - Automatically sweeps accumulated commercial USDC to the Operator's Cold Wallet:
-    Target Operator: 0x255F9991233f86B29dB847c8d5b8CB9915e80dCf
+    Target Operator: 0xA185B43fDD19619f99952AAed6eabf1029bF36a1
 """
 
 import sys
@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 load_dotenv()
 
-OPERATOR_WALLET = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+OPERATOR_WALLET = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
 LEDGER_FILE = "data/operator_cashflow_ledger.json"
 
 # ANSI Terminal Colors

@@ -43,7 +43,7 @@ def run_all_service_settlements():
     print(f"================================================================================{C_RESET}")
     print(f"Gateway: {C_PURPLE}{BASE_URL}{C_RESET}\n")
 
-    agent_addr = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+    agent_addr = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
     client_addr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
 
     # -------------------------------------------------------------------------

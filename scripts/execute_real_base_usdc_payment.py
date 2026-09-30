@@ -2,7 +2,7 @@
 Live On-Chain Real USDC Micropayment Execution Script on Base Mainnet (Chain ID 8453)
 =====================================================================================
 Uses the user's real funded account to execute an authentic on-chain payment:
-  1. Sender: 0x255F9991233f86B29dB847c8d5b8CB9915e80dCf
+  1. Sender: 0xA185B43fDD19619f99952AAed6eabf1029bF36a1
   2. Token: Circle Native USDC on Base (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
   3. Amount: 0.002 USDC (2,000 Micro-Units)
   4. Network: Base Mainnet (https://mainnet.base.org)

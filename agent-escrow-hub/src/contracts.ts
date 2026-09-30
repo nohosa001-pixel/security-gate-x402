@@ -46,6 +46,6 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
   }
 };
 
-export const ORACLE_PUBLIC_KEY = '0x255F9991233f86B29dB847c8d5b8CB9915e80dCf';
+export const ORACLE_PUBLIC_KEY = '0xA185B43fDD19619f99952AAed6eabf1029bF36a1';
 export const PROTOCOL_TOLL_BPS = 25; // 0.25%
 export const SLASHING_BOUNTY_BPS = 2000; // 20% to treasury, 80% to client

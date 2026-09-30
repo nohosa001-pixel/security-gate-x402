@@ -11,7 +11,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 load_dotenv()
 
 DEPLOYER_KEY = os.getenv("DEPLOYER_PRIVATE_KEY")
-DEPLOYER = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+DEPLOYER = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
 
 # Safe v1.3.0 Canonical Addresses across EVM L2s
 FACTORY = "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2"

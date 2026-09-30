@@ -42,7 +42,7 @@ bytecode = contract_data["bin"]
 print(f"Bytecode length: {len(bytecode)} characters")
 
 # 2. Deploy SafeSecurityGateGuard
-oracle_signer = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+oracle_signer = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
 max_risk = 30
 
 contract = w3.eth.contract(abi=abi, bytecode=bytecode)

@@ -104,7 +104,7 @@ This guide provides everything required to verify and publicly display the **Age
 * **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173](https://polygonscan.com/verifyContract?a=0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173)
 * **Source File**: [`contracts/verification/SafeSecurityGateGuard.flattened.sol`](SafeSecurityGateGuard.flattened.sol)
 * **Constructor Arguments**:
-  * `_oracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_oracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
   * `_maxAllowedRiskScore`: `30`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
@@ -121,7 +121,7 @@ This guide provides everything required to verify and publicly display the **Age
 * **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x6418f408cFf03F862D7691f01fAb00a895E6aB93](https://polygonscan.com/verifyContract?a=0x6418f408cFf03F862D7691f01fAb00a895E6aB93)
 * **Source File**: [`contracts/verification/AgentCreditOracle.flattened.sol`](AgentCreditOracle.flattened.sol)
 * **Constructor Arguments**:
-  * `_oracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_oracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
 ```text
@@ -137,7 +137,7 @@ This guide provides everything required to verify and publicly display the **Age
 * **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x28292D76E07E5539F15F3b97935dE8E0432E76DD](https://polygonscan.com/verifyContract?a=0x28292D76E07E5539F15F3b97935dE8E0432E76DD)
 * **Source File**: [`contracts/verification/AgentComplianceRegistry.flattened.sol`](AgentComplianceRegistry.flattened.sol)
 * **Constructor Arguments**:
-  * `_complianceOracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_complianceOracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
 ```text
@@ -154,7 +154,7 @@ This guide provides everything required to verify and publicly display the **Age
 * **Source File**: [`contracts/verification/AgentEscrow.flattened.sol`](AgentEscrow.flattened.sol)
 * **Constructor Arguments**:
   * `_paymentToken` (Polygon Native USDC): `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`
-  * `_oracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_oracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
 ```text
@@ -188,8 +188,8 @@ This guide provides everything required to verify and publicly display the **Age
 * **Source File**: [`contracts/verification/AgentInsurancePool.standard.json`](AgentInsurancePool.standard.json)
 * **Constructor Arguments**:
   * `_usdcToken`: `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`
-  * `_oracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
-  * `_oracleTreasury`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_oracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
+  * `_oracleTreasury`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
 ```text
@@ -235,7 +235,7 @@ This guide provides everything required to verify and publicly display the **Age
 * **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA](https://polygonscan.com/verifyContract?a=0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA)
 * **Source File**: [`contracts/verification/SecurityGateConsumer.flattened.sol`](SecurityGateConsumer.flattened.sol)
 * **Constructor Arguments**:
-  * `_oracleSigner`: `0x255F9991233f86B29dB847c8d5b8CB9915e80dCf`
+  * `_oracleSigner`: `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
 * **ABI-Encoded Constructor Arguments (HEX)**:
 
 ```text

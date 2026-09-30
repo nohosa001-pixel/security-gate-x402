@@ -88,7 +88,7 @@ def print_living_economy_banner():
     print(f"{CYAN}{BOLD}╚══════════════════════════════════════════════════════════════════════════╝{RESET}")
     print(f" {BOLD}Settlement Core:{RESET}  Polygon Mainnet (137) | Base (8453) | Arbitrum (42161)")
     print(f" {BOLD}T-Bill Reserve:{RESET}   {GREEN}$1,582,888.21 USDC{RESET} (Ondo USDY, BlackRock BUIDL, Matrixdock STBT)")
-    print(f" {BOLD}Operator Target:{RESET}  {CYAN}0x255F9991233f86B29dB847c8d5b8CB9915e80dCf{RESET}")
+    print(f" {BOLD}Operator Target:{RESET}  {CYAN}0xA185B43fDD19619f99952AAed6eabf1029bF36a1{RESET}")
     print(f" {BOLD}BFT Quorum:{RESET}       {YELLOW}4-of-6 Global Branch Quorum (66.7% Fault Tolerance){RESET}")
     print(f"{DIM}────────────────────────────────────────────────────────────────────────────{RESET}\n")
 

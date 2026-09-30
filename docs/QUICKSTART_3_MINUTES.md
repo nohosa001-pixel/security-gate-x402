@@ -39,7 +39,7 @@ from sdk import BoundedAgentWallet, SecurityGateClient
 wallet = BoundedAgentWallet(
     per_tx_limit_usdc=0.05,  # Max $0.05 per API call
     daily_limit_usdc=1.00,   # Hard daily stop of $1.00
-    whitelist=["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"]
+    whitelist=["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"]
 )
 
 gate = SecurityGateClient(bounded_wallet=wallet)

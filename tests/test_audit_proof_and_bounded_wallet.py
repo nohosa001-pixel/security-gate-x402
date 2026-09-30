@@ -107,24 +107,24 @@ class TestBoundedAgentWalletGuardrails:
         wallet = BoundedAgentWallet(
             daily_limit_usdc=1.0,
             per_tx_limit_usdc=0.05,
-            whitelist=["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"]
+            whitelist=["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"]
         )
 
         allowed, reason = wallet.can_pay("0x9999999999999999999999999999999999999999", 0.002)
         assert not allowed
         assert "not in authorized whitelist" in reason
 
-        allowed_gate, _ = wallet.can_pay("0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", 0.002)
+        allowed_gate, _ = wallet.can_pay("0xA185B43fDD19619f99952AAed6eabf1029bF36a1", 0.002)
         assert allowed_gate
 
     def test_per_tx_limit_enforcement(self):
         wallet = BoundedAgentWallet(
             daily_limit_usdc=1.0,
             per_tx_limit_usdc=0.005,  # Max 0.005 USDC per call
-            whitelist=["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"]
+            whitelist=["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"]
         )
 
-        allowed, reason = wallet.can_pay("0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", 0.01)
+        allowed, reason = wallet.can_pay("0xA185B43fDD19619f99952AAed6eabf1029bF36a1", 0.01)
         assert not allowed
         assert "exceeds per-transaction limit" in reason
 
@@ -132,17 +132,17 @@ class TestBoundedAgentWalletGuardrails:
         wallet = BoundedAgentWallet(
             daily_limit_usdc=0.005,
             per_tx_limit_usdc=0.005,
-            whitelist=["0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"]
+            whitelist=["0xA185B43fDD19619f99952AAed6eabf1029bF36a1"]
         )
 
         # 1st spend: 0.003
-        allowed1, _ = wallet.can_pay("0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", 0.003)
+        allowed1, _ = wallet.can_pay("0xA185B43fDD19619f99952AAed6eabf1029bF36a1", 0.003)
         assert allowed1
-        wallet.record_spend("0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", 0.003)
+        wallet.record_spend("0xA185B43fDD19619f99952AAed6eabf1029bF36a1", 0.003)
         assert wallet.get_daily_spent() == 0.003
 
         # 2nd spend: 0.003 -> Should exceed 0.005 daily limit
-        allowed2, reason2 = wallet.can_pay("0x255F9991233f86B29dB847c8d5b8CB9915e80dCf", 0.003)
+        allowed2, reason2 = wallet.can_pay("0xA185B43fDD19619f99952AAed6eabf1029bF36a1", 0.003)
         assert not allowed2
         assert "Daily limit reached" in reason2
 
@@ -158,7 +158,7 @@ class TestBoundedAgentWalletGuardrails:
                 ledger_path=ledger_file
             )
             w1.record_spend(
-                recipient="0x255F9991233f86B29dB847c8d5b8CB9915e80dCf",
+                recipient="0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
                 amount_usdc=0.004,
                 audit_proof="0xabc123"
             )

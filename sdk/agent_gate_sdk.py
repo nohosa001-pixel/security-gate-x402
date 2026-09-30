@@ -77,7 +77,7 @@ class BoundedAgentWallet:
     Enforces per-transaction limits, daily spend caps, recipient whitelisting,
     and persistent local ledger recording to survive process restarts.
     """
-    DEFAULT_SHERIFF_GATE = "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"
+    DEFAULT_SHERIFF_GATE = "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
 
     def __init__(
         self,

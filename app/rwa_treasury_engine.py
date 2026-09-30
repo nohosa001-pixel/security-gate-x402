@@ -106,7 +106,7 @@ class SovereignTreasuryEngine:
                 "annualized_yield_runrate_usdc": round(total_treasury_assets * blended_apy, 2)
             },
             "portfolio": portfolio_breakdown,
-            "oracle_signer": getattr(self.signer, "signer_address", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf"),
+            "oracle_signer": getattr(self.signer, "signer_address", "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"),
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
 
@@ -192,7 +192,7 @@ class SovereignTreasuryEngine:
                 "v": v,
                 "r": r,
                 "s": s,
-                "oracle_signer": getattr(self.signer, "signer_address", "0x255F9991233f86B29dB847c8d5b8CB9915e80dCf")
+                "oracle_signer": getattr(self.signer, "signer_address", "0xA185B43fDD19619f99952AAed6eabf1029bF36a1")
             },
             "terms": "ZERO_LIABILITY_AS_IS_PROVENANCE_V1",
             "compliance": "US T-Bills Backed (ERC-4626 / Ondo USDY / BlackRock BUIDL Compatible)"
