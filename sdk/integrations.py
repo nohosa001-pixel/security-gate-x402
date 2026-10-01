@@ -289,7 +289,11 @@ class UniversalEscrowTool:
             "BIO_KNOWLEDGE_IP": IndustryDomain.BIO_KNOWLEDGE_IP,
             "BIO": IndustryDomain.BIO_KNOWLEDGE_IP,
             "CONSTRUCTION_BUILD": IndustryDomain.CONSTRUCTION_BUILD,
-            "CONSTRUCTION": IndustryDomain.CONSTRUCTION_BUILD
+            "CONSTRUCTION": IndustryDomain.CONSTRUCTION_BUILD,
+            "EUDR_FOREST": IndustryDomain.EUDR_FOREST,
+            "EUDR": IndustryDomain.EUDR_FOREST,
+            "CONFLICT_MINERALS": IndustryDomain.CONFLICT_MINERALS,
+            "MINERALS": IndustryDomain.CONFLICT_MINERALS
         }
         dom = domain_map.get(domain_name.upper(), IndustryDomain.CONSTRUCTION_BUILD)
         try:

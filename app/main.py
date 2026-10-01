@@ -54,6 +54,8 @@ from app.schemas import (
     MaritimeTruthRequest,
     BioZkTruthRequest,
     BuildDroneTruthRequest,
+    EudrTruthRequest,
+    MineralsTruthRequest,
     UniversalEscrowSettleRequest,
     SolanaTruthAttestationRequest,
     SolanaTruthAttestationResponse,
@@ -1351,13 +1353,51 @@ async def verify_build_drone_truth_endpoint(req: BuildDroneTruthRequest):
     )
 
 
+@app.post("/api/v1/truth/eudr", tags=["Universal Truth Escrow"])
+async def verify_eudr_truth_endpoint(req: EudrTruthRequest):
+    """Evaluates EUDR deforestation-free compliance, plot GPS polygon, and DDS filing."""
+    from app.truth_adapters import eudr_truth_adapter
+    coords = [(c[0], c[1]) for c in req.polygon_coordinates]
+    return eudr_truth_adapter.verify_eudr_truth(
+        job_id=req.job_id,
+        commodity=req.commodity,
+        country_code=req.country_code,
+        polygon_coordinates=coords,
+        dds_reference_id=req.dds_reference_id,
+        deforestation_detected=req.deforestation_detected,
+        legal_harvest_verified=req.legal_harvest_verified,
+        satellite_cutoff_date=req.satellite_cutoff_date,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
+@app.post("/api/v1/truth/minerals", tags=["Universal Truth Escrow"])
+async def verify_minerals_truth_endpoint(req: MineralsTruthRequest):
+    """Evaluates conflict-free mineral provenance, RMI audited smelter ID, and child-labor-free chain of custody."""
+    from app.truth_adapters import minerals_truth_adapter
+    return minerals_truth_adapter.verify_minerals_truth(
+        job_id=req.job_id,
+        mineral_type=req.mineral_type,
+        smelter_id=req.smelter_id,
+        smelter_audit_status=req.smelter_audit_status,
+        mine_country_code=req.mine_country_code,
+        chain_of_custody_verified=req.chain_of_custody_verified,
+        child_labor_free=req.child_labor_free,
+        conflict_region=req.conflict_region,
+        enhanced_due_diligence=req.enhanced_due_diligence,
+        chain_id=req.chain_id,
+        verifying_contract=req.verifying_contract
+    )
+
+
 @app.post("/api/v1/escrow/universal/settle", tags=["Universal Truth Escrow"])
 async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
     """
     Executes / prepares atomic Direct Split settlement on UniversalEscrowCore.sol.
     Disburses funds directly to laborers, suppliers, and researchers bypassing general contractors.
     Cross-system validations:
-    - Domain bounds checking (Maritime=0, Bio=1, Construction=2)
+    - Domain bounds checking (Maritime=0, Bio=1, Construction=2, EUDR=3, Minerals=4)
     - Oracle attestation validity & expiry verification
     - Recipient address format, non-zero, and blacklist checks
     - Synchronization with Credit Rating Engine & Sovereign RWA Treasury
@@ -1368,8 +1408,8 @@ async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
     from app.rwa_treasury_engine import sovereign_treasury
 
     # 1. Domain Validation
-    if req.domain not in (0, 1, 2):
-        raise HTTPException(status_code=400, detail=f"Invalid domain: {req.domain}. Must be 0 (Maritime), 1 (Bio), or 2 (Construction).")
+    if req.domain not in (0, 1, 2, 3, 4):
+        raise HTTPException(status_code=400, detail=f"Invalid domain: {req.domain}. Must be 0 (Maritime), 1 (Bio), 2 (Construction), 3 (EUDR), or 4 (Minerals).")
 
     # 2. Attestation Validation
     att = req.attestation or {}

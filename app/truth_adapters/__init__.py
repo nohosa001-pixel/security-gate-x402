@@ -9,6 +9,8 @@ Provides deterministic physical & mathematical truth evaluation engines for:
 from app.truth_adapters.trade_iot_adapter import TradeIoTAdapter, trade_iot_adapter
 from app.truth_adapters.bio_zk_adapter import BioZkAdapter, bio_zk_adapter
 from app.truth_adapters.build_drone_adapter import BuildDroneAdapter, build_drone_adapter
+from app.truth_adapters.eudr_truth_adapter import EudrTruthAdapter, eudr_truth_adapter
+from app.truth_adapters.minerals_truth_adapter import MineralsTruthAdapter, minerals_truth_adapter
 
 __all__ = [
     "TradeIoTAdapter",
@@ -16,5 +18,9 @@ __all__ = [
     "BioZkAdapter",
     "bio_zk_adapter",
     "BuildDroneAdapter",
-    "build_drone_adapter"
+    "build_drone_adapter",
+    "EudrTruthAdapter",
+    "eudr_truth_adapter",
+    "MineralsTruthAdapter",
+    "minerals_truth_adapter"
 ]

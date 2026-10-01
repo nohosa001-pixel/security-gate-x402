@@ -703,10 +703,12 @@ from enum import IntEnum
 
 
 class IndustryDomain(IntEnum):
-    """3 Universal Real-World Truth Domains defined in UNIVERSAL_TRUTH_ADAPTER_BLUEPRINT.md."""
+    """5 Universal Real-World Truth Domains."""
     TRADE_MARITIME = 0       # 🚢 Global maritime freight, cold-chain timeseries, port RFID
     BIO_KNOWLEDGE_IP = 1     # 🧬 Genomic sequence Merkle root, TEE compute, ZK binding affinity
     CONSTRUCTION_BUILD = 2   # 🏗️ 3D Drone LiDAR point-cloud, BIM CAD matching, concrete strength
+    EUDR_FOREST = 3          # 🌲 EU Deforestation-free satellite polygon, legal tenure, DDS compliance
+    CONFLICT_MINERALS = 4    # ⛏️ OECD 3TG & Cobalt supply chain, RMI audited smelters, conflict-free provenance
 
 
 class UniversalEscrowJob:

@@ -11,7 +11,9 @@ interface ITruthAdapter {
     enum IndustryDomain {
         TRADE_MARITIME,       // 0: Global maritime freight, cold-chain timeseries, port RFID geofencing
         BIO_KNOWLEDGE_IP,     // 1: Genomic data integrity, TEE confidential computing, ZK affinity proofs
-        CONSTRUCTION_BUILD    // 2: 3D Drone LiDAR point-cloud, BIM matching, concrete compressive strength
+        CONSTRUCTION_BUILD,   // 2: 3D Drone LiDAR point-cloud, BIM matching, concrete compressive strength
+        EUDR_FOREST,          // 3: EU Deforestation-free satellite polygon, legal tenure, DDS compliance
+        CONFLICT_MINERALS     // 4: OECD 3TG & Cobalt supply chain, RMI audited smelters, conflict-free provenance
     }
 
     /**

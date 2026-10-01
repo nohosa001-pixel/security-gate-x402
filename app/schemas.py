@@ -346,6 +346,33 @@ class BuildDroneTruthRequest(BaseModel):
     verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
 
 
+class EudrTruthRequest(BaseModel):
+    job_id: str = Field(..., description="Escrow task unique job ID", examples=["job_eudr_timber_401"])
+    commodity: str = Field(..., description="EUDR Annex I commodity (wood, rubber, palm_oil, soy, coffee, cocoa, cattle)", examples=["timber"])
+    country_code: str = Field(..., description="ISO 3166-1 alpha-2 production country", examples=["BR"])
+    polygon_coordinates: List[List[float]] = Field(..., min_length=3, description="List of [latitude, longitude] plot polygon vertices", examples=[[[-3.12, -60.02], [-3.12, -60.01], [-3.13, -60.01], [-3.13, -60.02]]])
+    dds_reference_id: str = Field(..., description="EU Due Diligence Statement registry ID", examples=["EU-DDS-2026-BR-99482"])
+    deforestation_detected: bool = Field(False, description="Flag indicating if deforestation was detected on/after cutoff date (must be False)")
+    legal_harvest_verified: bool = Field(True, description="Proof of compliance with local harvest & land tenure legislation (must be True)")
+    satellite_cutoff_date: str = Field("2020-12-31", description="EUDR baseline cutoff date")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
+
+
+class MineralsTruthRequest(BaseModel):
+    job_id: str = Field(..., description="Escrow task unique job ID", examples=["job_minerals_cobalt_501"])
+    mineral_type: str = Field(..., description="Regulated 3TG or battery critical mineral (tin, tantalum, tungsten, gold, cobalt, lithium, nickel)", examples=["cobalt"])
+    smelter_id: str = Field(..., description="RMI or officially audited smelter/refiner CID", examples=["CID001842"])
+    smelter_audit_status: str = Field("CONFORMANT", description="Smelter audit status (CONFORMANT, ACTIVE, CERTIFIED)", examples=["CONFORMANT"])
+    mine_country_code: str = Field(..., description="ISO 3166-1 alpha-2 mine country of origin", examples=["CD"])
+    chain_of_custody_verified: bool = Field(True, description="Verified bag-and-tag / mass-balance custody chain (must be True)")
+    child_labor_free: bool = Field(True, description="Zero-tolerance human rights & child labor freedom attestation (must be True)")
+    conflict_region: bool = Field(False, description="Whether the mine is in a Conflict-Affected and High-Risk Area (CAHRA)")
+    enhanced_due_diligence: bool = Field(True, description="Enhanced OECD due diligence mitigation satisfied for CAHRA areas")
+    chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    verifying_contract: str = Field("0x5555555555555555555555555555555555555555", description="UniversalEscrowCore deployed address")
+
+
 class UniversalEscrowSettleRequest(BaseModel):
     job_id: str = Field(..., description="Universal escrow task unique job ID", examples=["job_bridge_milestone_4"])
     domain: int = Field(..., description="Domain enum (0=Maritime, 1=Bio, 2=Construction)")
