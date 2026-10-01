@@ -49,7 +49,7 @@ $FACILITATOR = if ($env:FACILITATOR_URL) { $env:FACILITATOR_URL } else { "https:
 $CHAIN_ID = if ($env:POLYGON_CHAIN_ID) { $env:POLYGON_CHAIN_ID } elseif ($env:CHAIN_ID) { $env:CHAIN_ID } else { "137" }
 $USDC_CONTRACT = if ($env:USDC_CONTRACT_ADDRESS) { $env:USDC_CONTRACT_ADDRESS } else { "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" }
 
-$GATE_KEY = if ($env:GATE_PRIVATE_KEY) { $env:GATE_PRIVATE_KEY } else { "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d" }
+$GATE_KEY = if ($env:GATE_PRIVATE_KEY) { $env:GATE_PRIVATE_KEY } elseif ($env:DEPLOYER_PRIVATE_KEY) { $env:DEPLOYER_PRIVATE_KEY } else { "" }
 
 # 3. Build & Deploy to Cloud Run
 Write-Host "🏗️ Building and deploying container to Google Cloud Run..." -ForegroundColor Cyan

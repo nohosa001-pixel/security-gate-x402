@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse, HTM
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app import __version__
 from app.schemas import (
     InspectionRequest,
     InspectionResponse,
@@ -76,7 +77,7 @@ app = FastAPI(
         "cryptographic attestation on Polygon, Base, and Arbitrum. "
         "Explore the interactive Web Dashboard at /dashboard."
     ),
-    version="1.2.1",
+    version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -520,7 +521,7 @@ async def health():
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "service": "Agent Security Gate x402",
         "oracle": "Agent Security Gate x402",
-        "version": "1.2.3",
+        "version": __version__,
         "uptime_seconds": round(uptime, 2),
         "subsystems": {
             "security_engine": "online",
