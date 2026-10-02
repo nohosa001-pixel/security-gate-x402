@@ -1,0 +1,42 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/plugin-security-gate/**'
+      - '.github/workflows/npm-publish.yml'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install and Build Plugin
+        working-directory: packages/plugin-security-gate
+        run: |
+          bun install
+          bun run build
+          bun test
+
+      - name: Publish package to npm
+        working-directory: packages/plugin-security-gate
+        run: npm publish --access public --provenance
