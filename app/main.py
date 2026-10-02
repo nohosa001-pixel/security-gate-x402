@@ -1414,15 +1414,39 @@ async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
     # 2. Attestation Validation
     att = req.attestation or {}
     verdict = att.get("verdict")
-    is_valid = att.get("isValid", True if verdict == "PASSED" else (False if verdict == "FAILED" else True))
-    if verdict == "FAILED" or is_valid is False:
-        raise HTTPException(status_code=400, detail="Cannot settle escrow: Physical truth verification failed or attestation is invalid.")
 
-    expires_at = att.get("expiresAt")
-    if expires_at is not None:
+    # Check validity across both camelCase and snake_case representations
+    if "isValid" in att:
+        is_valid = bool(att["isValid"])
+    elif "is_valid" in att:
+        is_valid = bool(att["is_valid"])
+    else:
+        is_valid = True if verdict == "PASSED" else (False if verdict == "FAILED" else True)
+
+    deforestation_free = att.get("deforestation_free", att.get("deforestationFree", True))
+    child_labor_free = att.get("child_labor_free", att.get("childLaborFree", True))
+
+    if verdict == "FAILED" or is_valid is False or deforestation_free is False or child_labor_free is False:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot settle escrow: Physical truth verification failed or attestation is invalid."
+        )
+
+    expires_at_val = att.get("expiresAt")
+    if expires_at_val is None:
+        expires_at_val = att.get("expires_at")
+    elif "expires_at" in att:
         try:
-            if float(expires_at) < time.time():
+            expires_at_val = min(float(expires_at_val), float(att["expires_at"]))
+        except (ValueError, TypeError):
+            pass
+
+    if expires_at_val is not None:
+        try:
+            if float(expires_at_val) < time.time():
                 raise HTTPException(status_code=400, detail="Cannot settle escrow: Physical truth attestation has expired.")
+        except HTTPException:
+            raise
         except (ValueError, TypeError):
             pass
 

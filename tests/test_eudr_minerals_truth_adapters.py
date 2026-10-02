@@ -254,3 +254,79 @@ def test_universal_escrow_domain_enum_alignment():
     """Enum Test: IndustryDomain enum must contain EUDR_FOREST (3) and CONFLICT_MINERALS (4)."""
     assert IndustryDomain.EUDR_FOREST == 3
     assert IndustryDomain.CONFLICT_MINERALS == 4
+
+
+def test_universal_escrow_settle_eudr_deforestation_rejected():
+    """Security Invariant: Deforestation-detected attestation MUST be rejected at escrow settlement."""
+    inv_attestation = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_escrow_eudr_deforest_illegal",
+        commodity="timber",
+        country_code="BR",
+        polygon_coordinates=[(-3.12, -60.02), (-3.12, -60.01), (-3.13, -60.01)],
+        dds_reference_id="EU-DDS-2026-BR-ILLEGAL",
+        deforestation_detected=True,  # Deforestation!
+        legal_harvest_verified=True
+    )
+    assert inv_attestation["is_valid"] is False
+    assert inv_attestation["verdict"] == "FAILED"
+
+    resp = client.post("/api/v1/escrow/universal/settle", json={
+        "job_id": "job_escrow_eudr_deforest_illegal",
+        "domain": 3,
+        "recipients": [{"recipient": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "amount": 10000.0}],
+        "truth_payload": "Deforested Timber",
+        "attestation": inv_attestation
+    })
+    assert resp.status_code == 400
+    assert "Cannot settle escrow" in resp.json()["detail"]
+
+
+def test_universal_escrow_settle_minerals_child_labor_rejected():
+    """Security Invariant: Child labor violation attestation MUST be rejected at escrow settlement."""
+    inv_attestation = minerals_truth_adapter.verify_minerals_truth(
+        job_id="job_escrow_minerals_child_labor",
+        mineral_type="cobalt",
+        smelter_id="CID002891",
+        smelter_audit_status="CONFORMANT",
+        mine_country_code="CD",
+        chain_of_custody_verified=True,
+        child_labor_free=False  # Human rights violation!
+    )
+    assert inv_attestation["is_valid"] is False
+    assert inv_attestation["verdict"] == "FAILED"
+
+    resp = client.post("/api/v1/escrow/universal/settle", json={
+        "job_id": "job_escrow_minerals_child_labor",
+        "domain": 4,
+        "recipients": [{"recipient": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "amount": 20000.0}],
+        "truth_payload": "Violating Cobalt",
+        "attestation": inv_attestation
+    })
+    assert resp.status_code == 400
+    assert "Cannot settle escrow" in resp.json()["detail"]
+
+
+def test_universal_escrow_settle_attestation_expired_rejected():
+    """Security Invariant: Expired attestation MUST be rejected at escrow settlement."""
+    attestation = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_escrow_eudr_expired",
+        commodity="coffee",
+        country_code="CO",
+        polygon_coordinates=[(4.57, -74.29), (4.58, -74.30), (4.59, -74.28)],
+        dds_reference_id="EU-DDS-2026-CO-EXP",
+        deforestation_detected=False,
+        legal_harvest_verified=True
+    )
+    attestation["expires_at"] = 1000000000
+    attestation["expiresAt"] = 1000000000
+
+    resp = client.post("/api/v1/escrow/universal/settle", json={
+        "job_id": "job_escrow_eudr_expired",
+        "domain": 3,
+        "recipients": [{"recipient": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "amount": 5000.0}],
+        "truth_payload": "Expired Coffee Attestation",
+        "attestation": attestation
+    })
+    assert resp.status_code == 400
+    assert "expired" in resp.json()["detail"]
+
