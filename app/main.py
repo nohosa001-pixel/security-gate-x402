@@ -392,6 +392,7 @@ async def root(request: Request):
                 "ap2_manifest": "/.well-known/ap2",
                 "mcp_tools": "/mcp/tools",
                 "llms_manifest": "/llms.txt",
+                "agents_directive": "/AGENTS.md",
                 "readme": "/README.md",
                 "agent_escrow_hub": "/hub",
                 "robots_txt": "/robots.txt",
@@ -749,6 +750,18 @@ async def get_llms_txt():
     if LLMS_FILE_PATH.exists():
         return PlainTextResponse(LLMS_FILE_PATH.read_text(encoding="utf-8"))
     return PlainTextResponse("Agent Security Gate x402 - Micro-Oracle")
+
+
+AGENTS_MD_PATH = Path(__file__).resolve().parent.parent / "AGENTS.md"
+
+
+@app.get("/AGENTS.md", tags=["System"])
+@app.get("/agents.txt", tags=["System"])
+async def get_agents_md():
+    """Serves the autonomous agent directive and protocol handshake guide."""
+    if AGENTS_MD_PATH.exists():
+        return PlainTextResponse(AGENTS_MD_PATH.read_text(encoding="utf-8"))
+    return PlainTextResponse("AGENTS.md not found", status_code=404)
 
 
 @app.get("/.well-known/ap2", tags=["System"])
@@ -1665,6 +1678,12 @@ async def get_treasury_proof_of_reserve(chain_id: int = Query(137, description="
     """Issues EIP-712 cryptographic Proof-of-Reserve (PoR) attestation for US Treasury holdings."""
     from app.rwa_treasury_engine import sovereign_treasury
     return sovereign_treasury.generate_proof_of_reserve(chain_id)
+
+
+@app.get("/api/v1/escrow/por", tags=["Escrow", "Proof of Reserve"])
+async def get_escrow_proof_of_reserve_alias(chain_id: int = Query(137, description="EVM Chain ID")):
+    """Alias for Proof-of-Reserve (PoR) attestation for escrow solvency and treasury holdings."""
+    return await get_treasury_proof_of_reserve(chain_id=chain_id)
 
 
 @app.post("/api/v1/treasury/simulate-compound", tags=["Treasury"])

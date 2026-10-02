@@ -38,7 +38,8 @@ def test_contract_addresses():
     expected = {
         137: "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
         8453: "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
-        42161: "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278"
+        42161: "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
+        501: "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
     }
 
     all_matched = True

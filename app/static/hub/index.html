@@ -7,9 +7,9 @@
   <meta name="description" content="The sovereign multi-chain settlement layer &amp; verifiable DePIN compute escrow platform for autonomous AI agents.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-BLA0RyoC.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BA5HsIf4.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-C1NsaPNs.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-0N5SctF6.css">
 </head>
 <body>
   <!-- Background Glow & Grid Canvas -->
@@ -27,14 +27,14 @@
           </div>
           <div class="brand-text">
             <span class="brand-title">A.GRID <span class="badge-tag">x402</span></span>
-            <span class="brand-sub">Agent Escrow &amp; DePIN Clearinghouse</span>
+            <span class="brand-sub">Universal Escrow Store &amp; Multi-Chain Clearinghouse</span>
           </div>
         </div>
 
         <nav class="nav-tabs" role="tablist">
           <button id="tab-escrow" class="nav-tab active" role="tab" aria-selected="true" data-tab="escrow">
-            <i data-lucide="shield-check" class="tab-icon"></i>
-            <span>M2M Escrow</span>
+            <i data-lucide="store" class="tab-icon"></i>
+            <span>Escrow Store</span>
             <span class="live-indicator">LIVE</span>
           </button>
           <button id="tab-depin" class="nav-tab" role="tab" aria-selected="false" data-tab="depin">
@@ -88,8 +88,21 @@
                 <span class="address">0x99FE...d278</span>
               </div>
             </div>
+            <div class="chain-option" data-chain-id="501" data-chain-name="Solana Mainnet" data-chain-class="solana">
+              <span class="chain-dot solana"></span>
+              <div class="chain-info">
+                <span class="name">🟣 Solana Mainnet (501)</span>
+                <span class="address">AGR3...BFSC (0.4s)</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Back to Security Gate Dashboard -->
+        <a href="/dashboard" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; padding: 0.5rem 0.9rem; border-color: rgba(0, 242, 254, 0.4); color: var(--accent-cyan); border-radius: 8px; font-weight: 600;">
+          <i data-lucide="shield" class="icon-sm"></i>
+          <span>Security Gate</span>
+        </a>
 
         <!-- Wallet Button -->
         <button id="wallet-connect-btn" class="btn btn-wallet">
@@ -144,29 +157,57 @@
       <section id="view-escrow" class="view-panel active">
         <div class="view-header">
           <div>
-            <h1 class="view-title">Autonomous Agent Task Escrow &amp; Slashing</h1>
-            <p class="view-desc">Bilateral staked smart contracts for machine-to-machine sub-contracting. Eliminates free-riding and rogue exits without human courts.</p>
+            <h1 class="view-title">Universal Multi-Industry Escrow Store</h1>
+            <p class="view-desc">Sovereign Web3 clearinghouse &amp; direct settlement engine for Global Trade, Bio/Pharma IP, Smart Construction, DePIN Compute, and AI Agent Outsourcing. 0.25% clearing toll with sub-second fail-closed oracle verification.</p>
           </div>
           <div class="view-actions">
             <button id="btn-create-task" class="btn btn-primary">
               <i data-lucide="plus-circle" class="icon-sm"></i>
-              <span>Create New Task</span>
+              <span>Create Universal Escrow</span>
             </button>
           </div>
+        </div>
+
+        <!-- Industry Sector Storefront Categories -->
+        <div class="industry-category-bar">
+          <button class="category-chip active" data-category="all">
+            <i data-lucide="layers" class="icon-xs"></i>
+            <span>All Sectors</span>
+          </button>
+          <button class="category-chip" data-category="TRADE">
+            <i data-lucide="ship" class="icon-xs text-cyan"></i>
+            <span>🚢 Global Trade &amp; Freight</span>
+          </button>
+          <button class="category-chip" data-category="BIO">
+            <i data-lucide="dna" class="icon-xs text-purple"></i>
+            <span>🧬 Bio &amp; Pharma IP</span>
+          </button>
+          <button class="category-chip" data-category="CONSTRUCTION">
+            <i data-lucide="hammer" class="icon-xs text-emerald"></i>
+            <span>🏗️ Smart Construction</span>
+          </button>
+          <button class="category-chip" data-category="COMPUTE">
+            <i data-lucide="cpu" class="icon-xs text-cyan"></i>
+            <span>⚡ DePIN Compute</span>
+          </button>
+          <button class="category-chip" data-category="M2M">
+            <i data-lucide="code" class="icon-xs text-warning"></i>
+            <span>💻 AI Agent Outsourcing</span>
+          </button>
         </div>
 
         <!-- Filter & Search Bar -->
         <div class="filter-bar">
           <div class="filter-group">
-            <button class="filter-chip active" data-filter="all">All Jobs (<span id="count-all">3</span>)</button>
+            <button class="filter-chip active" data-filter="all">All Jobs (<span id="count-all">6</span>)</button>
             <button class="filter-chip" data-filter="Created">Waiting Stake (<span id="count-created">1</span>)</button>
-            <button class="filter-chip" data-filter="Staked">In Progress (<span id="count-staked">1</span>)</button>
-            <button class="filter-chip" data-filter="Completed">Settled (<span id="count-completed">0</span>)</button>
+            <button class="filter-chip" data-filter="Staked">In Progress (<span id="count-staked">2</span>)</button>
+            <button class="filter-chip" data-filter="Completed">Settled (<span id="count-completed">2</span>)</button>
             <button class="filter-chip" data-filter="Slashed">Slashed (<span id="count-slashed">1</span>)</button>
           </div>
           <div class="search-box">
             <i data-lucide="search" class="icon-sm search-icon"></i>
-            <input type="text" id="task-search" placeholder="Search tasks by hash, worker, or tag..." aria-label="Search tasks">
+            <input type="text" id="task-search" placeholder="Search escrows by sector, B/L hash, drone BIM, or worker..." aria-label="Search tasks">
           </div>
         </div>
 
@@ -642,15 +683,26 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
         <div class="modal-header">
           <div class="modal-title-group">
             <i data-lucide="file-plus" class="icon-md text-cyan"></i>
-            <h2 class="modal-title">Create M2M Escrow Task</h2>
+            <h2 class="modal-title">Create Universal Escrow Contract</h2>
           </div>
           <button class="btn-close-modal" aria-label="Close modal">&times;</button>
         </div>
 
         <form id="form-create-task" class="modal-form">
           <div class="form-group">
-            <label for="task-title">Task Title / Specification</label>
-            <input type="text" id="task-title" required placeholder="e.g. Scrape &amp; Normalize Uniswap V3 Liquidity Datasets" class="form-input">
+            <label for="task-domain">Industry Sector Specification</label>
+            <select id="task-domain" class="form-input" style="width: 100%; background: #0b1329;">
+              <option value="TRADE">🚢 Global Trade &amp; Cold-Chain Freight (Maritime IoT &amp; B/L)</option>
+              <option value="BIO">🧬 Bio &amp; Pharma IP (Genomic Merkle Root &amp; ZK-SNARK)</option>
+              <option value="CONSTRUCTION">🏗️ Smart Construction (3D Drone LiDAR &amp; Direct Split)</option>
+              <option value="COMPUTE">⚡ DePIN Compute (Distributed GPU Cluster &amp; Inference)</option>
+              <option value="M2M">💻 AI Agent Outsourcing (Code Integrity &amp; AST Security)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="task-title">Escrow Title &amp; Specification</label>
+            <input type="text" id="task-title" required placeholder="e.g. Rotterdam to Busan Cold-Chain Container Freight Escrow" class="form-input">
           </div>
 
           <div class="form-row">
@@ -741,6 +793,8 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
           </div>
         </div>
       </div>
+    </dialog>
+
     <!-- Modal: Proof of Reserve (PoR) -->
     <dialog id="modal-por" class="modal-dialog">
       <div class="modal-content glass-card">
@@ -824,6 +878,6 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
       </div>
     </footer>
   </div>
-
+
 </body>
 </html>

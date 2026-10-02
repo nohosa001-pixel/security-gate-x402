@@ -25,6 +25,24 @@
       "endpoint": "/mcp/invoke",
       "method": "POST",
       "description": "Direct JSON-RPC standard MCP tool dispatcher with x402 payment validation."
+    },
+    {
+      "action": "universal_escrow_settlement",
+      "endpoint": "/api/v1/escrow/audit",
+      "method": "POST",
+      "description": "Truth Oracle evaluation & automated escrow settlement across Trade, Bio IP, Construction, Solana DePIN, and AI Gigs with 0.25% protocol fee."
+    },
+    {
+      "action": "escrow_proof_of_reserves",
+      "endpoint": "/api/v1/escrow/por",
+      "method": "GET",
+      "description": "Cryptographic Proof-of-Reserves (PoR) solvency and treasury audit."
+    },
+    {
+      "action": "universal_escrow_hub_ui",
+      "endpoint": "/hub/",
+      "method": "GET",
+      "description": "Interactive web interface for universal multi-chain escrow & clearinghouse."
     }
   ],
 

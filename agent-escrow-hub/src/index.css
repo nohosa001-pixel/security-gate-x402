@@ -290,6 +290,23 @@ body {
   box-shadow: 0 0 8px rgba(40, 160, 240, 0.6);
 }
 
+.chain-dot.solana {
+  background: #14F195;
+  box-shadow: 0 0 8px rgba(20, 241, 149, 0.7);
+}
+
+.btn-solana {
+  background: linear-gradient(135deg, #9945FF, #14F195);
+  color: #000 !important;
+  font-weight: 700;
+  border: none;
+}
+
+.btn-solana:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 16px rgba(20, 241, 149, 0.45);
+}
+
 .chain-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -1753,4 +1770,168 @@ dialog.modal-dialog::backdrop {
   border-radius: 10px;
   padding: 0.85rem;
   margin-bottom: 1rem;
+}
+
+/* --- Universal Escrow Storefront Category Bar --- */
+.industry-category-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding: 0.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.category-chip.active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(168, 85, 247, 0.2));
+  border-color: var(--accent-cyan);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+}
+
+/* Domain Badges on Job Cards */
+.domain-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.domain-badge.trade {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #38bdf8;
+}
+
+.domain-badge.bio {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.domain-badge.construction {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.domain-badge.compute {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.domain-badge.m2m {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #818cf8;
+}
+
+.domain-badge.solana {
+  background: linear-gradient(135deg, rgba(153, 69, 255, 0.2), rgba(20, 241, 149, 0.2));
+  border: 1px solid rgba(20, 241, 149, 0.5);
+  color: #14F195;
+  box-shadow: 0 0 10px rgba(20, 241, 149, 0.2);
+}
+
+.truth-req-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.73rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-cyan);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.truth-req-title {
+  font-weight: 700;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+}
+
+.truth-req-desc {
+  color: rgba(248, 250, 252, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.split-preview-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px dashed rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  padding: 0.45rem 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.split-preview-title {
+  font-weight: 700;
+  color: var(--accent-emerald);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+}
+
+.split-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.split-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.split-pill strong {
+  color: #fff;
+  font-family: var(--font-mono);
 }

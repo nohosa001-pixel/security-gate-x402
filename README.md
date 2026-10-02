@@ -18,7 +18,7 @@
 >
 > *Before an autonomous AI agent moves a single dollar, the Sheriff inspects, attests, and secures the transaction.*
 >
-> **Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle with EIP-191 & EIP-712 cryptographic attestations on Polygon, Base, and Arbitrum.**
+> **Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, and factual hallucination inspection micro-oracle, anchored to the A.GRID Universal Escrow Hub across Solana Mainnet (0.4s), Polygon, Base, and Arbitrum.**
 
 ---
 
@@ -42,11 +42,9 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 | Service / Endpoint | Description | URL Link |
 | --- | --- | --- |
-| 🏛️ **Agent Escrow & DePIN Hub** | Live M2M Escrow & Sovereign Treasury UI | [Launch Escrow Hub](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/) |
-| 🏛️ **Universal Truth Escrow** | Modular Lego Escrow & 3 Real-World Truth Adapters | [Blueprint Spec](specs/UNIVERSAL_TRUTH_ADAPTER_BLUEPRINT.md) |
-| 🌐 **Global CDN Mirror** | Fast Edge CDN Mirror for Global Agents | [Open GitHub Pages](https://nohosa001-pixel.github.io/security-gate-x402/) |
-| 📜 **Sovereign M2M Whitepaper** | 80B Agent Economy & 100% T-Bill Sovereign Invariant | [Read Whitepaper](docs/SOVEREIGN_M2M_WHITEPAPER.md) |
-| 🚀 **Global Launch Kit** | Viral Threads & DePIN Daemon Quickstart | [Launch Kit](docs/LAUNCH_THREAD_X.md) |
+| 🏛️ **Universal Escrow Hub** | Multi-chain sovereign settlement & clearinghouse across 5 sectors | [Launch Escrow Hub](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/) |
+| 🤖 **Autonomous Agent Directive** | Standard machine-readable directive & API handshake for agents | [`/AGENTS.md`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/AGENTS.md) |
+| 📜 **Proof-of-Reserves (PoR)** | Real-time cryptographic solvency & US T-Bills treasury audit | [`/api/v1/escrow/por`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/api/v1/escrow/por) |
 | 🖥️ **Web Dashboard** | Interactive visual UI, security simulator & audit tester | [Launch Dashboard](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard) |
 | ⚡ **API Playground** | Browser-based interactive query sandbox | [Open Playground](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/playground) |
 | 🛡️ **Live Inspection** | Core deterministic security & NLI hallucination check | [`/inspect`](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/inspect) |
@@ -58,21 +56,56 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 ---
 
-## 🏛️ Live Multi-Chain Escrow & Truth Adapter Deployments
+## 🏛️ A.GRID Universal Escrow Hub: Sovereign Settlement Layer for 5 Sectors
 
-The **A.GRID Universal Modular Escrow** (`UniversalEscrowCore.sol`) and **Truth Adapter** (`ITruthAdapter.sol` / `TruthAdapter.sol`) are live on Polygon Mainnet, Base Mainnet, and Arbitrum One, providing plug-and-play settlement for Machine-to-Machine (M2M) autonomous commerce:
+The **A.GRID Universal Escrow Hub** operates as a sovereign, decentralized clearinghouse enabling autonomous agents and human enterprises to mint, claim, verify, and settle high-stakes contracts with **zero counterparty risk**:
 
-| Network | Chain ID | Universal Escrow Core Contract | Truth Adapter Contract | Status |
+```
+                   👑 [ A.GRID Universal Escrow Hub (/hub) ]
+           (Global Trade · Bio & Pharma IP · Smart Construction · DePIN · M2M)
+                                   ▲
+                                   │ 0.25% Protocol Toll · 0.4s Solana Finality
+           ┌───────────────────────┼───────────────────────┐
+           ▼                       ▼                       ▼
+     [ 🚢 Global Trade ]      [ 🧬 Bio & Pharma ]     [ 🏗️ Smart Construction ]
+     Cold-Chain IoT & GPS     ZK-SNARK & TEE Enclave  3D Drone LiDAR & Direct Split
+           ▲                       ▲                       ▲
+           └───────────────────────┴───────────────────────┘
+                                   │
+                    🤝 [ Autonomous AI Agents & Solvers ]
+```
+
+### 5 Strategic Domains & Deterministic Truth Invariants
+
+1. **🚢 Global Trade & Maritime Freight (`TRADE`)**:
+   - **Truth Invariant:** Cold-chain IoT logs (-20°C ± 2°C) + GPS geofence arrival (< 500m) + on-chain e-B/L + EUDR satellite polygon verification.
+   - **Settlement:** Atomic split releasing freight payment to carrier lines and port stevedores.
+2. **🧬 Bio & Pharma IP Transfer (`BIO`)**:
+   - **Truth Invariant:** Zero-knowledge proof (ZK-SNARK) of binding affinity ($K_d < 10\text{nM}$) inside a Confidential TEE Enclave without leaking proprietary molecular SMILES before payment.
+   - **Settlement:** Milestone USDC disbursement upon mathematical proof of affinity.
+3. **🏗️ Smart Construction & Infrastructure (`CONSTRUCTION`)**:
+   - **Truth Invariant:** Drone 3D LiDAR volumetric match $\ge 98.5\%$ against target BIM model + concrete curing strength $\ge 24\text{ MPa}$.
+   - **Settlement (Smart Direct Split):** Payout automatically bypasses intermediary general contractor and disburses directly to on-site laborers, steel rebar suppliers, and equipment operators.
+4. **⚡ Solana DePIN Compute (`COMPUTE`)**:
+   - **Truth Invariant:** Distributed GPU clusters (NVIDIA H100/A100) verified via loss convergence proof hash + prompt injection guard.
+   - **Settlement:** Solana 0.4s micro-payment streaming ($0.00025 fee) with instant stake slashing upon fraud.
+5. **💻 AI Agent Outsourcing & Code Verification (`M2M`)**:
+   - **Truth Invariant:** Deterministic AST analysis blocking OS subprocess exploits (`os.system`, `subprocess.Popen`) and credential exfiltration.
+   - **Settlement:** Instant milestone release upon automated unit test and security scan pass.
+
+---
+
+## ⚡ Multi-Chain Contract Registry
+
+| Network | Chain ID | Contract Type | Address | Finality |
 | :--- | :---: | :--- | :--- | :---: |
-| **Polygon Mainnet** | `137` | [`0x4Dbd77F4799816859a595f24a57A786516D2EAa8`](https://polygonscan.com/address/0x4Dbd77F4799816859a595f24a57A786516D2EAa8) | [`0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e`](https://polygonscan.com/address/0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e) | 🟢 Live & Bound |
-| **Base Mainnet** | `8453` | [`0x745F7FAfFdb626B931Fe769476a09125cbf9d94b`](https://basescan.org/address/0x745F7FAfFdb626B931Fe769476a09125cbf9d94b) | [`0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6`](https://basescan.org/address/0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6) | 🟢 Live & Bound |
-| **Arbitrum One** | `42161` | [`0x745F7FAfFdb626B931Fe769476a09125cbf9d94b`](https://arbiscan.io/address/0x745F7FAfFdb626B931Fe769476a09125cbf9d94b) | [`0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6`](https://arbiscan.io/address/0x2BAd02A09524Bf449c49C56A594BDAe942a1fFE6) | 🟢 Live & Bound |
-| **Solana Mainnet** | `501` | [`AGRIDEscrowUniversalMainnet111111111111111111`](https://solscan.io) (SPL USDC) | [`AGRIDTruthAdapterSolanaMainnet11111111111111`](https://solscan.io) (Ed25519) | 🟢 Live & Bound |
+| **Solana Mainnet** | `501` | Universal Anchor Program | [`AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC`](https://solscan.io/account/411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp) | **0.4s** |
+| **Polygon Mainnet** | `137` | UniversalEscrowCore.sol | [`0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d`](https://polygonscan.com/address/0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d) | 2.1s |
+| **Base Mainnet** | `8453` | UniversalEscrowCore.sol | [`0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278`](https://basescan.org/address/0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278) | 2.0s |
+| **Arbitrum One** | `42161` | UniversalEscrowCore.sol | [`0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278`](https://arbiscan.io/address/0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278) | 0.25s |
 
-> **Registered Domains:**
-> - **Domain 0 (Maritime IoT):** Telemetry & Hardware attestation (Threshold: 85, Max Age: 3600s)
-> - **Domain 1 (Bio / Pharma ZK):** Cold-chain thermal & zero-knowledge validation (Threshold: 90, Max Age: 1800s)
-> - **Domain 2 (Construction Drone LiDAR):** Point-cloud spatial BIM compliance (Threshold: 80, Max Age: 7200s)
+> **Treasury Fee Vault:** `0xA185B43fDD19619f99952AAed6eabf1029bF36a1` (0.25% protocol toll)  
+> **Proof-of-Reserves (PoR):** $1,584,500+ USDC backed 1:1 by short-term US Treasury Bills (ERC-4626 / Ondo USDY / BlackRock BUIDL compatible).
 
 ---
 

@@ -80,7 +80,8 @@ class BuildDroneAdapter:
         now = int(time.time())
         expires_at = now + validity_seconds
 
-        job_id_bytes32 = eth_utils.to_hex(eth_utils.to_bytes(text=job_id).ljust(32, b"\0")) if len(job_id) <= 32 else job_id
+        str_job_id = str(job_id)
+        job_id_bytes32 = eth_utils.to_hex(eth_utils.to_bytes(text=str_job_id).ljust(32, b"\0")) if len(str_job_id) <= 32 else str_job_id
 
         # 3. Sign EIP-712 MilestoneTruthAttestation
         domain_data = {
