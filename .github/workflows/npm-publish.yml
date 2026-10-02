@@ -38,4 +38,4 @@ jobs:
 
       - name: Publish package to npm
         working-directory: packages/plugin-security-gate
-        run: npm publish --access public --provenance
+        run: npm publish --access public

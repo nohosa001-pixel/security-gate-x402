@@ -4,7 +4,8 @@
 	"description": "Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git"
+		"url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",
+		"directory": "packages/plugin-security-gate"
 	},
 	"publishConfig": {
 		"access": "public"
