@@ -13,7 +13,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
       - name: Checkout repository
@@ -40,20 +40,5 @@ jobs:
           bun test
 
       - name: Publish package to npm
-        id: publish_step
-        continue-on-error: true
         working-directory: packages/plugin-security-gate
-        run: |
-          npm publish --access public --provenance > publish.log 2>&1 || npm publish --access public > publish.log 2>&1
-
-      - name: Record Publish Log
-        if: steps.publish_step.outcome != 'success'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git checkout -b ci-debug
-          git add packages/plugin-security-gate/publish.log
-          git commit -m "ci: capture npm publish log"
-          git push origin ci-debug --force
-          cat packages/plugin-security-gate/publish.log
-          exit 1
+        run: npm publish --access public --provenance
