@@ -193,7 +193,7 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		const poly = getSecurityGateContracts(137);
 		expect(poly.chainName).toBe("Polygon Mainnet");
 		expect(poly.contracts.safeSecurityGateGuard).toBe(
-			"0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
+			"0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
 		);
 		expect(poly.contracts.agentInsurancePool).toBe(
 			"0xE67F4BC75B11dBb3ef2C9Ad1848B4b193c2c69C6",
