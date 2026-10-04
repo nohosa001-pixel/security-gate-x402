@@ -28,7 +28,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm to latest
         run: npm install -g npm@latest
@@ -42,6 +41,4 @@ jobs:
 
       - name: Publish package to npm
         working-directory: packages/plugin-security-gate
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public --provenance
