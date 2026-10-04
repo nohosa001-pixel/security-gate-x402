@@ -83,9 +83,11 @@ class MineralsTruthAdapter:
         )
 
         # Formulate canonical truth digest
+        clean_smelter = str(smelter_id or "").strip().upper()
+        clean_mine_country = str(mine_country_code or "").strip().upper()
         truth_material = (
-            f"MINERALS:{job_id}:{clean_mineral}:{smelter_id.strip().upper()}:"
-            f"{clean_smelter_status}:{mine_country_code.strip().upper()}:"
+            f"MINERALS:{job_id}:{clean_mineral}:{clean_smelter}:"
+            f"{clean_smelter_status}:{clean_mine_country}:"
             f"{int(coc_valid)}:{int(human_rights_valid)}:{int(conflict_risk_passed)}"
         )
         truth_hash = eth_utils.keccak(text=truth_material)
@@ -94,9 +96,14 @@ class MineralsTruthAdapter:
         now = int(time.time())
         expires_at = now + validity_seconds
 
-        # Format job_id bytes32
-        str_job_id = str(job_id)
-        job_id_bytes32 = eth_utils.to_hex(eth_utils.to_bytes(text=str_job_id).ljust(32, b"\0")) if len(str_job_id) <= 32 else str_job_id
+        # Format job_id bytes32 safely
+        str_job_id = str(job_id or "").strip()
+        if str_job_id.startswith("0x") and len(str_job_id) == 66 and eth_utils.is_hex(str_job_id):
+            job_id_bytes32 = str_job_id
+        elif len(str_job_id.encode("utf-8")) <= 32:
+            job_id_bytes32 = eth_utils.to_hex(str_job_id.encode("utf-8").ljust(32, b"\0"))
+        else:
+            job_id_bytes32 = "0x" + eth_utils.keccak(text=str_job_id).hex()
 
         # Sign EIP-712 MineralsTruthAttestation
         domain_data = {

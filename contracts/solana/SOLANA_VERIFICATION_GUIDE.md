@@ -44,6 +44,7 @@ All 13 original EVM smart contracts (`contracts/*.sol`) have their own **dedicat
 ## 🛠️ 3. Step-by-Step Registration Instructions
 
 ### Method A: SolanaFM Developer Portal & Solscan Web UI (1-Click Safe Registration)
+
 1. Open **[SolanaFM Developer Portal](https://portal.solana.fm)** or **[Solscan.io](https://solscan.io)**
 2. Connect your wallet (e.g. Phantom) with your Public Key: `411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp`
 3. Enter each of the **13 Solana Program IDs** from the table above
@@ -51,7 +52,9 @@ All 13 original EVM smart contracts (`contracts/*.sol`) have their own **dedicat
 5. Once uploaded, the explorer immediately parses instructions and displays interactive verification sandboxes!
 
 ### Method B: Anchor CLI (On-Chain IDL Initialization)
+
 If using the Anchor CLI, initialize the on-chain IDL account for any of the 13 programs:
+
 ```bash
 # Example for Universal Escrow Core
 anchor idl init \
@@ -60,9 +63,10 @@ anchor idl init \
   AGRIDEscrowUniversalMainnet111111111111111111
 ```
 
-
 ### Method C: OtterSec Verifiable Build (Source Code Verification)
+
 To achieve the green checkmark for source-code verification on Solana:
+
 ```bash
 # Build verifiable deterministic docker image
 anchor build --verifiable

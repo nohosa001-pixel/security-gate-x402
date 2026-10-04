@@ -327,6 +327,12 @@ class TestStrictPaymentSecurity:
         assert data_attack["payment_receipt"]["adversarial_penalty_slashed_usdc"] == 5.0
         assert "SLASHED" in res_attack.headers.get("X-Adversarial-Penalty", "")
 
-
-
-
+    def test_fake_hex_signature_strictly_rejected(self):
+        """Security Invariant: A random 130-char hex string must NEVER bypass signature verification."""
+        from unittest.mock import MagicMock
+        req = MagicMock()
+        req.headers = {"x-402-signature": "0x" + "f" * 130}
+        req.client.host = "1.2.3.4"
+        ok, reason, hdrs = x402_verifier.verify_request_payment(req)
+        assert ok is False
+        assert "recovery failed" in reason

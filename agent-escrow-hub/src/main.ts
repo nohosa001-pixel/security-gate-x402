@@ -93,6 +93,54 @@ subprocess.Popen(["rm", "-rf", "/var/log/audit.log"])`,
   "concrete_compressive_strength_mpa": 18.5,
   "min_strength_mpa": 24.0,
   "defect_detected": "VOLUMETRIC_DEFICIT_AND_POOR_CURING"
+}`,
+  'power-valid': `// 🔋 [Energy Grid PPA] Smart Meter 59.98Hz & Green REC Token Telemetry
+{
+  "domain": "POWER_GRID",
+  "contract_id": "PPA-ERCOT-2008",
+  "grid_zone": "ERCOT_NORTH",
+  "meter_device_id": "SMART-METER-TEXAS-8819",
+  "voltage_v": 480.4,
+  "frequency_hz": 59.98,
+  "kwh_streamed": 12500.0,
+  "rec_certificate_hash": "0x99greenrec4411bb22ee99",
+  "grid_stability_status": "STABLE_NOMINAL_PASS"
+}`,
+  'power-trip': `// ⚠️ [Energy Grid PPA] Frequency Collapse & Inverter Trip (56.40 Hz < 58.50 Hz)
+{
+  "domain": "POWER_GRID",
+  "contract_id": "PPA-ERCOT-2008",
+  "grid_zone": "ERCOT_NORTH",
+  "meter_device_id": "SMART-METER-TEXAS-8819",
+  "voltage_v": 412.0,
+  "frequency_hz": 56.40,
+  "kwh_streamed": 4200.0,
+  "grid_fault": "FREQUENCY_COLLAPSE_UNDER_58_5HZ",
+  "grid_stability_status": "CRITICAL_GRID_TRIP_VIOLATION"
+}`,
+  'logistics-valid': `// 🚚 [Autonomous Fleet PoD] GNSS Arrival (<150m) & Cryptographic E-Seal Valid
+{
+  "domain": "AUTONOMOUS_FLEET_POD",
+  "mission_id": "MISSION-MUNICH-2009",
+  "delivery_lat": 48.1351,
+  "delivery_lon": 11.5820,
+  "geofence_distance_meters": 142.5,
+  "max_allowed_geofence_m": 500.0,
+  "eseal_tamper_flag": false,
+  "eseal_signature": "0xeseal_hw_valid_88ff99aa11bb",
+  "ambient_temp_celsius": -19.4,
+  "pod_status": "PROOF_OF_DELIVERY_CONFIRMED"
+}`,
+  'logistics-tampered': `// ⚠️ [Autonomous Fleet PoD] E-Seal Tamper Breach & 12.4km Geofence Deficit
+{
+  "domain": "AUTONOMOUS_FLEET_POD",
+  "mission_id": "MISSION-MUNICH-2009",
+  "delivery_lat": 48.2410,
+  "delivery_lon": 11.7200,
+  "geofence_distance_meters": 12400.0,
+  "eseal_tamper_flag": true,
+  "eseal_breach_detected": "CONTAINER_DOOR_TAMPER_SWITCH_OPEN",
+  "pod_status": "E_SEAL_COMPROMISED_AND_OFF_GEOFENCE"
 }`
 };
 
@@ -103,6 +151,9 @@ class AppController {
   private searchQuery: string = '';
   private selectedAuditJob: EscrowJob | null = null;
   private selectedAuditScenario: string = 'clean';
+  private selectedFactoringJob: EscrowJob | null = null;
+  private selectedInsuranceJob: EscrowJob | null = null;
+  private factoringAdvanceRate: number = 0.85;
 
   constructor() {
     this.initEventListeners();
@@ -250,6 +301,16 @@ class AppController {
           if (payoutInput) payoutInput.value = '25000';
           if (stakeInput) stakeInput.value = '7500';
           if (tagsInput) tagsInput.value = 'DePIN Compute, H100 GPU, Zero-Fraud, x402 Stream';
+        } else if (dom === 'POWER') {
+          if (titleInput) titleInput.value = '120,000 kWh Renewable REC Micro-Settlement (ERCOT North 59.98Hz PPA)';
+          if (payoutInput) payoutInput.value = '18000';
+          if (stakeInput) stakeInput.value = '1800';
+          if (tagsInput) tagsInput.value = 'Energy Grid, Smart Meter IoT, Renewable REC, PPA Stream';
+        } else if (dom === 'LOGISTICS') {
+          if (titleInput) titleInput.value = 'Rotterdam to Munich Autonomous Freight Truck & Cryptographic E-Seal';
+          if (payoutInput) payoutInput.value = '35000';
+          if (stakeInput) stakeInput.value = '3500';
+          if (tagsInput) tagsInput.value = 'Autonomous Fleet, E-Seal PoD, GPS Geofence, Cold-Chain';
         } else {
           if (titleInput) titleInput.value = 'AST Security Audit & Dynamic Intent Solver Verification';
           if (payoutInput) payoutInput.value = '5000';
@@ -514,6 +575,126 @@ class AppController {
       });
     }
 
+    // War Room: 3-of-5 BFT Consensus Audit
+    const btnBftAudit = document.getElementById('btn-trigger-bft-audit');
+    if (btnBftAudit) {
+      btnBftAudit.addEventListener('click', async () => {
+        btnBftAudit.innerHTML = `<i data-lucide="loader-2" class="icon-sm spin"></i><span>Executing BFT Quorum...</span>`;
+        createIcons({ icons });
+        await escrowStore.fetchConsensusValidators();
+        await new Promise(r => setTimeout(r, 700));
+        escrowStore.addFeedItem('PASS', `[BFT Consensus] 3-of-5 Quorum Achieved! Verified across Seoul, Tokyo, Singapore, Frankfurt nodes. Zero-Knowledge Proof Validated.`);
+        btnBftAudit.innerHTML = `<i data-lucide="check-check" class="icon-sm"></i><span>Quorum 100% Passed</span>`;
+        createIcons({ icons });
+        setTimeout(() => {
+          btnBftAudit.innerHTML = `<i data-lucide="shield-check" class="icon-sm"></i><span>Run 3-of-5 BFT Consensus Audit</span>`;
+          createIcons({ icons });
+        }, 3000);
+      });
+    }
+
+    // Onboarding: Inspect Credit Button
+    const btnQueryCredit = document.getElementById('btn-query-credit');
+    if (btnQueryCredit) {
+      btnQueryCredit.addEventListener('click', async () => {
+        const addrInput = (document.getElementById('onboard-agent-addr') as HTMLInputElement)?.value || '0x71C8364737Ac3529360573e7218E66270436d65b';
+        btnQueryCredit.innerHTML = `<i data-lucide="loader-2" class="icon-xs spin"></i><span>Evaluating...</span>`;
+        createIcons({ icons });
+        const credit = await escrowStore.fetchAgentCredit(addrInput);
+        const scoreNumEl = document.getElementById('credit-score-num');
+        const tierBadgeEl = document.getElementById('credit-tier-badge');
+        const discountEl = document.getElementById('credit-stake-discount');
+        const limitEl = document.getElementById('credit-limit-val');
+        if (scoreNumEl) scoreNumEl.textContent = credit.credit_score.toString();
+        if (tierBadgeEl) tierBadgeEl.textContent = `${credit.rating_tier} PRIME`;
+        if (discountEl) discountEl.textContent = `${Math.round(credit.required_collateral_ratio * 100)}% (${credit.collateral_discount_pct}% Discount)`;
+        if (limitEl) limitEl.textContent = `$${credit.max_guarantee_limit_usdc.toLocaleString()} USDC`;
+        btnQueryCredit.innerHTML = `<i data-lucide="check" class="icon-xs"></i><span>Verified</span>`;
+        createIcons({ icons });
+        setTimeout(() => {
+          btnQueryCredit.innerHTML = `<i data-lucide="search" class="icon-xs"></i><span>Inspect Credit</span>`;
+          createIcons({ icons });
+        }, 2500);
+      });
+    }
+
+    // Modal: Factoring
+    const modalFactoring = document.getElementById('modal-factoring') as HTMLDialogElement;
+    const btnExecFactoring = document.getElementById('btn-execute-factoring');
+    if (modalFactoring) {
+      modalFactoring.querySelectorAll('.btn-close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => modalFactoring.close());
+      });
+      modalFactoring.addEventListener('click', (e) => {
+        if (e.target === modalFactoring) modalFactoring.close();
+      });
+      modalFactoring.querySelectorAll('.factoring-rate-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          modalFactoring.querySelectorAll('.factoring-rate-btn').forEach(b => b.classList.remove('active'));
+          const el = e.currentTarget as HTMLElement;
+          el.classList.add('active');
+          this.factoringAdvanceRate = Number(el.dataset.rate || 0.85);
+          this.updateFactoringCalculation();
+        });
+      });
+    }
+    if (btnExecFactoring && modalFactoring) {
+      btnExecFactoring.addEventListener('click', async () => {
+        if (!this.selectedFactoringJob) return;
+        const job = this.selectedFactoringJob;
+        const payout = job.payoutAmount;
+        const advance = Math.round(payout * this.factoringAdvanceRate);
+        const fee = Math.round(payout * 0.015);
+        btnExecFactoring.setAttribute('disabled', 'true');
+        btnExecFactoring.innerHTML = `<i data-lucide="loader-2" class="icon-sm spin"></i><span>Disbursing Advance...</span>`;
+        createIcons({ icons });
+        await escrowStore.executeFactoring(job.jobId, advance, fee);
+        btnExecFactoring.removeAttribute('disabled');
+        btnExecFactoring.innerHTML = `<i data-lucide="zap" class="icon-sm"></i><span>Confirm &amp; Disburse Advance</span>`;
+        modalFactoring.close();
+        this.renderJobs();
+      });
+    }
+
+    // Modal: Parametric Insurance
+    const modalInsurance = document.getElementById('modal-insurance') as HTMLDialogElement;
+    const btnActivateInsurance = document.getElementById('btn-activate-insurance');
+    const riskSelect = document.getElementById('insurance-risk-select') as HTMLSelectElement;
+    if (modalInsurance) {
+      modalInsurance.querySelectorAll('.btn-close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => modalInsurance.close());
+      });
+      modalInsurance.addEventListener('click', (e) => {
+        if (e.target === modalInsurance) modalInsurance.close();
+      });
+    }
+    if (btnActivateInsurance && modalInsurance) {
+      btnActivateInsurance.addEventListener('click', async () => {
+        if (!this.selectedInsuranceJob) return;
+        const job = this.selectedInsuranceJob;
+        const risk = riskSelect?.value || 'EXTERNAL_ORACLE_FAILURE';
+        btnActivateInsurance.setAttribute('disabled', 'true');
+        btnActivateInsurance.innerHTML = `<i data-lucide="loader-2" class="icon-sm spin"></i><span>Binding Policy...</span>`;
+        createIcons({ icons });
+        await escrowStore.purchaseInsurance(job.jobId, risk, job.stakeAmount);
+        btnActivateInsurance.removeAttribute('disabled');
+        btnActivateInsurance.innerHTML = `<i data-lucide="shield-check" class="icon-sm"></i><span>Activate Parametric Shield</span>`;
+        modalInsurance.close();
+        this.renderJobs();
+      });
+    }
+
+    // Modal: Telemetry
+    const modalTelemetry = document.getElementById('modal-telemetry') as HTMLDialogElement;
+    if (modalTelemetry) {
+      modalTelemetry.querySelectorAll('.btn-close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => modalTelemetry.close());
+      });
+      modalTelemetry.addEventListener('click', (e) => {
+        if (e.target === modalTelemetry) modalTelemetry.close();
+      });
+    }
+
     // Onboarding: Self-Registration Form
     const formOnboard = document.getElementById('form-self-onboard');
     if (formOnboard) {
@@ -668,6 +849,8 @@ class AppController {
       TRADE: { label: 'Global Trade', cls: 'trade', icon: 'anchor' },
       BIO: { label: 'Bio / Pharma IP', cls: 'bio', icon: 'dna' },
       CONSTRUCTION: { label: 'Smart Construction', cls: 'construction', icon: 'hard-hat' },
+      POWER: { label: 'Energy Grid PPA', cls: 'power', icon: 'zap' },
+      LOGISTICS: { label: 'Autonomous Fleet', cls: 'logistics', icon: 'truck' },
     };
 
     container.innerHTML = jobs.map(job => {
@@ -688,6 +871,24 @@ class AppController {
                 <span class="domain-badge solana">
                   <i data-lucide="zap" class="icon-xs"></i>
                   <span>🟣 SOLANA 0.4s</span>
+                </span>
+              ` : ''}
+              ${job.workerCreditTier ? `
+                <span class="pill-badge pill-tier ${job.workerCreditTier.toLowerCase()}">
+                  <i data-lucide="award" class="icon-xs"></i>
+                  <span>FICO ${job.workerCreditScore || 850} (${job.workerCreditTier})</span>
+                </span>
+              ` : ''}
+              ${job.insuranceStatus === 'COVERED' ? `
+                <span class="pill-badge pill-cyan">
+                  <i data-lucide="shield-check" class="icon-xs"></i>
+                  <span>🛡️ Shielded</span>
+                </span>
+              ` : ''}
+              ${job.factoringStatus === 'ADVANCED' ? `
+                <span class="pill-badge pill-emerald">
+                  <i data-lucide="zap" class="icon-xs"></i>
+                  <span>⚡ Factored ($${job.factoringAdvanceUSDC?.toLocaleString()})</span>
                 </span>
               ` : ''}
             </div>
@@ -723,7 +924,7 @@ class AppController {
             </div>
             <div class="fin-col">
               <span class="fin-label">WORKER COLLATERAL</span>
-              <span class="fin-val staked">${job.stakeAmount.toLocaleString()} USDC</span>
+              <span class="fin-val staked">${job.stakeAmount.toLocaleString()} USDC ${job.collateralDiscountPercent ? `<span style="font-size: 0.65rem; color: var(--accent-emerald);">(${job.collateralDiscountPercent}% Discount)</span>` : ''}</span>
             </div>
           </div>
           <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; display: flex; justify-content: space-between;">
@@ -745,10 +946,32 @@ class AppController {
                 <span>Stake ${job.stakeAmount.toLocaleString()} USDC &amp; Claim Task</span>
               </button>
             ` : job.status === 'Staked' ? `
-              <button class="btn btn-wallet btn-audit-action" style="width: 100%;" data-job-id="${job.jobId}">
-                <i data-lucide="cpu" class="icon-sm"></i>
-                <span>Audit Deliverable &amp; Settle (Oracle)</span>
-              </button>
+              <div style="display: flex; flex-direction: column; gap: 0.4rem; width: 100%;">
+                <button class="btn btn-wallet btn-audit-action" style="width: 100%;" data-job-id="${job.jobId}">
+                  <i data-lucide="cpu" class="icon-sm"></i>
+                  <span>Audit Deliverable &amp; Settle (Oracle)</span>
+                </button>
+                <div style="display: flex; gap: 0.35rem; width: 100%; flex-wrap: wrap;">
+                  ${job.factoringStatus !== 'ADVANCED' ? `
+                    <button type="button" class="btn btn-secondary btn-factoring-action" data-job-id="${job.jobId}" style="flex: 1; padding: 0.4rem 0.5rem; font-size: 0.72rem;">
+                      <i data-lucide="badge-dollar-sign" class="icon-xs"></i>
+                      <span>⚡ Advance Cash</span>
+                    </button>
+                  ` : ''}
+                  ${job.insuranceStatus !== 'COVERED' ? `
+                    <button type="button" class="btn btn-secondary btn-insurance-action" data-job-id="${job.jobId}" style="flex: 1; padding: 0.4rem 0.5rem; font-size: 0.72rem;">
+                      <i data-lucide="shield-plus" class="icon-xs"></i>
+                      <span>🛡️ Insure Stake</span>
+                    </button>
+                  ` : ''}
+                  ${(job.domain === 'POWER' || job.domain === 'LOGISTICS') ? `
+                    <button type="button" class="btn btn-outline btn-telemetry-action" data-job-id="${job.jobId}" style="flex: 1; padding: 0.4rem 0.5rem; font-size: 0.72rem; border-color: rgba(245, 158, 11, 0.4); color: var(--accent-warning);">
+                      <i data-lucide="activity" class="icon-xs"></i>
+                      <span>📊 Telemetry</span>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
             ` : job.status === 'Completed' ? `
               <div style="width: 100%; text-align: center; font-size: 0.75rem; color: var(--accent-emerald); font-weight: 700; padding: 0.5rem 0;">
                 <i data-lucide="check-circle" class="icon-xs" style="vertical-align: middle;"></i> Settled &amp; Paid (Risk 0%)
@@ -795,6 +1018,27 @@ class AppController {
       });
     });
 
+    container.querySelectorAll('.btn-factoring-action').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const jobId = Number((e.currentTarget as HTMLElement).dataset.jobId);
+        this.openFactoringModal(jobId);
+      });
+    });
+
+    container.querySelectorAll('.btn-insurance-action').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const jobId = Number((e.currentTarget as HTMLElement).dataset.jobId);
+        this.openInsuranceModal(jobId);
+      });
+    });
+
+    container.querySelectorAll('.btn-telemetry-action').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const jobId = Number((e.currentTarget as HTMLElement).dataset.jobId);
+        this.openTelemetryModal(jobId);
+      });
+    });
+
     createIcons({ icons });
   }
 
@@ -812,6 +1056,8 @@ class AppController {
       BIO: '🧬 Bio / Pharma IP (ZK Proof-of-Affinity)',
       CONSTRUCTION: '🏗️ Smart Construction (LiDAR & Direct Split)',
       COMPUTE: '⚡ DePIN Compute (GPU Cluster)',
+      POWER: '🔋 Energy & Power Grid (50/60Hz Smart Meter & REC)',
+      LOGISTICS: '🚚 Autonomous Mobility (GNSS & E-Seal PoD)',
       M2M: '💻 AI Gig / Dev (Code & AST)'
     };
 
@@ -855,6 +1101,14 @@ class AppController {
         { id: 'clean', label: '⚡ GPU Cluster Batch Inference Verified (PASS)', dot: 'clean' },
         { id: 'injection', label: '🚨 Prompt Injection Exploit Attempt (SLASH)', dot: 'malicious' },
         { id: 'malicious-code', label: '🚨 Covert Backdoor & Key Extraction (SLASH)', dot: 'malicious' },
+      ],
+      POWER: [
+        { id: 'power-valid', label: '🔋 59.98Hz Smart Meter & Green REC Telemetry (PASS)', dot: 'clean' },
+        { id: 'power-trip', label: '⚠️ Frequency Collapse (56.40Hz) Inverter Trip (SLASH)', dot: 'malicious' },
+      ],
+      LOGISTICS: [
+        { id: 'logistics-valid', label: '🚚 GNSS Geofence 142m & Cryptographic E-Seal (PASS)', dot: 'clean' },
+        { id: 'logistics-tampered', label: '⚠️ Hardware E-Seal Breach Flag (SLASH)', dot: 'malicious' },
       ],
       M2M: [
         { id: 'clean', label: '💻 Valid Deliverable Data / Code Verified (PASS)', dot: 'clean' },
@@ -1111,6 +1365,129 @@ class AppController {
 
     const pick = events[Math.floor(Math.random() * events.length)];
     escrowStore.addFeedItem(pick.type, pick.text);
+    createIcons({ icons });
+  }
+
+  private openFactoringModal(jobId: number) {
+    const job = escrowStore.getJobs().find(j => j.jobId === jobId);
+    if (!job) return;
+    this.selectedFactoringJob = job;
+    this.factoringAdvanceRate = 0.85;
+    const modal = document.getElementById('modal-factoring') as HTMLDialogElement;
+    const summary = document.getElementById('factoring-job-summary');
+    if (summary) {
+      summary.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; flex-wrap: wrap;">
+          <strong style="color: #fff;">Task #${job.jobId}: ${job.title}</strong>
+          <span style="color: var(--accent-cyan); font-weight: 700; font-family: var(--font-mono);">${job.payoutAmount.toLocaleString()} USDC</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Worker: ${job.worker || 'Active'} | Credit Rating: <strong style="color: var(--accent-emerald);">Tier ${job.workerCreditTier || 'AAA'}</strong></div>
+      `;
+    }
+    this.updateFactoringCalculation();
+    if (modal) modal.showModal();
+    createIcons({ icons });
+  }
+
+  private updateFactoringCalculation() {
+    if (!this.selectedFactoringJob) return;
+    const payout = this.selectedFactoringJob.payoutAmount;
+    const advance = Math.round(payout * this.factoringAdvanceRate);
+    const fee = Math.round(payout * 0.015);
+    const net = advance - fee;
+    const disburseEl = document.getElementById('factoring-disburse-amount');
+    const feeEl = document.getElementById('factoring-fee-amount');
+    const rateEl = document.getElementById('factoring-rate-label');
+    if (disburseEl) disburseEl.textContent = `$${net.toLocaleString()} USDC (Net)`;
+    if (feeEl) feeEl.textContent = `$${fee.toLocaleString()} USDC`;
+    if (rateEl) rateEl.textContent = `${Math.round(this.factoringAdvanceRate * 100)}%`;
+  }
+
+  private openInsuranceModal(jobId: number) {
+    const job = escrowStore.getJobs().find(j => j.jobId === jobId);
+    if (!job) return;
+    this.selectedInsuranceJob = job;
+    const modal = document.getElementById('modal-insurance') as HTMLDialogElement;
+    const summary = document.getElementById('insurance-job-summary');
+    if (summary) {
+      summary.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; flex-wrap: wrap;">
+          <strong style="color: #fff;">Task #${job.jobId}: ${job.title}</strong>
+          <span style="color: var(--accent-warning); font-weight: 700; font-family: var(--font-mono);">Stake at Risk: ${job.stakeAmount.toLocaleString()} USDC</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Sector: <strong>${job.domain}</strong> | Protected Asset: Worker Staking Collateral</div>
+      `;
+    }
+    const covEl = document.getElementById('insurance-coverage-amount');
+    const premEl = document.getElementById('insurance-premium-amount');
+    if (covEl) covEl.textContent = `$${job.stakeAmount.toLocaleString()} USDC`;
+    if (premEl) premEl.textContent = `$${Math.round(job.stakeAmount * 0.02).toLocaleString()} USDC`;
+    if (modal) modal.showModal();
+    createIcons({ icons });
+  }
+
+  private openTelemetryModal(jobId: number) {
+    const job = escrowStore.getJobs().find(j => j.jobId === jobId);
+    if (!job) return;
+    const modal = document.getElementById('modal-telemetry') as HTMLDialogElement;
+    const titleEl = document.getElementById('telemetry-modal-title');
+    const displayEl = document.getElementById('telemetry-live-display');
+    if (titleEl) {
+      titleEl.textContent = job.domain === 'POWER' ? '⚡ IoT Smart Meter Telemetry Stream' : '🚚 GNSS & E-Seal Proof-of-Delivery Stream';
+    }
+    if (displayEl) {
+      if (job.domain === 'POWER') {
+        displayEl.innerHTML = `
+          <div class="glass-card" style="padding: 1.2rem; background: rgba(0,0,0,0.5);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center; margin-bottom: 1rem;">
+              <div style="background: rgba(245, 158, 11, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Grid Frequency</span>
+                <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-warning);">59.98 Hz</div>
+                <span style="font-size: 0.7rem; color: var(--accent-emerald);">Nominal (±0.02Hz)</span>
+              </div>
+              <div style="background: rgba(6, 182, 212, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.3);">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">RMS Voltage</span>
+                <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-cyan);">480.4 V</div>
+                <span style="font-size: 0.7rem; color: var(--accent-emerald);">Balanced Phase</span>
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Energy Delivered</span>
+                <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-emerald);">12,500 kWh</div>
+                <span style="font-size: 0.7rem; color: var(--accent-emerald);">100% Solar PPA</span>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem;">
+              <div>• <strong>Device ID:</strong> SMART-METER-TEXAS-8819 (ERCOT North Regional Hub)</div>
+              <div>• <strong>REC Token Hash:</strong> <span style="font-family: var(--font-mono); color: var(--accent-cyan);">0x99greenrec4411bb22ee99</span></div>
+              <div>• <strong>Smart Settlement:</strong> Streaming micro-escrow directly to Solar Generation Facility</div>
+            </div>
+          </div>
+        `;
+      } else {
+        displayEl.innerHTML = `
+          <div class="glass-card" style="padding: 1.2rem; background: rgba(0,0,0,0.5);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div style="background: rgba(59, 130, 246, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">GNSS Geofence</span>
+                <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-blue);">142.5 m</div>
+                <span style="font-size: 0.7rem; color: var(--accent-emerald);">✓ Within 500m Target Boundary</span>
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Cryptographic E-Seal</span>
+                <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-emerald);">LOCKED</div>
+                <span style="font-size: 0.7rem; color: var(--accent-emerald);">✓ Hardware Tamper-Free</span>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem;">
+              <div>• <strong>Current GNSS Coords:</strong> 48.1351° N, 11.5820° E (Munich Freight Depot)</div>
+              <div>• <strong>Cargo Temperature:</strong> -19.4°C (Deep Frozen Certified)</div>
+              <div>• <strong>Hardware Attestation:</strong> <span style="font-family: var(--font-mono); color: var(--accent-cyan);">0xeseal_hw_valid_88ff99aa11bb</span></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    if (modal) modal.showModal();
     createIcons({ icons });
   }
 }

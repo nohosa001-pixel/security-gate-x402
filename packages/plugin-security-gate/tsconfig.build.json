@@ -7,16 +7,13 @@
 		"strict": true,
 		"strictNullChecks": true,
 		"skipLibCheck": true,
+		"types": ["node"],
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"declaration": true,
 		"emitDeclarationOnly": true,
 		"rootDir": "src",
-		"outDir": "dist",
-		"paths": {
-			"@elizaos/core": ["../../eliza-upstream/packages/core/src/index.node.ts"],
-			"@elizaos/core/*": ["../../eliza-upstream/packages/core/src/*"]
-		}
+		"outDir": "dist"
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["src/**/*.test.ts"]

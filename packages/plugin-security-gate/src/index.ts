@@ -23,7 +23,10 @@ export * from "./providers/securityStatusProvider.js";
  * Provides deterministic inbound prompt injection defense, dangerous code pattern detection,
  * outbound covert-channel DLP, config tamper detection, and agent safety guardrails.
  */
-export const securityGatePlugin: Plugin = {
+export const securityGatePlugin: Plugin & {
+	chatPreHandlers?: any[];
+	chatPostHandlers?: any[];
+} = {
 	name: "security-gate",
 	description:
 		"Deterministic inbound prompt injection defense, outbound covert-channel DLP, config tamper detection, dangerous code pattern detection, autonomous task escrow auditing, and agent safety guardrails.",

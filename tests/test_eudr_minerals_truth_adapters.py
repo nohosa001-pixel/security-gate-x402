@@ -330,3 +330,118 @@ def test_universal_escrow_settle_attestation_expired_rejected():
     assert resp.status_code == 400
     assert "expired" in resp.json()["detail"]
 
+
+# --- 5. Hardened EUDR & Minerals Robustness Regression Tests ---
+
+def test_eudr_long_job_id_safe_encoding():
+    """Regression Test: Long job IDs (> 32 chars) must NOT raise eth_abi ValueOutOfBounds."""
+    long_job_id = "job_eudr_brazil_amazonas_rainforest_timber_clearance_audit_batch_991823"
+    result = eudr_truth_adapter.verify_eudr_truth(
+        job_id=long_job_id,
+        commodity="timber",
+        country_code="BR",
+        polygon_coordinates=[(-3.12, -60.02), (-3.12, -60.01), (-3.13, -60.01)],
+        dds_reference_id="EU-DDS-2026-BR-LONG99",
+        deforestation_detected=False,
+        legal_harvest_verified=True
+    )
+    assert result["is_valid"] is True
+    assert result["job_id_bytes32"].startswith("0x")
+    assert len(result["job_id_bytes32"]) == 66
+
+
+def test_eudr_null_safety_guards():
+    """Robustness Test: Missing or None fields must fail gracefully without AttributeError or 500."""
+    # None DDS
+    res_none_dds = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_eudr_none_dds",
+        commodity="timber",
+        country_code="BR",
+        polygon_coordinates=[(-3.12, -60.02), (-3.12, -60.01), (-3.13, -60.01)],
+        dds_reference_id=None,
+        deforestation_detected=False,
+        legal_harvest_verified=True
+    )
+    assert res_none_dds["is_valid"] is False
+    assert res_none_dds["verdict"] == "FAILED"
+    assert res_none_dds["rule_breakdown"]["dds_statement_verified"] is False
+
+    # None Country Code
+    res_none_country = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_eudr_none_country",
+        commodity="timber",
+        country_code=None,
+        polygon_coordinates=[(-3.12, -60.02), (-3.12, -60.01), (-3.13, -60.01)],
+        dds_reference_id="EU-DDS-2026-BR-8812",
+        deforestation_detected=False,
+        legal_harvest_verified=True
+    )
+    assert res_none_country["is_valid"] is False
+    assert res_none_country["rule_breakdown"]["country_code_valid"] is False
+
+
+def test_eudr_future_cutoff_date_rejected():
+    """EUDR Regulatory Invariant: Deforestation cutoff date after statutory 2020-12-31 MUST be rejected."""
+    result = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_eudr_future_cutoff",
+        commodity="soy",
+        country_code="BR",
+        polygon_coordinates=[(-12.55, -55.88), (-12.55, -55.80), (-12.60, -55.85)],
+        dds_reference_id="EU-DDS-2026-BR-FUTURE",
+        deforestation_detected=False,
+        legal_harvest_verified=True,
+        satellite_cutoff_date="2024-01-01"  # Illegal cutoff after 2020-12-31
+    )
+    assert result["is_valid"] is False
+    assert result["rule_breakdown"]["cutoff_baseline_conformed"] is False
+
+
+def test_eudr_degenerate_zero_area_polygon_rejected():
+    """Geometry Invariant: Polygons with zero area (e.g. repeated points or straight lines) MUST be rejected."""
+    # Point disguised as polygon (all identical coordinates)
+    result = eudr_truth_adapter.verify_eudr_truth(
+        job_id="job_eudr_fake_polygon",
+        commodity="coffee",
+        country_code="VN",
+        polygon_coordinates=[(11.94, 108.43), (11.94, 108.43), (11.94, 108.43)],
+        dds_reference_id="EU-DDS-2026-VN-ZERO",
+        deforestation_detected=False,
+        legal_harvest_verified=True
+    )
+    assert result["is_valid"] is False
+    assert result["rule_breakdown"]["polygon_integrity"] is False
+
+
+def test_eudr_commodity_synonyms_accepted():
+    """Annex I Scope Test: Standard synonyms for EUDR commodities (oil palm, soya, paper, chocolate) are supported."""
+    for comm in ["oil palm", "palm-oil", "soya", "soybean", "paper", "chocolate"]:
+        result = eudr_truth_adapter.verify_eudr_truth(
+            job_id=f"job_eudr_syn_{comm}",
+            commodity=comm,
+            country_code="ID",
+            polygon_coordinates=[(0.5, 101.5), (0.5, 101.6), (0.6, 101.5)],
+            dds_reference_id="EU-DDS-2026-ID-PALM",
+            deforestation_detected=False,
+            legal_harvest_verified=True
+        )
+        assert result["is_valid"] is True, f"Failed for commodity synonym: {comm}"
+        assert result["rule_breakdown"]["commodity_supported"] is True
+
+
+def test_minerals_long_job_id_and_null_safety():
+    """Minerals Robustness Test: Long job IDs and None inputs must be handled safely."""
+    long_job_id = "job_minerals_oecd_democratic_republic_congo_coltan_audited_smelter_9981"
+    res = minerals_truth_adapter.verify_minerals_truth(
+        job_id=long_job_id,
+        mineral_type="cobalt",
+        smelter_id="CID002891",
+        smelter_audit_status="CONFORMANT",
+        mine_country_code="CD",
+        chain_of_custody_verified=True,
+        child_labor_free=True
+    )
+    assert res["is_valid"] is True
+    assert res["job_id_bytes32"].startswith("0x")
+    assert len(res["job_id_bytes32"]) == 66
+
+

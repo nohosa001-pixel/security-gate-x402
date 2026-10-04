@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-C1NsaPNs.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-0N5SctF6.css">
+  <script type="module" crossorigin src="./assets/index-Dl6rx1dM.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-aLYim6T0.css">
 </head>
 <body>
   <!-- Background Glow & Grid Canvas -->
@@ -176,7 +176,7 @@
           </button>
           <button class="category-chip" data-category="TRADE">
             <i data-lucide="ship" class="icon-xs text-cyan"></i>
-            <span>🚢 Global Trade &amp; Freight</span>
+            <span>🚢 Global Trade</span>
           </button>
           <button class="category-chip" data-category="BIO">
             <i data-lucide="dna" class="icon-xs text-purple"></i>
@@ -190,9 +190,17 @@
             <i data-lucide="cpu" class="icon-xs text-cyan"></i>
             <span>⚡ DePIN Compute</span>
           </button>
+          <button class="category-chip" data-category="POWER">
+            <i data-lucide="zap" class="icon-xs text-amber"></i>
+            <span>🔋 Energy Grid PPA</span>
+          </button>
+          <button class="category-chip" data-category="LOGISTICS">
+            <i data-lucide="truck" class="icon-xs text-blue"></i>
+            <span>🚚 Fleet PoD &amp; E-Seal</span>
+          </button>
           <button class="category-chip" data-category="M2M">
             <i data-lucide="code" class="icon-xs text-warning"></i>
-            <span>💻 AI Agent Outsourcing</span>
+            <span>💻 AI Dev Gig</span>
           </button>
         </div>
 
@@ -386,6 +394,10 @@
             <p class="view-desc">Live multi-region Byzantine quorum telemetry, real on-chain transaction verifications, real-time US T-Bill compounding ticker, and operator revenue sweep status.</p>
           </div>
           <div class="view-actions">
+            <button id="btn-trigger-bft-audit" class="btn btn-outline" style="border-color: rgba(0, 242, 254, 0.5); color: var(--accent-cyan);">
+              <i data-lucide="shield-check" class="icon-sm"></i>
+              <span>Run 3-of-5 BFT Consensus Audit</span>
+            </button>
             <button id="btn-trigger-warroom-sweep" class="btn btn-primary">
               <i data-lucide="arrow-down-to-dot" class="icon-sm"></i>
               <span>Sweep Operator Cashflow</span>
@@ -635,6 +647,39 @@
                 <span>Uncollateralized Limit: <strong style="color: var(--accent-cyan);" id="display-credit-limit">$100,000 USDC</strong></span>
               </div>
             </div>
+
+            <!-- FICO Credit Rating Inspector -->
+            <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.08);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="award" class="icon-sm text-emerald"></i>
+                  <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Agent FICO Credit Rating &amp; Attestation</h3>
+                </div>
+                <button type="button" id="btn-query-credit" class="btn btn-secondary" style="font-size: 0.72rem; padding: 0.35rem 0.6rem;">
+                  <i data-lucide="search" class="icon-xs"></i>
+                  <span>Inspect Credit</span>
+                </button>
+              </div>
+              <div id="agent-credit-card" class="glass-card" style="padding: 0.8rem; background: rgba(0,0,0,0.3); border-color: rgba(16, 185, 129, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Reputation FICO Score</span>
+                    <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                      <span id="credit-score-num" style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-emerald);">885</span>
+                      <span id="credit-tier-badge" class="pill-badge pill-emerald">AAA PRIME</span>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Required Stake Collateral</span>
+                    <div id="credit-stake-discount" style="font-size: 1.2rem; font-weight: 700; color: var(--accent-cyan);">10% (66% Discount)</div>
+                  </div>
+                </div>
+                <div style="margin-top: 0.6rem; font-size: 0.72rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+                  <div>• Under-Collateralized Limit: <strong id="credit-limit-val" style="color: #fff;">$531,000 USDC</strong></div>
+                  <div>• Truth Audit Pass Rate: <strong style="color: var(--accent-emerald);">99.4% (184 Passed)</strong></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Right: SDK Quick-Start Snippets -->
@@ -696,6 +741,8 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
               <option value="BIO">🧬 Bio &amp; Pharma IP (Genomic Merkle Root &amp; ZK-SNARK)</option>
               <option value="CONSTRUCTION">🏗️ Smart Construction (3D Drone LiDAR &amp; Direct Split)</option>
               <option value="COMPUTE">⚡ DePIN Compute (Distributed GPU Cluster &amp; Inference)</option>
+              <option value="POWER">🔋 Energy &amp; Power Grid (IoT Smart Meter 50/60Hz &amp; REC PPA)</option>
+              <option value="LOGISTICS">🚚 Autonomous Mobility (Great-circle GNSS &amp; Cryptographic E-Seal)</option>
               <option value="M2M">💻 AI Agent Outsourcing (Code Integrity &amp; AST Security)</option>
             </select>
           </div>
@@ -762,15 +809,31 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
             <div class="scenario-buttons">
               <button type="button" class="scenario-btn active" data-scenario="clean">
                 <span class="scenario-dot clean"></span>
-                <span>Safe Data Deliverable (Clean)</span>
+                <span>Safe Deliverable (Clean)</span>
+              </button>
+              <button type="button" class="scenario-btn" data-scenario="power-valid">
+                <span class="scenario-dot clean"></span>
+                <span>59.98Hz Smart Meter (Power)</span>
+              </button>
+              <button type="button" class="scenario-btn" data-scenario="power-trip">
+                <span class="scenario-dot malicious"></span>
+                <span>56.4Hz Grid Trip (Power Slash)</span>
+              </button>
+              <button type="button" class="scenario-btn" data-scenario="logistics-valid">
+                <span class="scenario-dot clean"></span>
+                <span>142m Geofence &amp; E-Seal (Fleet)</span>
+              </button>
+              <button type="button" class="scenario-btn" data-scenario="logistics-tampered">
+                <span class="scenario-dot malicious"></span>
+                <span>E-Seal Breach Flag (Fleet Slash)</span>
               </button>
               <button type="button" class="scenario-btn" data-scenario="injection">
                 <span class="scenario-dot malicious"></span>
-                <span>Prompt Injection Override (Attack)</span>
+                <span>Prompt Injection (Attack)</span>
               </button>
               <button type="button" class="scenario-btn" data-scenario="malicious-code">
                 <span class="scenario-dot malicious"></span>
-                <span>Backdoor Exec / Key Leak (Attack)</span>
+                <span>Backdoor Exec (Attack)</span>
               </button>
             </div>
 
@@ -854,6 +917,116 @@ import { securityGatePlugin } from "@agrid/plugin-security-gate";
               <div>• <strong>15% Worker Agent Incentives:</strong> +$880.64 USDC (Distributed to 99%+ reputation nodes)</div>
               <div>• <strong>5% Oracle Infrastructure Subsidy:</strong> +$293.55 USDC (Covers gas &amp; Cloud Run hosting)</div>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-cancel">Close</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Modal: DePIN Factoring Liquidity Advance -->
+    <dialog id="modal-factoring" class="modal-dialog">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <i data-lucide="badge-dollar-sign" class="icon-md text-cyan"></i>
+            <h2 class="modal-title">DePIN Factoring: Instant Liquidity Advance</h2>
+          </div>
+          <button class="btn-close-modal" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div id="factoring-job-summary" style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px;">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; display: block;">Select Advance Percentage:</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary factoring-rate-btn active" data-rate="0.85">85% Advance (Standard)</button>
+              <button type="button" class="btn btn-secondary factoring-rate-btn" data-rate="0.75">75% Advance (Low Fee)</button>
+              <button type="button" class="btn btn-secondary factoring-rate-btn" data-rate="0.90">90% Advance (Max Liquid)</button>
+            </div>
+          </div>
+          <div class="oracle-result-box pass" style="display: block;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span>Instant Cash Disbursed to Worker:</span>
+              <strong style="color: var(--accent-emerald); font-size: 1.1rem;" id="factoring-disburse-amount">$0.00 USDC</strong>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.3rem;">
+              <div>• Advance Rate: <strong id="factoring-rate-label" style="color: #fff;">85%</strong> based on Agent FICO Score</div>
+              <div>• Protocol Factoring Discount Fee (1.5%): <strong id="factoring-fee-amount" style="color: var(--accent-warning);">$0.00 USDC</strong></div>
+              <div>• Escrow Receivable assigned to: <span style="font-family: var(--font-mono); color: var(--accent-cyan);">0x4Dbd77...EAa8 (AgentFactoringPool)</span></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+            <button type="button" id="btn-execute-factoring" class="btn btn-primary">
+              <i data-lucide="zap" class="icon-sm"></i>
+              <span>Confirm &amp; Disburse Advance</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Modal: Parametric Risk Shield Insurance -->
+    <dialog id="modal-insurance" class="modal-dialog">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <i data-lucide="shield-plus" class="icon-md text-emerald"></i>
+            <h2 class="modal-title">Parametric Risk Shield Policy</h2>
+          </div>
+          <button class="btn-close-modal" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div id="insurance-job-summary" style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px;">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; display: block;">Select Parametric Disruption Protection:</label>
+            <select id="insurance-risk-select" class="form-input" style="width: 100%; background: #0b1329;">
+              <option value="PORT_CONGESTION_DELAY">🚢 Port Congestion &amp; Customs Delay (&gt;48h)</option>
+              <option value="GRID_FREQUENCY_SPIKE">⚡ Substation Grid Frequency Spike &amp; Inverter Trip</option>
+              <option value="HARDWARE_E_SEAL_FAULT">🚚 IoT Hardware E-Seal Sensor Glitch Fault</option>
+              <option value="WEATHER_DISRUPTION">🌪️ Severe Weather / Storm Transit Force Majeure</option>
+            </select>
+          </div>
+          <div class="oracle-result-box pass" style="display: block;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span>Worker Stake Coverage (100% Protection):</span>
+              <strong style="color: var(--accent-cyan); font-size: 1.1rem;" id="insurance-coverage-amount">$0.00 USDC</strong>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.3rem;">
+              <div>• Actuarial Premium (2.0%): <strong id="insurance-premium-amount" style="color: var(--accent-emerald);">$0.00 USDC</strong></div>
+              <div>• Settlement Guarantee: Invariant breach due to external conditions triggers 100% stake indemnity refund</div>
+              <div>• Underwriting Reserve: Backed by Sovereign US T-Bill Solvency Pool</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+            <button type="button" id="btn-activate-insurance" class="btn btn-primary">
+              <i data-lucide="shield-check" class="icon-sm"></i>
+              <span>Activate Parametric Shield</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Modal: IoT Smart Meter & E-Seal Live Telemetry Inspector -->
+    <dialog id="modal-telemetry" class="modal-dialog">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <i data-lucide="activity" class="icon-md text-amber"></i>
+            <h2 class="modal-title" id="telemetry-modal-title">Live Hardware Telemetry Stream</h2>
+          </div>
+          <button class="btn-close-modal" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div id="telemetry-live-display">
+            <!-- Dynamic Telemetry Gauge / Map / Signal -->
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary btn-cancel">Close</button>

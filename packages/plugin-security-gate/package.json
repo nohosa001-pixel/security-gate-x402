@@ -40,7 +40,7 @@
 		}
 	},
 	"scripts": {
-		"build": "bun build src/index.ts --outdir dist --target node --format esm",
+		"build": "bun build src/index.ts --outdir dist --target node --format esm && tsc -p tsconfig.build.json",
 		"test": "bun test src/standalone.test.ts",
 		"lint": "bunx @biomejs/biome check --write --unsafe src",
 		"format": "bunx @biomejs/biome format --write src"

@@ -98,7 +98,7 @@ class X402Verifier:
             error="Payment Required",
             protocol="x402",
             network=network_name,
-            chain_id=target_chain.chain_id,
+            chain_id=int(target_chain.chain_id),
             asset=usdc_contract,
             amount_usdc=amt,
             amount_micro_units=micro_units,
@@ -263,8 +263,6 @@ class X402Verifier:
                     recovered_addr = Account.recover_message(msg_hash, signature=sig_clean)
                     return True, f"x402:{recovered_addr}", {"X-Tier": "STANDARD_X402", "X-Signer-Verified": recovered_addr}
                 except Exception:
-                    if all(c in "0123456789abcdefABCDEFx" for c in sig_clean):
-                        return True, "x402:verified_payer", {"X-Tier": "STANDARD_X402"}
                     return False, "Invalid cryptographic x402 payment signature: recovery failed.", {}
 
             return False, "Invalid x402 payment authorization: unrecognized payment proof format.", {}

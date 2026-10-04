@@ -22,7 +22,9 @@ export interface SecurityGateEvaluationResult {
 	mode: "local" | "remote-oracle";
 }
 
-export const securityGateEvaluator: Evaluator<LocalAuditResult> = {
+export const securityGateEvaluator: Evaluator<LocalAuditResult> & {
+	resolveOutput?: (context: EvaluatorPromptContext) => LocalAuditResult;
+} = {
 	name: "SECURITY_GATE_EVALUATOR",
 	similes: [
 		"PROMPT_INJECTION_RADAR",
@@ -50,8 +52,6 @@ export const securityGateEvaluator: Evaluator<LocalAuditResult> = {
 		const text = context.message?.content?.text || "";
 		return Boolean(text && text.trim().length > 0);
 	},
-
-	resolveOutputWhen: () => true,
 
 	resolveOutput(context: EvaluatorPromptContext): LocalAuditResult {
 		const text = context.message?.content?.text || "";
