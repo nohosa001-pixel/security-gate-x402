@@ -34,7 +34,10 @@ AGENT_FLEET = [
     {"name": "CrewAI-Escrow-Auditor", "framework": "CrewAI Autonomous", "chain": 137},
     {"name": "Auto-GPT-Task-Worker", "framework": "Auto-GPT / Agent Protocol", "chain": 8453},
     {"name": "Claude-AST-CodeGuard", "framework": "Anthropic MCP Tool", "chain": 42161},
-    {"name": "DePIN-GPU-Compute-Node", "framework": "A.GRID Verifiable DePIN", "chain": 137}
+    {"name": "DePIN-GPU-Compute-Node", "framework": "A.GRID Verifiable DePIN", "chain": 137},
+    {"name": "ERCOT-SmartMeter-PowerAgent", "framework": "A.GRID Power Grid Oracle", "chain": 137},
+    {"name": "Munich-Autonomous-Fleet-E-Seal", "framework": "A.GRID Autonomous PoD", "chain": 8453},
+    {"name": "Solana-Micropay-SpeedTrader", "framework": "Solana 0.4s Fast Anchor", "chain": 501}
 ]
 
 INJECTION_PAYLOADS = [
