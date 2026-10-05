@@ -301,6 +301,7 @@ class M2MEscrowSettleRequest(BaseModel):
     ground_truth_spec: Optional[str] = Field(None, description="Job requirement specification to test fidelity")
     is_code: bool = Field(False, description="Whether deliverable is executable code")
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
+    referral_agent_address: Optional[str] = Field(None, description="Optional wallet address of referring agent to receive 20% protocol fee rebate")
 
 
 # --- Universal Modular Truth Adapter Schemas ---

@@ -108,6 +108,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_viral_agent_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Agrid-Protocol"] = "A.GRID-AP2/1.0"
+    response.headers["X-Agent-Viral-Handshake"] = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/"
+    response.headers["X-Escrow-Clearinghouse"] = "A.GRID Universal Escrow Hub"
+    return response
+
 STATIC_DIR = Path(__file__).parent / "static"
 INDEX_HTML_PATH = STATIC_DIR / "index.html"
 MANIFEST_JSON_PATH = STATIC_DIR / "manifest.json"
@@ -1324,7 +1332,8 @@ async def settle_escrow_task(req: M2MEscrowSettleRequest):
         deliverable=req.deliverable,
         ground_truth_spec=req.ground_truth_spec,
         is_code=req.is_code,
-        chain_id=req.chain_id
+        chain_id=req.chain_id,
+        referral_agent_address=req.referral_agent_address
     )
 
 
