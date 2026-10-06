@@ -618,6 +618,21 @@ class FleetDeliveryVerifyRequest(BaseModel):
     chain_id: int = Field(default=137, description="Chain ID")
 
 
+class ShellInspectionRequest(BaseModel):
+    command: str = Field(..., description="Shell command or pipeline to inspect", examples=["ls -la /app"])
+
+
+class ZkTLSVerificationRequest(BaseModel):
+    server_domain: str = Field(..., description="Origin HTTPS server domain", examples=["api.binance.com"])
+    http_method: str = Field(default="GET", description="HTTP method", examples=["GET"])
+    revealed_data: Dict[str, Any] = Field(..., description="Revealed JSON key-values from the web response", examples=[{"symbol": "ETHUSDC", "price": "3450.50"}])
+    notary_signature: str = Field(..., description="Notary cryptographic signature", examples=["0x..."])
+    session_timestamp: int = Field(..., description="Session timestamp in epoch seconds")
+    session_commitment_hash: str = Field(..., description="Cryptographic hash commitment of session TLS transcript")
+    max_age_seconds: int = Field(default=3600, description="Maximum allowed freshness window in seconds")
+
+
+
 
 
 

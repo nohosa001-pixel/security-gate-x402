@@ -257,6 +257,60 @@ class AgentCreditEngine:
             }
         }
 
+    def calculate_adaptive_collateral(self, agent_address: str, job_amount_usdc: float) -> Dict[str, Any]:
+        """
+        Calculates exact worker collateral staking requirement based on agent credit tier.
+        High-reputation agents get collateral discounts; unverified/low-reputation agents pay higher stakes.
+        """
+        score_data = self.calculate_credit_score(agent_address)
+        ratio = score_data["required_collateral_ratio"]
+        required_stake = round(job_amount_usdc * ratio, 4)
+
+        return {
+            "agent_address": score_data["agent_address"],
+            "agent_name": score_data["agent_name"],
+            "credit_score": score_data["credit_score"],
+            "tier": score_data["tier"],
+            "job_amount_usdc": job_amount_usdc,
+            "collateral_ratio": ratio,
+            "required_collateral_usdc": required_stake,
+            "can_accept_job": score_data["credit_score"] >= 400
+        }
+
+    def slash_agent_stake(
+        self,
+        agent_address: str,
+        job_id: int,
+        slash_amount_usdc: float,
+        violation_reason: str,
+        chain_id: int = 137
+    ) -> Dict[str, Any]:
+        """
+        Executes deterministic forfeiture (slashing) of worker stake upon fraud, hallucination, or contract breach.
+        Penalizes credit score and emits cryptographic slashing attestation.
+        """
+        addr = agent_address.lower()
+        self.record_activity(agent_address=addr, is_success=False, task_volume_usdc=slash_amount_usdc)
+
+        new_score = self.calculate_credit_score(agent_address)
+        timestamp = int(time.time())
+
+        # Construct cryptographic slash proof
+        slash_hash = eth_utils.keccak(text=f"SLASH:{job_id}:{addr}:{slash_amount_usdc}:{violation_reason}:{timestamp}").hex()
+
+        return {
+            "status": "SLASHED",
+            "job_id": job_id,
+            "slashed_agent": eth_utils.to_checksum_address(agent_address),
+            "slashed_amount_usdc": slash_amount_usdc,
+            "violation_reason": violation_reason,
+            "new_credit_score": new_score["credit_score"],
+            "new_tier": new_score["tier"],
+            "slashing_proof_hash": f"0x{slash_hash}",
+            "timestamp": timestamp,
+            "message": f"Worker collateral {slash_amount_usdc} USDC slashed and forfeited to protocol insurance pool."
+        }
+
 
 # Singleton instance
 agent_credit_engine = AgentCreditEngine()

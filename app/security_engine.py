@@ -558,3 +558,9 @@ def parse_code_ast(code: str) -> Dict[str, Any]:
             "parsed_ast_nodes": 0
         }
 
+
+def inspect_shell_command(command: str) -> Dict[str, Any]:
+    """Sub-millisecond static analyzer for Unix/Bash/Windows shell commands."""
+    from app.shell_security_engine import shell_security_engine
+    return shell_security_engine.audit_command(command)
+

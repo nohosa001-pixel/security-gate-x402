@@ -73,6 +73,8 @@ from app.schemas import (
     FleetMissionRegisterRequest,
     FleetDeliveryVerifyRequest,
     SolanaTruthAttestationResponse,
+    ShellInspectionRequest,
+    ZkTLSVerificationRequest,
 )
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import x402_verifier, create_attestation, is_sanctioned_address, generate_audit_proof
@@ -2229,6 +2231,36 @@ async def get_warroom_telemetry():
     }
 
 
+# --- Advanced Security Core & zkTLS Proof Endpoints ---
+
+@app.post("/api/v1/security/shell", tags=["Security Gate"])
+async def audit_shell_command_endpoint(req: ShellInspectionRequest):
+    """
+    Sub-millisecond static analyzer for Unix/Bash/Windows shell commands.
+    Blocks rm -rf, /dev/tcp reverse shells, base64 obfuscation pipes, and credential dumps.
+    """
+    from app.shell_security_engine import shell_security_engine
+    return shell_security_engine.audit_command(req.command)
+
+
+@app.post("/api/v1/escrow/truth/zktls", tags=["Truth Oracle"])
+async def verify_zktls_proof_endpoint(req: ZkTLSVerificationRequest):
+    """
+    Verifies zero-knowledge cryptographic web session proofs (TLSNotary / zkTLS style)
+    for off-chain data provenance without exposing client credentials or API tokens.
+    """
+    from app.truth_adapters.zktls_web_proof_adapter import zktls_adapter
+    return zktls_adapter.verify_web_proof(
+        server_domain=req.server_domain,
+        http_method=req.http_method,
+        revealed_data=req.revealed_data,
+        notary_signature=req.notary_signature,
+        session_timestamp=req.session_timestamp,
+        session_commitment_hash=req.session_commitment_hash,
+        max_age_seconds=req.max_age_seconds
+    )
+
+
 # --- MCP Tool Call Endpoints ---
 
 @app.get("/mcp/tools", tags=["MCP"])
@@ -2271,6 +2303,12 @@ async def call_mcp_tool(
         code = args.get("code", "")
         ast_result = parse_code_ast(code)
         return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(ast_result, indent=2)}])
+
+    elif tool_name == "inspect_shell_command_safety":
+        from app.shell_security_engine import shell_security_engine
+        command = args.get("command", "")
+        shell_result = shell_security_engine.audit_command(command)
+        return MCPToolCallResponse(content=[{"type": "text", "text": json.dumps(shell_result, indent=2, ensure_ascii=False)}])
 
     elif tool_name == "get_onchain_security_attestation":
         payload = args.get("action_payload", "")

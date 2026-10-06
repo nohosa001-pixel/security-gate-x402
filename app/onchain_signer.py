@@ -16,26 +16,48 @@ import eth_abi
 class OnchainSecuritySigner:
     """Signs security audit payloads using EIP-712 for EVM smart contracts."""
 
+    INSECURE_TEST_KEY = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+
     def __init__(self):
-        # Master private key for gate oracle signer
-        raw_key = os.getenv(
-            "GATE_PRIVATE_KEY",
-            os.getenv("DEPLOYER_PRIVATE_KEY", os.getenv("SERVER_PRIVATE_KEY", "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"))
+        # Determine environment: Cloud Run sets K_SERVICE, production flag via APP_ENV / NODE_ENV / ENV
+        is_production = bool(
+            os.getenv("K_SERVICE")
+            or os.getenv("APP_ENV", "").lower() in ("prod", "production")
+            or os.getenv("ENV", "").lower() in ("prod", "production")
         )
+
+        # Master private key for gate oracle signer
+        raw_key = os.getenv("GATE_PRIVATE_KEY") or os.getenv("DEPLOYER_PRIVATE_KEY") or os.getenv("SERVER_PRIVATE_KEY")
+
         if raw_key:
             raw_key = raw_key.strip().strip('"').strip("'")
             if not raw_key.startswith("0x"):
                 raw_key = "0x" + raw_key
             self.private_key = raw_key
         else:
-            self.private_key = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+            if is_production:
+                raise RuntimeError(
+                    "🚨 [CRITICAL SECURITY ERROR] Production environment detected (Cloud Run/prod), "
+                    "but no valid GATE_PRIVATE_KEY / DEPLOYER_PRIVATE_KEY / SERVER_PRIVATE_KEY was supplied! "
+                    "Refusing to boot with default insecure test key to prevent unauthorized attestation forgery."
+                )
+            self.private_key = self.INSECURE_TEST_KEY
+
+        # Validate that production is not accidentally using the publicly known insecure test key
+        if is_production and self.private_key.lower() == self.INSECURE_TEST_KEY.lower():
+            raise RuntimeError(
+                "🚨 [CRITICAL SECURITY ERROR] Production environment cannot use the publicly known test private key! "
+                "Configure a secure private key via Secret Manager or GATE_PRIVATE_KEY."
+            )
 
         try:
             self.account = Account.from_key(self.private_key)
             self.signer_address = self.account.address
-        except Exception:
-            # Fallback to deterministic default testing signer if invalid key was injected
-            self.private_key = "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
+        except Exception as e:
+            if is_production:
+                raise RuntimeError(f"🚨 [CRITICAL SECURITY ERROR] Failed to load private key in production: {e}")
+            # Fallback to deterministic default testing signer in non-production only
+            self.private_key = self.INSECURE_TEST_KEY
             self.account = Account.from_key(self.private_key)
             self.signer_address = self.account.address
 
