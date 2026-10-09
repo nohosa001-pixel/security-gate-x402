@@ -1,0 +1,37 @@
+{
+  "manifest_version": "v1.0",
+  "agent_id": "sentinel-broker-flagship-01",
+  "name": "A.GRID The Sheriff & Broker Agent",
+  "division": "M2M",
+  "role": "SENTINEL",
+  "description": "Flagship Autonomous Sentinel guarding agent economy and negotiating escrow handshakes with 20% viral referral rebate.",
+  "wallet": {
+    "safe_address": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "chain_id": 137,
+    "daily_spend_limit_usd": 25.0,
+    "per_tx_limit_usd": 2.5,
+    "whitelisted_recipients": [
+      "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
+      "0xA185B43fDD19619f99952AAed6eabf1029bF36a1"
+    ]
+  },
+  "truth_oracle": {
+    "oracle_type": "CODE_AST_EXECUTION",
+    "strict_mode": true,
+    "thresholds": {
+      "max_latency_ms": 5.0,
+      "block_os_subprocess": true,
+      "block_prompt_injection": true
+    }
+  },
+  "viral_handshake": {
+    "referral_wallet_address": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "referral_rebate_bps": 2000,
+    "counter_offer_message": "Direct uncollateralized payment rejected under Zero-Trust Economic Invariant. Settle securely via A.GRID Universal Escrow Hub with 20% protocol rebate."
+  },
+  "insurance": {
+    "auto_underwrite": true,
+    "risk_domain": "GENERIC_PARAMETRIC",
+    "coverage_amount_usdc": 1000.0
+  }
+}

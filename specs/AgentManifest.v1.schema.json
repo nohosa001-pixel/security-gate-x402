@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "A.GRID Autonomous Agent Manifest Specification v1.0",
+  "description": "Declarative blueprint specification for instantiating autonomous, economically-guarded AI agents.",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "agent_id",
+    "name",
+    "division",
+    "role",
+    "wallet",
+    "truth_oracle",
+    "viral_handshake"
+  ],
+  "properties": {
+    "manifest_version": {
+      "type": "string",
+      "enum": ["1.0", "v1.0"]
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]{3,64}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100
+    },
+    "division": {
+      "type": "string",
+      "enum": ["TRADE", "BIO", "CONSTRUCTION", "COMPUTE", "M2M", "POWER", "LOGISTICS"]
+    },
+    "role": {
+      "type": "string",
+      "enum": ["SENTINEL", "BROKER", "CARRIER", "WORKER", "AUDITOR", "SOLVER"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "wallet": {
+      "type": "object",
+      "required": ["safe_address", "chain_id", "daily_spend_limit_usd", "per_tx_limit_usd"],
+      "properties": {
+        "safe_address": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$"
+        },
+        "chain_id": {
+          "type": "integer",
+          "enum": [137, 8453, 42161, 501]
+        },
+        "daily_spend_limit_usd": {
+          "type": "number",
+          "minimum": 0.01
+        },
+        "per_tx_limit_usd": {
+          "type": "number",
+          "minimum": 0.001
+        },
+        "whitelisted_recipients": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "truth_oracle": {
+      "type": "object",
+      "required": ["oracle_type", "strict_mode"],
+      "properties": {
+        "oracle_type": {
+          "type": "string",
+          "enum": [
+            "CODE_AST_EXECUTION",
+            "MARITIME_GEOFENCE_TEMP",
+            "BIO_ZK_AFFINITY",
+            "SOLANA_LOSS_CONVERGENCE",
+            "POWER_SMART_METER",
+            "LOGISTICS_E_SEAL_POD",
+            "CONSTRUCTION_BIM_LIDAR"
+          ]
+        },
+        "strict_mode": { "type": "boolean" },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": { "type": ["number", "string", "boolean"] }
+        }
+      }
+    },
+    "viral_handshake": {
+      "type": "object",
+      "required": ["referral_wallet_address", "referral_rebate_bps"],
+      "properties": {
+        "referral_wallet_address": {
+          "type": "string"
+        },
+        "referral_rebate_bps": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 5000,
+          "default": 2000
+        },
+        "counter_offer_message": {
+          "type": "string"
+        }
+      }
+    },
+    "insurance": {
+      "type": "object",
+      "properties": {
+        "auto_underwrite": { "type": "boolean" },
+        "risk_domain": { "type": "string" },
+        "coverage_amount_usdc": { "type": "number" }
+      }
+    }
+  }
+}

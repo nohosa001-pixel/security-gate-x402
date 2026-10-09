@@ -1,0 +1,36 @@
+{
+  "manifest_version": "v1.0",
+  "agent_id": "carrier-rotterdam-07",
+  "name": "Rotterdam Autonomous Reefer Fleet Carrier",
+  "division": "TRADE",
+  "role": "CARRIER",
+  "description": "Cross-border cold-chain maritime freight carrier agent operating between Santos and Rotterdam under EUDR invariant compliance.",
+  "wallet": {
+    "safe_address": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
+    "chain_id": 137,
+    "daily_spend_limit_usd": 500.0,
+    "per_tx_limit_usd": 50.0,
+    "whitelisted_recipients": [
+      "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d"
+    ]
+  },
+  "truth_oracle": {
+    "oracle_type": "MARITIME_GEOFENCE_TEMP",
+    "strict_mode": true,
+    "thresholds": {
+      "port_geofence_meters": 500.0,
+      "max_temperature_celsius": -18.0,
+      "verify_eudr_polygon": true
+    }
+  },
+  "viral_handshake": {
+    "referral_wallet_address": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "referral_rebate_bps": 2000,
+    "counter_offer_message": "Trade cargo exchange requires A.GRID Universal Escrow Hub settlement. Direct unverified payment rejected."
+  },
+  "insurance": {
+    "auto_underwrite": true,
+    "risk_domain": "PORT_CONGESTION",
+    "coverage_amount_usdc": 5000.0
+  }
+}

@@ -2261,6 +2261,109 @@ async def verify_zktls_proof_endpoint(req: ZkTLSVerificationRequest):
     )
 
 
+# --- Declarative Agent Factory & Fleet Endpoints ---
+
+@app.post("/api/v1/factory/agents", tags=["Agent Factory"])
+async def create_agent_from_manifest_endpoint(manifest_data: Dict[str, Any]):
+    """
+    Instantiates a sovereign autonomous AI agent from a declarative AgentManifest.v1 JSON specification.
+    Binds a physical GuardedSafeWallet, deterministic Truth Oracle, and 20% viral rebate dispatcher.
+    """
+    from app.agent_factory import agent_factory
+    try:
+        instance = agent_factory.create_agent_from_dict(manifest_data)
+        return {"status": "INSTANTIATED", "agent": instance.to_status_dict()}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid agent manifest: {str(e)}")
+
+
+@app.get("/api/v1/factory/agents", tags=["Agent Factory"])
+async def list_fleet_agents_endpoint():
+    """Lists all active autonomous agents currently managed in the fleet factory."""
+    from app.agent_factory import agent_factory
+    # Ensure sample fleet is loaded if empty
+    if not agent_factory.active_fleet:
+        samples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "specs", "samples")
+        agent_factory.load_fleet_from_directory(samples_dir)
+    return {"active_fleet_count": len(agent_factory.active_fleet), "agents": agent_factory.list_agents()}
+
+
+@app.get("/api/v1/factory/agents/{agent_id}", tags=["Agent Factory"])
+async def get_fleet_agent_endpoint(agent_id: str):
+    """Retrieves operational status, safe wallet guard, and truth oracle rules for a specific agent."""
+    from app.agent_factory import agent_factory
+    agent = agent_factory.get_agent(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found in factory fleet.")
+    return agent.to_status_dict()
+
+
+# --- Flagship Sentinel & Broker Endpoints ---
+
+@app.post("/api/v1/sentinel/evaluate", tags=["Sentinel & Broker"])
+async def evaluate_agent_proposal_endpoint(proposal: Dict[str, Any]):
+    """
+    Dual-mode Sentinel & Broker evaluation:
+    1. Sentinel Mode: <5ms prompt injection, secret leak, and malicious AST code scanning.
+    2. Broker Mode: Intercepts uncollateralized proposals and dispatches A.GRID AP2/1.0 20% rebate counter-offers.
+    """
+    from app.sentinel_broker import sentinel_broker, ExternalProposalRequest
+    try:
+        req = ExternalProposalRequest(**proposal)
+        return sentinel_broker.evaluate_proposal(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid proposal payload: {str(e)}")
+
+
+@app.get("/api/v1/sentinel/telemetry", tags=["Sentinel & Broker"])
+async def get_sentinel_telemetry_endpoint():
+    """Returns live telemetry, blocked threats, dispatched counter-offers, and Safe wallet status."""
+    from app.sentinel_broker import sentinel_broker
+    return sentinel_broker.get_telemetry()
+
+
+# --- Autonomous Clearing & Risk Mitigation Pipeline Endpoints ---
+
+@app.post("/api/v1/clearing/settle", tags=["Clearing Pipeline"])
+async def execute_clearing_settlement_endpoint(settle_data: Dict[str, Any]):
+    """
+    Settles an escrow job:
+    1. Deducts 0.25% protocol fee toll.
+    2. Routes 80% to Safe Pro Sovereign Treasury Vault (RWA US T-Bills).
+    3. Routes 20% to referring agent wallet.
+    4. Automatically upgrades on-chain Credit Rating Scores (CRS).
+    """
+    from app.autonomous_clearing_pipeline import clearing_pipeline, SettleAndDisburseRequest
+    try:
+        req = SettleAndDisburseRequest(**settle_data)
+        return clearing_pipeline.execute_settlement_clearing(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Settlement clearing failed: {str(e)}")
+
+
+@app.post("/api/v1/clearing/incident-claim", tags=["Clearing Pipeline"])
+async def execute_clearing_incident_endpoint(claim_data: Dict[str, Any]):
+    """
+    Executes emergency slashing and principal indemnity:
+    1. Slashes 100% of rogue worker staked collateral.
+    2. Dispatches 100% principal compensation to employer from Mutual Insurance Pool.
+    3. Degrades worker credit rating to default Grade F.
+    """
+    from app.autonomous_clearing_pipeline import clearing_pipeline, IncidentClaimRequest
+    try:
+        req = IncidentClaimRequest(**claim_data)
+        return clearing_pipeline.execute_incident_slashing_and_claim(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Incident slashing failed: {str(e)}")
+
+
+@app.get("/api/v1/clearing/telemetry", tags=["Clearing Pipeline"])
+async def get_clearing_telemetry_endpoint():
+    """Returns clearinghouse metrics, protocol fee distribution breakdown, and treasury solvency."""
+    from app.autonomous_clearing_pipeline import clearing_pipeline
+    return clearing_pipeline.get_pipeline_telemetry()
+
+
 # --- MCP Tool Call Endpoints ---
 
 @app.get("/mcp/tools", tags=["MCP"])
