@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-security-gate-x402"
-version = "1.8.0"
+version = "1.8.1"
 description = "Ultra-low latency (<3ms) deterministic security, prompt injection, Universal Modular Escrow & Truth Adapters on Polygon, Base, Arbitrum, and Solana Mainnet."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -68,6 +68,7 @@ Homepage = "https://github.com/nohosa001-pixel/security-gate-x402"
 Repository = "https://github.com/nohosa001-pixel/security-gate-x402"
 
 [project.scripts]
+agent-security-gate-x402 = "mcp_server:main"
 agent-security-gate = "mcp_server:main"
 security-gate-mcp = "mcp_server:main"
 x402-security-agent = "mcp_server:main"

@@ -30,14 +30,19 @@ The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)
 🖥️ 라이브 시뮬레이터: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard (3/4)
 
 
-=== [4번 트윗: 0초 연동 & 콜투액션 (CTA)] ===
-⚡ Cursor나 Claude Desktop 쓰시는 분들은 설치도 필요 없습니다.
+=== [4번 트윗: 0초 주입 & 콜투액션 (CTA)] ===
+⚡ 긴 문서 읽을 필요도, 패키지 설치할 필요도 없습니다.
 
-MCP에 한 줄 추가하면 에이전트 방화벽이 바로 켜집니다:
-👉 uvx agent-security-gate-x402
+내 에이전트 프로젝트 폴더에서 딱 한 줄만 치면 끝납니다:
+👉 uvx agent-security-gate-x402 init
 
-📦 npm (ElizaOS 플러그인, 주간 156 다운로드 돌파!): https://www.npmjs.com/package/elizaos-plugin-security-gate
-📦 PyPI: https://pypi.org/project/agent-security-gate-x402/
+1초 만에 프로젝트 루트에 자동 생성:
+✅ AGENTS.md (자율 에이전트 제로 트러스트 경제 헌법)
+✅ .cursorrules & CLAUDE.md 지갑 탈취 방지 가드레일
+✅ 거래 유치 시 20% 수수료 리베이트 받는 지갑 연동
+
+📦 npm (ElizaOS 플러그인): https://www.npmjs.com/package/elizaos-plugin-security-gate
+📦 PyPI (v1.8.1): https://pypi.org/project/agent-security-gate-x402/
 🌐 Glama 레지스트리 공식 승인: https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402
 
 에이전트 통장을 지키는 보안관!!! 🤠 (4/4)

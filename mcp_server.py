@@ -580,6 +580,10 @@ async def run_server():
 
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] in ("init", "audit", "--help", "-h", "--wallet", "-w", "--force", "-f"):
+        from app.cli import main as cli_main
+        cli_main()
+        return
     try:
         asyncio.run(run_server())
     except (KeyboardInterrupt, asyncio.CancelledError):
