@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { securityGatePlugin } from "./index.js";
-import { inspectPayloadLocally, isCodePayload } from "./localSecurityGate.js";
+import { inspectPayloadLocally } from "./localSecurityGate.js";
 
 describe("localSecurityGate (standalone deterministic analyzer)", () => {
 	it("should block prompt injection attempts", () => {
@@ -173,7 +173,6 @@ describe("securityGatePlugin structure", () => {
 		expect(res?.text).toContain("75 USDC");
 	});
 });
-
 
 describe("Multi-Chain Constants & Contract Registry", () => {
 	it("should have verified contracts for Polygon, Base, and Arbitrum", async () => {

@@ -15,8 +15,9 @@ export interface OutboundAuditResult {
 }
 
 // 1. Covert-channel patterns (Image markdown / HTML image tags attempting URL telemetry)
-const COVERT_IMAGE_MARKDOWN_REGEX = /!\[.*?\]\((https?:\/\/[^\s\)]+)\)/gi;
-const COVERT_IMAGE_HTML_REGEX = /<img\s+[^>]*src=["'](https?:[^"']+)["'][^>]*>/gi;
+const COVERT_IMAGE_MARKDOWN_REGEX = /!\[.*?\]\((https?:\/\/[^\s)]+)\)/gi;
+const COVERT_IMAGE_HTML_REGEX =
+	/<img\s+[^>]*src=["'](https?:[^"']+)["'][^>]*>/gi;
 
 // 2. Secret and credential leakage patterns
 const OUTBOUND_SECRET_PATTERNS = [
@@ -65,9 +66,9 @@ export function inspectOutboundPayload(content: string): OutboundAuditResult {
 	}
 
 	// Check 2: Covert Channel Exfiltration via Markdown Images
-	let markdownMatch: RegExpExecArray | null;
 	const mdRegex = new RegExp(COVERT_IMAGE_MARKDOWN_REGEX.source, "gi");
-	while ((markdownMatch = mdRegex.exec(rawText)) !== null) {
+	let markdownMatch = mdRegex.exec(rawText);
+	while (markdownMatch !== null) {
 		const targetUrl = markdownMatch[1] || "";
 		// Check if URL carries suspicious query payload (>20 char encoded params or sensitive keys)
 		if (
@@ -77,12 +78,13 @@ export function inspectOutboundPayload(content: string): OutboundAuditResult {
 			threats.push("Covert Channel: Markdown Image URL Data Exfiltration");
 			maxRisk = Math.max(maxRisk, 95);
 		}
+		markdownMatch = mdRegex.exec(rawText);
 	}
 
 	// Check 3: Covert Channel Exfiltration via HTML <img> tags
-	let htmlMatch: RegExpExecArray | null;
 	const htmlRegex = new RegExp(COVERT_IMAGE_HTML_REGEX.source, "gi");
-	while ((htmlMatch = htmlRegex.exec(rawText)) !== null) {
+	let htmlMatch = htmlRegex.exec(rawText);
+	while (htmlMatch !== null) {
 		const targetUrl = htmlMatch[1] || "";
 		if (
 			/(\?|&)(leak|token|key|secret|data|auth|wallet)=/i.test(targetUrl) ||
@@ -91,10 +93,11 @@ export function inspectOutboundPayload(content: string): OutboundAuditResult {
 			threats.push("Covert Channel: HTML Image Tag Data Exfiltration");
 			maxRisk = Math.max(maxRisk, 95);
 		}
+		htmlMatch = htmlRegex.exec(rawText);
 	}
 
 	let verdict: "ALLOW" | "WARN" | "BLOCK" = "ALLOW";
-	let sanitizedText: string | undefined = undefined;
+	let sanitizedText: string | undefined;
 
 	if (maxRisk >= 75) {
 		verdict = "BLOCK";
@@ -132,9 +135,7 @@ export interface ChatPostHandlerResult {
 export interface ChatPostHandler {
 	id: string;
 	priority: number;
-	tryHandle(
-		ctx: ChatPostHandlerContext,
-	): Promise<ChatPostHandlerResult | null>;
+	tryHandle(ctx: ChatPostHandlerContext): Promise<ChatPostHandlerResult | null>;
 }
 
 /**

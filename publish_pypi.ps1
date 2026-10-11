@@ -28,11 +28,29 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[2/2] Ready to upload to PyPI." -ForegroundColor Green
 $confirm = Read-Host "Proceed with uploading to PyPI? (y/n)"
 if ($confirm -eq "y" -or $confirm -eq "Y") {
+    # Auto-load token from .env if available
+    if ((-not $env:UV_PUBLISH_TOKEN) -and (-not $env:TWINE_PASSWORD) -and (Test-Path ".env")) {
+        Get-Content ".env" | ForEach-Object {
+            $line = $_.Trim()
+            if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
+                $parts = $line.Split("=", 2)
+                $key = $parts[0].Trim()
+                $val = $parts[1].Trim().Trim('"').Trim("'")
+                if ($key -eq "UV_PUBLISH_TOKEN" -or $key -eq "TWINE_PASSWORD") {
+                    $env:UV_PUBLISH_TOKEN = $val
+                    $env:TWINE_PASSWORD = $val
+                }
+            }
+        }
+    }
+
     if (-not $env:UV_PUBLISH_TOKEN -and -not $env:TWINE_PASSWORD) {
         $token = Read-Host "Enter PyPI API Token (pypi-...)" -AsSecureString
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
         $tokenPlain = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
         $env:UV_PUBLISH_TOKEN = $tokenPlain
+    } else {
+        Write-Host "[INFO] Detected PyPI token from environment/.env." -ForegroundColor Cyan
     }
     
     if (Get-Command uv -ErrorAction SilentlyContinue) {

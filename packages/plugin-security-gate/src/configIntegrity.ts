@@ -18,7 +18,9 @@ export interface IntegrityCheckResult {
  */
 export function hashConfigObject(config: Record<string, unknown>): string {
 	const sortedKeys = Object.keys(config).sort();
-	const serialized = sortedKeys.map((k) => `${k}=${JSON.stringify(config[k])}`).join("::");
+	const serialized = sortedKeys
+		.map((k) => `${k}=${JSON.stringify(config[k])}`)
+		.join("::");
 	return createHash("sha256").update(serialized).digest("hex");
 }
 
@@ -51,8 +53,7 @@ export function verifyConfigIntegrity(
 	const tamperedKeys: string[] = [];
 	for (const key of seal.keysSealed) {
 		if (
-			JSON.stringify(currentConfig[key]) !==
-			undefined &&
+			JSON.stringify(currentConfig[key]) !== undefined &&
 			// Compare against expected baseline by checking key presence
 			!(key in currentConfig)
 		) {

@@ -51,7 +51,7 @@ If you wish to route safety checks through an external micro-oracle:
 ```json
 {
   "name": "SecureAgent",
-  "plugins": ["@elizaos/plugin-security-gate"],
+  "plugins": ["elizaos-plugin-security-gate"],
   "settings": {
     "secrets": {
       "SECURITY_GATE_URL": "https://your-security-gate-oracle.example.com",

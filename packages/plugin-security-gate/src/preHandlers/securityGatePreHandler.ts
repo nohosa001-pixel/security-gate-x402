@@ -1,7 +1,16 @@
 export interface ChatPreHandlerContext {
-	runtime?: any;
-	message?: any;
-	state?: any;
+	runtime?: {
+		getSetting?: (key: string) => string | undefined;
+		[key: string]: unknown;
+	};
+	message?: {
+		content?: {
+			text?: string;
+			[key: string]: unknown;
+		};
+		[key: string]: unknown;
+	};
+	state?: unknown;
 	signal?: AbortSignal;
 	abortSignal?: AbortSignal;
 }
@@ -10,7 +19,7 @@ export interface ChatPreHandlerResult {
 	stop?: boolean;
 	content?: string;
 	error?: Error;
-	response?: any;
+	response?: unknown;
 	responseText?: string;
 }
 
@@ -20,9 +29,12 @@ export interface ChatPreHandler {
 	description?: string;
 	order?: number;
 	priority?: number;
-	tryHandle?: (context: ChatPreHandlerContext) => Promise<ChatPreHandlerResult | null | undefined>;
+	tryHandle?: (
+		context: ChatPreHandlerContext,
+	) => Promise<ChatPreHandlerResult | null | undefined>;
 	handle?: (context: ChatPreHandlerContext) => Promise<ChatPreHandlerResult>;
 }
+
 import { inspectPayloadLocally, isCodePayload } from "../localSecurityGate.js";
 
 declare const process: { env?: Record<string, string | undefined> } | undefined;
@@ -65,7 +77,7 @@ export const securityGatePreHandler: ChatPreHandler = {
 	async tryHandle(
 		ctx: ChatPreHandlerContext,
 	): Promise<ChatPreHandlerResult | null> {
-		const text = ctx.message.content?.text || "";
+		const text = ctx.message?.content?.text || "";
 		if (!text.trim()) {
 			return null;
 		}
@@ -81,7 +93,7 @@ export const securityGatePreHandler: ChatPreHandler = {
 		// 2. Opt-in remote micro-oracle inspection (if explicitly configured)
 		const env = process?.env ?? {};
 		const configuredGateUrl =
-			ctx.runtime.getSetting("SECURITY_GATE_URL") || env.SECURITY_GATE_URL;
+			ctx.runtime?.getSetting?.("SECURITY_GATE_URL") || env.SECURITY_GATE_URL;
 
 		if (configuredGateUrl) {
 			try {

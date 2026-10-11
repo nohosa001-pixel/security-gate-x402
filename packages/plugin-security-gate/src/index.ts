@@ -3,8 +3,14 @@ import { auditEscrowTaskAction } from "./actions/auditEscrowTask.js";
 import { createEscrowTaskAction } from "./actions/createEscrowTask.js";
 import { inspectSafetyAction } from "./actions/inspectSafety.js";
 import { securityGateEvaluator } from "./evaluators/securityGateEvaluator.js";
-import { securityGatePostHandler } from "./postHandlers/securityGatePostHandler.js";
-import { securityGatePreHandler } from "./preHandlers/securityGatePreHandler.js";
+import {
+	type ChatPostHandler,
+	securityGatePostHandler,
+} from "./postHandlers/securityGatePostHandler.js";
+import {
+	type ChatPreHandler,
+	securityGatePreHandler,
+} from "./preHandlers/securityGatePreHandler.js";
 import { securityStatusProvider } from "./providers/securityStatusProvider.js";
 
 export * from "./actions/auditEscrowTask.js";
@@ -24,8 +30,8 @@ export * from "./providers/securityStatusProvider.js";
  * outbound covert-channel DLP, config tamper detection, and agent safety guardrails.
  */
 export const securityGatePlugin: Plugin & {
-	chatPreHandlers?: any[];
-	chatPostHandlers?: any[];
+	chatPreHandlers?: ChatPreHandler[];
+	chatPostHandlers?: ChatPostHandler[];
 } = {
 	name: "security-gate",
 	description:
@@ -36,6 +42,5 @@ export const securityGatePlugin: Plugin & {
 	chatPreHandlers: [securityGatePreHandler],
 	chatPostHandlers: [securityGatePostHandler],
 };
-
 
 export default securityGatePlugin;

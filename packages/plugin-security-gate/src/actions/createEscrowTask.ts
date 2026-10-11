@@ -42,21 +42,13 @@ export const createEscrowTaskAction: Action = {
 				"0x0000000000000000000000000000000000000000",
 		);
 		const payout = Number(
-			options.payout ??
-				options.payoutUsdc ??
-				contentData.payout ??
-				50.0,
+			options.payout ?? options.payoutUsdc ?? contentData.payout ?? 50.0,
 		);
 		const stake = Number(
-			options.stake ??
-				options.stakeUsdc ??
-				contentData.stake ??
-				15.0,
+			options.stake ?? options.stakeUsdc ?? contentData.stake ?? 15.0,
 		);
 		const durationSeconds = Number(
-			options.durationSeconds ??
-				contentData.durationSeconds ??
-				86400,
+			options.durationSeconds ?? contentData.durationSeconds ?? 86400,
 		);
 
 		const responseText = `🛡️ [A.GRID ESCROW] Task Escrow Prepared:\n- Worker: ${worker}\n- Locked Payout: ${payout} USDC\n- Required Collateral Stake: ${stake} USDC\n- SLA Duration: ${durationSeconds / 3600}h\n- Invariant: 100% US Treasury Backed Non-custodial Clearinghouse.`;
