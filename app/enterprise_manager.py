@@ -31,6 +31,11 @@ class EnterpriseManager:
         self._seed_demo_enterprise_key()
 
     def _seed_demo_enterprise_key(self):
+        # Strictly disabled in production mode to prevent unauthorized free enterprise access
+        import os
+        if os.getenv("ENVIRONMENT") == "production":
+            return
+
         now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         demo_key = "sec_live_enterprise_demo_gate_2026"
         self._keys[demo_key] = EnterpriseKeyRecord(

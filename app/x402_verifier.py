@@ -69,6 +69,11 @@ def is_sanctioned_address(address: str) -> bool:
     return address.lower() in SANCTIONED_ADDRESSES
 
 
+# Anti-Replay signature cache (signature -> expiry_timestamp)
+_used_signatures: Dict[str, float] = {}
+_SIGNATURE_TTL_SECONDS = 300  # 5 minutes replay window
+
+
 class X402Verifier:
     """Handles x402 HTTP 402 payment challenge creation and multi-mode settlement verification."""
 
@@ -250,26 +255,64 @@ class X402Verifier:
             except Exception:
                 pass
 
+            # Dev bypass tokens: strictly prohibited in production mode
             if sig_clean.startswith("x402_") or sig_clean.startswith("tx_verified_") or sig_clean in ("mock_sig", "dev_bypass_signature", "x402_dev_bypass"):
-                return True, "x402:test_payer", {"X-Tier": "STANDARD_X402"}
+                import sys
+                is_prod = os.getenv("ENVIRONMENT") == "production"
+                is_test_mode = "pytest" in sys.modules or bool(os.getenv("PYTEST_CURRENT_TEST")) or os.getenv("ENV") in ("development", "test") or os.getenv("TESTING") == "1"
+                if not is_prod and is_test_mode:
+                    return True, "x402:test_payer", {"X-Tier": "STANDARD_X402"}
+                return False, "Dev bypass tokens are strictly forbidden in production.", {}
 
             # Anti-Replay & Cryptographic Signature Validation
             if sig_clean.startswith("0x") and len(sig_clean) >= 130:
+                now_ts = time.time()
+                # Clean up expired signatures
+                if len(_used_signatures) > 1000:
+                    expired = [s for s, exp in _used_signatures.items() if exp < now_ts]
+                    for s in expired:
+                        _used_signatures.pop(s, None)
+
+                # Check if this exact payment signature was already consumed
+                if sig_clean in _used_signatures and _used_signatures[sig_clean] > now_ts:
+                    return False, "Signature replay detected: this x402 payment signature has already been consumed.", {}
+
                 try:
                     req_chain = headers.get("x-chain-id", "137")
                     req_net = headers.get("x-network", "polygon")
                     expected_msg = f"x402-agent-security-gate:0.002-usdc:{req_net}:{req_chain}"
                     msg_hash = encode_defunct(text=expected_msg)
                     recovered_addr = Account.recover_message(msg_hash, signature=sig_clean)
-                    return True, f"x402:{recovered_addr}", {"X-Tier": "STANDARD_X402", "X-Signer-Verified": recovered_addr}
-                except Exception:
-                    return False, "Invalid cryptographic x402 payment signature: recovery failed.", {}
+
+                    # [IRON RULE 2]: Raw x402 signatures without verified on-chain settlement
+                    # or an attached funded vault are INCOMPLETE and strictly blocked.
+                    # Verify if recovered signer has an active, pre-funded vault collateral to settle the fee:
+                    deducted, reason, rem_bal = vault_manager.deduct(recovered_addr, cost_usdc=cost_usdc)
+                    if deducted:
+                        # Mark signature as consumed (strictly single-use, 5 minute replay window)
+                        _used_signatures[sig_clean] = now_ts + _SIGNATURE_TTL_SECONDS
+                        return True, f"x402:{recovered_addr}", {
+                            "X-Tier": "STANDARD_X402",
+                            "X-Signer-Verified": recovered_addr,
+                            "X-Vault-Remaining-USDC": f"{rem_bal:.4f}"
+                        }
+
+                    # Non-production test environment fallback only if explicitly enabled
+                    import sys
+                    is_prod = os.getenv("ENVIRONMENT") == "production"
+                    is_test_mode = "pytest" in sys.modules or bool(os.getenv("PYTEST_CURRENT_TEST")) or os.getenv("ENV") in ("development", "test") or os.getenv("TESTING") == "1"
+                    if not is_prod and is_test_mode and os.getenv("ALLOW_RAW_SIGNATURE_IN_TEST") == "1":
+                        _used_signatures[sig_clean] = now_ts + _SIGNATURE_TTL_SECONDS
+                        return True, f"x402:{recovered_addr}", {"X-Tier": "STANDARD_X402", "X-Signer-Verified": recovered_addr}
+
+                    return False, f"Incomplete x402 signature blocked [Iron Rule 2]: Signer {recovered_addr} has no funded vault balance to settle {cost_usdc} USDC. Raw signatures without funded vault collateral or verified on-chain settlement are strictly rejected.", {}
+                except Exception as exc:
+                    return False, f"Invalid cryptographic x402 payment signature: recovery failed ({str(exc)}).", {}
 
             return False, "Invalid x402 payment authorization: unrecognized payment proof format.", {}
 
-        # 4. Default Sandbox Free Trial mode
-        # In cloud or demo mode, allow free sandbox inspection
-        return True, f"sandbox:{client_ip}", {"X-Tier": "FREE_TRIAL", "X-Sandbox-Trials-Remaining": "Unlimited Sandbox"}
+        # 4. No valid credentials or payment authorization headers
+        return False, "No valid x402 payment authorization, pre-funded vault key, or enterprise key provided.", {}
 
 
 x402_verifier = X402Verifier()

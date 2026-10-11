@@ -3,6 +3,7 @@ FROM python:3.11-slim-bookworm
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8080 \
+    ENVIRONMENT=production \
     ENV=production
 
 WORKDIR /app

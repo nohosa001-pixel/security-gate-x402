@@ -38,6 +38,36 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 ---
 
+## 🏛️ Modular 3-Tier Architecture: The "Tip of the Spear"
+
+`agent-security-gate-x402` follows a clean, decoupled 3-tier architecture. Developers start with the ultra-fast Core (Tier 1) and seamlessly scale into Institutional Governance (Tier 2) and Enterprise Domain Extensions (Tier 3):
+
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🗡️ TIER 1: THE TIP OF THE SPEAR (Developer Core & Settlement Engine)    │
+│  • Sub-5ms Zero-Trust AST Gate & Prompt Injection Defense (/inspect)    │
+│  • HTTP 402 Autonomous Escrow Hub & Multi-Chain Settlement (/hub)       │
+│  • Solana Mainnet (0.4s) · Polygon (137) · Base (8453) · Arbitrum (42161)│
+│  • 1-Line Drop-In SDK & Model Context Protocol (MCP) Server             │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │ powers
+┌────────────────────────────────────▼────────────────────────────────────┐
+│ 🛡️ TIER 2: INSTITUTIONAL GOVERNANCE (Treasury & Trust Framework)        │
+│  • Safe{Wallet} Guard & Spend Policy Firewall (daily/tx micro-ceilings) │
+│  • Moody's & S&P AI Agent Credit Rating Oracle & EIP-712 Certificates   │
+│  • EU AI Act Article 50 Compliance & Dynamic Risk Passport              │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │ scales to
+┌────────────────────────────────────▼────────────────────────────────────┐
+│ 🌐 TIER 3: ENTERPRISE & DOMAIN EXTENSIONS (Real-World Assets & DePIN)   │
+│  • 5 Strategic Truth Oracles (Maritime, Bio IP, BIM, DePIN, Code)       │
+│  • Autonomous Receivables Factoring Bridge & Parametric Insurance Pool  │
+│  • Sovereign RWA Treasury Backing & Multi-Agent Fleet Registry          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 🔗 Live Service Links & Resources
 
 | Service / Endpoint | Description | URL Link |
@@ -60,7 +90,7 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 The **A.GRID Universal Escrow Hub** operates as a sovereign, decentralized clearinghouse enabling autonomous agents and human enterprises to mint, claim, verify, and settle high-stakes contracts with **zero counterparty risk**:
 
-```
+```text
                    👑 [ A.GRID Universal Escrow Hub (/hub) ]
            (Global Trade · Bio & Pharma IP · Smart Construction · DePIN · M2M)
                                    ▲
@@ -178,8 +208,8 @@ A critical question in AI Agent security engineering: **Where does enforcement l
 
 | Integration Mode | Position in Stack | Enforcement Mechanism | Security Guarantee |
 | :--- | :--- | :--- | :--- |
-| **Advisory Mode** <br/> *(MCP Peer Server)* | Lateral to Agent Model | Host LLM decides whether to invoke tool and whether to honor verdict | **Best-effort / Advisory**. Compromised or jailbroken models can ignore the tool. |
-| **Fail-Closed Gate Mode** <br/> *(Pre-Handler / Inline Gateway)* | Directly in Request Path | Deterministic code execution intercepting traffic **before** tool/action runs | **Deterministic Enforcement**. Bypasses model volition; invalid payloads are dropped at network/runtime boundary. |
+| **Advisory Mode** *(MCP Peer Server)* | Lateral to Agent Model | Host LLM decides whether to invoke tool and whether to honor verdict | **Best-effort / Advisory**. Compromised or jailbroken models can ignore the tool. |
+| **Fail-Closed Gate Mode** *(Pre-Handler / Inline Gateway)* | Directly in Request Path | Deterministic code execution intercepting traffic **before** tool/action runs | **Deterministic Enforcement**. Bypasses model volition; invalid payloads are dropped at network/runtime boundary. |
 
 ```mermaid
 flowchart LR

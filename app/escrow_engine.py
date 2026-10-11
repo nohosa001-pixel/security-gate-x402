@@ -170,6 +170,22 @@ class AgentEscrowEngine:
         })
 
         if not eval_result["is_safe"]:
+            slashed_amt = 0.0
+            if worker_address:
+                from app.vault_manager import vault_manager
+                ok, amt, _ = vault_manager.slash_collateral(
+                    worker_address,
+                    penalty_usdc=10.0,
+                    reason=f"Escrow malicious deliverable exploit: job #{job_id}"
+                )
+                if ok:
+                    slashed_amt = amt
+                from app.credit_rating_engine import credit_engine
+                credit_engine.record_exploit_attempt(
+                    worker_address,
+                    reason=f"Escrow deliverable exploit attempt: job #{job_id}"
+                )
+
             return {
                 "status": "BLOCKED_MALICIOUS_TASK",
                 "job_id": job_id,
@@ -180,6 +196,8 @@ class AgentEscrowEngine:
                 "action": "REFUND_CLIENT_AND_SLASH_WORKER",
                 "refund_to_client_usdc": payout_usdc,
                 "payout_to_worker_usdc": 0.0,
+                "slashed_worker_collateral_usdc": slashed_amt,
+                "worker_credit_grade": "F (300 - DEF_BLACKLIST)",
                 "fee_to_treasury_usdc": 0.0,
                 "treasury_address": TREASURY_SAFE,
                 "attestation": eval_result["attestation"],

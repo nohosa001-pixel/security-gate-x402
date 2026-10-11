@@ -24,10 +24,11 @@ The Sheriff of Agent Finance: Agent Security Gate x402 👇 (1/4)
 === [3번 트윗: 온체인 영수증 & 라이브 데모 (Receipts & Proof)] ===
 📜 '착한 말'을 믿지 마세요. 우리는 암호화 서명만 믿습니다.
 
-이미 Polygon 메인넷에 배포된 스마트 컨트랙트가 오라클의 EIP-712 안전 보증서가 없는 에이전트 트랜잭션은 가스비 1원도 못 빼가도록 온체인에서 즉시 Revert(차단)합니다.
+Polygon, Base, Arbitrum 메인넷에 배포된 SafeSecurityGateGuard 스마트 컨트랙트가 작동합니다.
+오라클(0xA185B43f...)의 EIP-712 안전 보증서가 없는 트랜잭션은 온체인에서 즉시 Revert(차단)되어 $500,000 DAO 금고도 1원 한 푼 안 털립니다.
 
-지금 브라우저에서, 보안관의 활약상을 직접 보세요!
-🖥️ 라이브 시뮬레이터: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard (3/4)
+🖥️ 브라우저 라이브 시뮬레이터:
+https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard (3/4)
 
 
 === [4번 트윗: 0초 주입 & 콜투액션 (CTA)] ===

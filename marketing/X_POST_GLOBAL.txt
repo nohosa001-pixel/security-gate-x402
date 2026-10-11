@@ -21,12 +21,12 @@ The Wild West is over. Meet The Sheriff of Agent Finance: Agent Security Gate x4
 No complex enterprise sales calls. Pure plug-and-play code. (2/4)
 
 
-=== [Tweet 3: Cryptographic Proof on Polygon] ===
+=== [Tweet 3: Cryptographic Proof on Polygon, Base & Arbitrum] ===
 📜 We don't trust LLM vibes. We trust cryptographic signatures.
 
-Every inspection issues an EIP-712/EIP-191 attestation.
-Deployed on Polygon Mainnet (0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA):
-If the Sheriff hasn't signed it, the smart contract strictly reverts. Zero balance drain.
+Every inspection issues an EIP-712 attestation signed by Oracle 0xA185B43f...
+Deployed across Polygon, Base, and Arbitrum:
+If the Sheriff hasn't signed it, SafeSecurityGateGuard strictly reverts on-chain. $500,000 treasury preserved. Zero balance drain.
 
 Test your malicious payloads live without login:
 🖥️ https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard (3/4)
