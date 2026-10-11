@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm to latest
         run: npm install -g npm@latest
@@ -41,4 +42,22 @@ jobs:
 
       - name: Publish package to npm
         working-directory: packages/plugin-security-gate
-        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          PKG_NAME=$(node -p "require('./package.json').name")
+          echo "Checking if $PKG_NAME@$PKG_VERSION is already published on npm..."
+          
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "::notice ::Version $PKG_VERSION is already published on npm registry. Skipping publication step."
+            exit 0
+          fi
+
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error ::NODE_AUTH_TOKEN (secrets.NPM_TOKEN) is not set in GitHub repository secrets!"
+            exit 1
+          fi
+
+          echo "Publishing $PKG_NAME@$PKG_VERSION to npm..."
+          npm publish --access public --provenance
