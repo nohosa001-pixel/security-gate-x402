@@ -22,6 +22,10 @@ from .agent_escrow_client import (
     AgentEscrowClient,
     DEPLOYED_ESCROW_CONTRACTS
 )
+from .viral_handshake import (
+    AGridViralHandshake,
+    viral_handshake
+)
 
 __all__ = [
     "SecurityGateClient",
@@ -40,7 +44,9 @@ __all__ = [
     "SovereignTreasuryTool",
     "UniversalEscrowTool",
     "AgentEscrowClient",
-    "DEPLOYED_ESCROW_CONTRACTS"
+    "DEPLOYED_ESCROW_CONTRACTS",
+    "AGridViralHandshake",
+    "viral_handshake"
 ]
 
 
