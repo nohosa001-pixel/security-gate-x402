@@ -43,7 +43,7 @@ https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/dashboard 
 ✅ 거래 유치 시 20% 수수료 리베이트 받는 지갑 연동
 
 📦 npm (ElizaOS 플러그인): https://www.npmjs.com/package/elizaos-plugin-security-gate
-📦 PyPI (v1.8.1): https://pypi.org/project/agent-security-gate-x402/
+📦 PyPI (v1.9.0): https://pypi.org/project/agent-security-gate-x402/
 🌐 Glama 레지스트리 공식 승인: https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402
 
 에이전트 통장을 지키는 보안관!!! 🤠 (4/4)
