@@ -132,7 +132,7 @@ def simulate_guard_turn(client: httpx.Client) -> Dict[str, Any]:
         "X-Client-Address": agent["address"],
         "X-Network": "polygon",
         "X-Chain-ID": "137",
-        "X-402-Signature": f"0x{''.join(random.choices('0123456789abcdef', k=130))}"
+        "X-402-Signature": f"tx_verified_{agent['address'][:10]}_{int(time.time()*1000)}_{random.randint(1000,9999)}"
     }
 
     t0 = time.perf_counter()
@@ -174,6 +174,13 @@ def simulate_escrow_turn(client: httpx.Client, job_counter: int) -> Dict[str, An
     deliverable = scenario["malicious_deliverable"] if is_slashing else scenario["clean_deliverable"]
     val = scenario["payout"] + scenario["stake"]
 
+    headers = {
+        "X-Client-Address": client_agent["address"],
+        "X-Network": "polygon",
+        "X-Chain-ID": "137",
+        "X-402-Signature": f"tx_verified_{client_agent['address'][:10]}_{int(time.time()*1000)}_{random.randint(1000,9999)}"
+    }
+
     t0 = time.perf_counter()
     resp = client.post(
         ESCROW_ENDPOINT,
@@ -185,6 +192,7 @@ def simulate_escrow_turn(client: httpx.Client, job_counter: int) -> Dict[str, An
             "chain_id": 137,
             "verifying_contract": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d"
         },
+        headers=headers,
         timeout=10.0
     )
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
