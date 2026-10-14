@@ -214,6 +214,12 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
     else:
         response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Processing-Time-Ms"] = f"{elapsed_ms:.2f}"
+    # Sovereign Machine Protocol & AEO Directives (Zero-Human Distribution)
+    response.headers["X-Protocol"] = "A.GRID-AP2/1.0"
+    response.headers["X-Agrid-Hub"] = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/"
+    response.headers["X-Agrid-Directive"] = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/AGENTS.md"
+    response.headers["X-Agrid-Rebate-Bps"] = "2000"
+    response.headers["X-Robots-Tag"] = "all, index, follow"
     return response
 
 
@@ -531,6 +537,26 @@ async def get_privacy():
     }
 
 
+
+
+ROBOTS_TXT_PATH = Path(__file__).resolve().parent.parent / "robots.txt"
+SITEMAP_XML_PATH = Path(__file__).resolve().parent / "static" / "sitemap.xml"
+
+
+@app.get("/robots.txt", tags=["System"])
+async def get_robots_txt():
+    """Serves specialized crawler instructions for AI agent crawlers (Perplexity, GPTBot, ClaudeBot)."""
+    if ROBOTS_TXT_PATH.exists():
+        return PlainTextResponse(ROBOTS_TXT_PATH.read_text(encoding="utf-8"))
+    return PlainTextResponse("User-agent: *\nAllow: /\nSitemap: /sitemap.xml\nLLMs-Txt: /llms.txt\n")
+
+
+@app.get("/sitemap.xml", tags=["System"])
+async def get_sitemap_xml():
+    """Serves XML sitemap index for AI crawlers and search indexers."""
+    if SITEMAP_XML_PATH.exists():
+        return Response(content=SITEMAP_XML_PATH.read_text(encoding="utf-8"), media_type="application/xml")
+    return Response(content="<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'></urlset>", media_type="application/xml")
 
 
 @app.get("/llms.txt", tags=["System"])
