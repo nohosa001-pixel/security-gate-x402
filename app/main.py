@@ -308,6 +308,14 @@ async def get_analytics_direct_page():
     return HTMLResponse("<h2>Analytics Dashboard</h2>")
 
 
+@app.get("/gate", tags=["System"])
+async def get_gate_page():
+    """Step 1: Dedicated Security Gate Inspection & Zero-Trust Defense Screen."""
+    if INDEX_HTML_PATH.exists():
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html; charset=utf-8")
+    return HTMLResponse("<h2>Security Gate x402</h2>")
+
+
 @app.get("/dashboard", tags=["System"])
 async def get_dashboard(tab: Optional[str] = None):
     if INDEX_HTML_PATH.exists():
