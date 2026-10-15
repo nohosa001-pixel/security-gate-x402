@@ -118,6 +118,7 @@ if HUB_STATIC_DIR.exists():
     app.mount("/escrow", StaticFiles(directory=str(HUB_STATIC_DIR), html=True), name="escrow")
 
 AP2_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "ap2.json"
+X402_FILE_PATH = Path(__file__).parent.parent / ".well-known" / "x402.json"
 LLMS_FILE_PATH = Path(__file__).parent.parent / "llms.txt"
 SERVER_CARD_PATH = Path(__file__).parent.parent / ".well-known" / "mcp" / "server-card.json"
 
@@ -293,9 +294,25 @@ async def root(request: Request):
     return HTMLResponse("<h2>Agent Security Gate x402</h2>")
 
 
-@app.get("/dashboard", tags=["System"])
-async def get_dashboard():
+@app.get("/analytics", tags=["System"])
+async def get_analytics_direct_page():
+    """Direct landing page for On-Chain Live Analytics (Dune-Grade) Command Center."""
     if INDEX_HTML_PATH.exists():
+        html = INDEX_HTML_PATH.read_text(encoding="utf-8")
+        html = html.replace('class="tab-btn active" id="tab-sheriff"', 'class="tab-btn" id="tab-sheriff"')
+        html = html.replace('id="tab-analytics" onclick="switchTab(\'analytics\')"', 'id="tab-analytics" onclick="switchTab(\'analytics\')" class="tab-btn active"')
+        html = html.replace("switchTab('sheriff');", "switchTab('analytics');")
+        html = html.replace('id="sheriff-chat-panel" class="panel" style="margin-bottom: 28px;', 'id="sheriff-chat-panel" class="panel" style="display: none; margin-bottom: 28px;')
+        html = html.replace('id="analytics-dashboard-panel" class="panel" style="display: none;', 'id="analytics-dashboard-panel" class="panel" style="display: block;')
+        return HTMLResponse(content=html, media_type="text/html; charset=utf-8")
+    return HTMLResponse("<h2>Analytics Dashboard</h2>")
+
+
+@app.get("/dashboard", tags=["System"])
+async def get_dashboard(tab: Optional[str] = None):
+    if INDEX_HTML_PATH.exists():
+        if tab == "analytics":
+            return await get_analytics_direct_page()
         return FileResponse(INDEX_HTML_PATH, media_type="text/html")
     return HTMLResponse("<h2>Dashboard is loading...</h2>")
 
@@ -585,6 +602,16 @@ async def get_ap2_manifest():
         with open(AP2_FILE_PATH, "r", encoding="utf-8") as f:
             return JSONResponse(content=json.load(f))
     return JSONResponse({"error": "AP2 manifest not configured"}, status_code=404)
+
+
+@app.get("/.well-known/x402", tags=["System"])
+@app.get("/.well-known/x402.json", tags=["System"])
+async def get_x402_manifest():
+    """Coinbase x402 discovery manifest for autonomous agent machine discovery."""
+    if X402_FILE_PATH.exists():
+        with open(X402_FILE_PATH, "r", encoding="utf-8") as f:
+            return JSONResponse(content=json.load(f))
+    return JSONResponse({"error": "x402 manifest not configured"}, status_code=404)
 
 
 @app.get("/.well-known/mcp/server-card.json", tags=["MCP"])

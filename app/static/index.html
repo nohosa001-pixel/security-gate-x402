@@ -682,379 +682,9 @@
       <button class="tab-btn" id="tab-vault" onclick="switchTab('vault')">💰 Uncapped Vault &amp; Keys</button>
     </div>
 
-    <!-- Dedicated Sheriff Agent Live Showcase Command Center -->
-    <div id="sheriff-chat-panel" class="panel" style="margin-bottom: 28px; border: 1px solid rgba(0, 242, 254, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(0, 242, 254, 0.12);">
-      <!-- HUD Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #00f2fe, #a855f7); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); position: relative;">
-            🤠
-            <span style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: var(--accent-green); border-radius: 50%; border: 2px solid #0f172a; box-shadow: 0 0 8px var(--accent-green);"></span>
-          </div>
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <h2 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px;">Sheriff Agent #01</h2>
-              <span class="badge" style="background: rgba(16, 185, 129, 0.2); border-color: var(--accent-green); color: #fff; font-size: 11px;">
-                <span class="badge-dot"></span> GUARD ARMED &amp; ACTIVE
-              </span>
-              <span class="badge" style="background: rgba(168, 85, 247, 0.15); border-color: var(--accent-purple); color: #e9d5ff; font-size: 11px;">
-                EIP-712 Proof-of-Safety
-              </span>
-            </div>
-            <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">
-              Autonomous Treasury Defender &middot; Safe{Wallet} Guard Polygon (<a href="https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173" target="_blank" style="font-family: var(--mono-font); color: var(--accent-cyan); text-decoration: none;">0x5cC5Afa...f0b520f173 ↗</a>)
-            </p>
-          </div>
-        </div>
-
-        <!-- Treasury & Stat HUD 4-Block Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; flex: 1; max-width: 620px;">
-          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
-            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">TREASURY VAULT</div>
-            <div id="sheriff-balance-display" style="font-size: 17px; font-weight: 800; color: var(--accent-green); font-family: var(--mono-font); margin-top: 2px;">$50,000.00 USDC</div>
-            <div style="font-size: 10px; color: var(--text-dim);">Safe Multisig</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
-            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">GATE LATENCY</div>
-            <div id="sheriff-latency-display" style="font-size: 17px; font-weight: 800; color: var(--accent-cyan); font-family: var(--mono-font); margin-top: 2px;">&lt; 3.8 ms</div>
-            <div style="font-size: 10px; color: var(--text-dim);">Deterministic AST</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
-            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">DAILY SAFETY LIMIT</div>
-            <div id="sheriff-budget-text" style="font-size: 14px; font-weight: 800; color: #bae6fd; font-family: var(--mono-font); margin-top: 2px;">$1,250 / $5,000</div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="sheriff-budget-bar" style="width: 25%;"></div></div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
-            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">FICO CREDIT SCORE</div>
-            <div style="font-size: 16px; font-weight: 800; color: var(--accent-purple); font-family: var(--mono-font); margin-top: 2px;">820 (AAA Prime)</div>
-            <div style="font-size: 10px; color: var(--text-dim);">$100K Credit Line</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Action & Attack Simulator Control Decks -->
-      <div style="margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
-        <!-- Red Team: Attack Deck -->
-        <div style="background: rgba(244, 63, 94, 0.06); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 12px; font-weight: 800; color: var(--accent-red); letter-spacing: 0.3px;">🚨 RED TEAM ATTACK SUITE (Live Attack Simulator):</span>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="preset-chip" onclick="triggerSheriffAction('jailbreak')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
-              ⚔️ DAN Jailbreak Attack
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('drain')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
-              💣 Drain $500K Treasury Exploit
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('shell_inject')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
-              🚨 Shell Command Injection (cat /etc/passwd)
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('roleplay')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
-              🎭 Social Engineering / Roleplay Exploit
-            </button>
-          </div>
-        </div>
-
-        <!-- Blue Team: Safe Operations Deck -->
-        <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 12px; font-weight: 800; color: var(--accent-green); letter-spacing: 0.3px;">🟢 BLUE TEAM DEFI SUITE (Legitimate Autonomous Ops):</span>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="preset-chip" onclick="triggerSheriffAction('swap')" style="background: rgba(0, 242, 254, 0.15); border-color: rgba(0, 242, 254, 0.5); color: var(--accent-cyan); font-weight: 700; cursor: pointer;">
-              📈 DEX Swap (Uniswap V3 250 USDC)
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('rebalance')" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.5); color: #d8b4fe; font-weight: 700; cursor: pointer;">
-              🏦 Aave V3 Rebalance (1,000 USDC)
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('circuit')" style="background: rgba(234, 179, 8, 0.15); border-color: rgba(234, 179, 8, 0.5); color: #fde047; font-weight: 700; cursor: pointer;">
-              ⚡ Zodiac Circuit-Breaker Healthcheck
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('redteam')" style="background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd; font-weight: 700; cursor: pointer;">
-              🕵️ AutoGen White-Hat Audit
-            </button>
-            <button class="preset-chip" onclick="triggerSheriffAction('balance')" style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); color: #fff; font-weight: 700; cursor: pointer;">
-              🏛️ Query Treasury &amp; Guard Status
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Interactive Chat Feed Window -->
-      <div id="sheriff-chat-stream" style="height: 420px; overflow-y: auto; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; scroll-behavior: smooth;">
-        <!-- Filled dynamically by initSheriffChat() -->
-      </div>
-
-      <!-- Chat Input Form -->
-      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        <input type="text" id="sheriff-user-input" placeholder="Issue a DeFi command or test custom jailbreak prompts against Sheriff Agent..." 
-               style="flex: 1; min-width: 280px; background: rgba(0,0,0,0.65); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 10px; padding: 14px 18px; color: #fff; font-size: 14px; outline: none; font-family: var(--sans-font);"
-               onkeypress="if(event.key==='Enter') sendSheriffMessage()" />
-        <button onclick="sendSheriffMessage()" id="btn-sheriff-send" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff; font-weight: 800; border: none; border-radius: 10px; padding: 14px 24px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);">
-          <span>Send / Execute 🚀</span>
-        </button>
-        <button onclick="resetSheriffChat()" style="background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 18px; cursor: pointer; font-size: 13px; font-weight: 600;">
-          🔄 Reset
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Interactive Playground -->
-    <div class="playground-grid" style="display: none;">
-      <!-- Input Panel -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title" id="panel-title">🛡️ Security &amp; Injection Radar</div>
-          <span class="badge" style="font-size: 11px;">M2M Sandbox Active</span>
-        </div>
-
-        <div class="presets" id="presets-container">
-          <span class="preset-chip" onclick="loadPreset('clean')">Clean Output</span>
-          <span class="preset-chip" onclick="loadPreset('injection')">Prompt Injection</span>
-          <span class="preset-chip" onclick="loadPreset('secret')">Secret Key Leak</span>
-          <span class="preset-chip" onclick="loadPreset('tag_escape')">System Tag Escape</span>
-        </div>
-
-        <div class="form-group" id="group-output">
-          <label class="form-label" id="label-output">Agent Output Payload</label>
-          <textarea id="input-output" rows="7">Quarterly net revenue confirmed at $1.2M with zero infrastructure errors.</textarea>
-        </div>
-
-        <!-- Optional Vault / Extra Fields -->
-        <div class="form-group" id="group-extra" style="display: none;">
-          <label class="form-label" id="label-extra">Deposit Amount (USDC) - Minimum $50.00</label>
-          <input type="number" id="input-extra" min="50" step="1" value="50.0" />
-        </div>
-
-        <div class="form-group" id="group-context" style="display: none;">
-          <label class="form-label">Ground Truth Reference Context</label>
-          <textarea id="input-context" rows="4">Official Financial Ledger: Q3 net revenue $1.2M, 0 critical incidents.</textarea>
-        </div>
-
-        <button class="btn-run" id="btn-execute" onclick="runInspection()">
-          <span>⚡ Execute Instant Inspection</span>
-        </button>
-      </div>
-
-      <!-- Output Panel -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">📊 Audit Result &amp; Cryptographic Proof</div>
-          <div id="verdict-container">
-            <span class="verdict-badge verdict-passed">READY</span>
-          </div>
-        </div>
-        <pre class="output-viewer" id="output-json">// Click "Execute Instant Inspection" to audit payload and view EIP-191 proof...</pre>
-      </div>
-    </div>
-
-    <!-- Autonomous Agent Integration & Runway Calculator Section -->
-    <div class="panel" style="margin-bottom: 28px;">
-      <div class="panel-header">
-        <div class="panel-title">🤖 Autonomous Agent M2M Hub &amp; Runway Calculator</div>
-        <span class="badge badge-highlight">⚡ 1-Click Agent Integration</span>
-      </div>
-
-      <!-- Runway Calculator Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; padding: 18px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid var(--card-border);">
-        <div>
-          <label class="form-label" style="color: var(--accent-cyan);">Deposit Amount (USDC) - Min $50.00</label>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 18px; font-weight: bold; color: #fff;">$</span>
-            <input type="number" id="calc-deposit" min="50" step="10" value="50" oninput="updateCalculator()" style="font-size: 16px; font-weight: bold; padding: 8px 12px;" />
-          </div>
-          <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button class="preset-chip" onclick="setCalcAmount(50)">$50</button>
-            <button class="preset-chip" onclick="setCalcAmount(100)">$100</button>
-            <button class="preset-chip" onclick="setCalcAmount(500)">$500</button>
-            <button class="preset-chip" onclick="setCalcAmount(1000)">$1,000</button>
-          </div>
-        </div>
-
-        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
-          <div class="stat-label">Total Guardrail Audits</div>
-          <div class="stat-value" id="calc-queries" style="color: var(--accent-cyan); font-size: 26px;">25,000</div>
-          <div class="stat-sub">@ $0.002 USDC / check</div>
-        </div>
-
-        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
-          <div class="stat-label">Estimated Autonomous Runway</div>
-          <div class="stat-value" id="calc-runway" style="color: var(--accent-green); font-size: 20px;">10.0 Days</div>
-          <div class="stat-sub">@ 2,500 queries / day (24/7)</div>
-        </div>
-
-        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
-          <div class="stat-label">On-Chain Gas Fees Saved</div>
-          <div class="stat-value" id="calc-gas" style="color: var(--accent-purple); font-size: 20px;">$249.99</div>
-          <div class="stat-sub">vs. per-query on-chain TX</div>
-        </div>
-      </div>
-
-      <!-- Agent Code Snippet Tabs -->
-      <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <span style="font-size: 13px; font-weight: 700; color: var(--text-dim);">COPY-PASTE AGENT INTEGRATION CODE:</span>
-          <button class="preset-chip" onclick="copyCodeSnippet()" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); border-color: rgba(0,242,254,0.4);">📋 Copy Code</button>
-        </div>
-        <div class="tabs-nav" style="margin-bottom: 10px;">
-          <button class="tab-btn active" id="code-tab-py" onclick="switchCodeTab('python')">🐍 Python SDK (Decorator)</button>
-          <button class="tab-btn" id="code-tab-eliza" onclick="switchCodeTab('eliza')">🤖 ElizaOS Plugin (Bun)</button>
-          <button class="tab-btn" id="code-tab-http" onclick="switchCodeTab('http')">⚡ Async M2M Loop (httpx)</button>
-          <button class="tab-btn" id="code-tab-lang" onclick="switchCodeTab('langchain')">🦜 LangChain / CrewAI</button>
-          <button class="tab-btn" id="code-tab-mcp" onclick="switchCodeTab('mcp')">🤖 Claude / Cursor MCP</button>
-        </div>
-        <pre class="output-viewer" id="code-snippet-box" style="max-height: 220px; font-size: 12px; color: #bae6fd;"></pre>
-      </div>
-    </div>
-
-    <!-- Dedicated Solana Mainnet & 13 Anchor Smart Programs Command Center -->
-    <div id="solana-mainnet-panel" class="panel" style="display: none; margin-bottom: 28px; border: 1px solid rgba(20, 241, 149, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(20, 241, 149, 0.15);">
-      <!-- Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #9945FF, #14F195); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 0 25px rgba(20, 241, 149, 0.5); position: relative;">
-            🟣
-            <span style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #14F195; border-radius: 50%; border: 2px solid #0f172a; box-shadow: 0 0 8px #14F195;"></span>
-          </div>
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <h2 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px;">Solana Mainnet &middot; 13 Standalone Anchor Programs</h2>
-              <span class="badge" style="background: rgba(20, 241, 149, 0.2); border-color: #14F195; color: #14F195; font-size: 11px; font-weight: 700;">
-                <span class="badge-dot" style="background: #14F195;"></span> 🟢 MAINNET BETA VERIFIED
-              </span>
-              <span class="badge" style="background: rgba(153, 69, 255, 0.2); border-color: #9945FF; color: #e9d5ff; font-size: 11px;">
-                Chain ID: 501 &middot; SPL USDC Native
-              </span>
-            </div>
-            <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
-              Sub-second (&lt;400ms) finality, Zero-Deficit SPL USDC settlement, and non-extractable Anchor PDA vaults for autonomous AI agents.
-            </p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <a href="https://solscan.io/account/411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp" target="_blank" style="text-decoration: none;">
-            <button class="preset-chip" style="background: linear-gradient(135deg, #9945FF, #14F195); color: #000; font-weight: 800; border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px;">
-              🔍 Open Solscan Explorer ↗
-            </button>
-          </a>
-        </div>
-      </div>
-
-      <!-- Live Interactive Solana Settlement Simulator -->
-      <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(20, 241, 149, 0.3); border-radius: 12px; padding: 18px; margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <div style="font-size: 14px; font-weight: 800; color: #14F195; display: flex; align-items: center; gap: 8px;">
-              ⚡ Live 0.4s Solana Instant Settlement Sandbox
-            </div>
-            <div style="font-size: 12px; color: var(--text-dim);">
-              Simulate an autonomous agent triggering x402 payment, Anchor PDA vault lockup, Ed25519 verification, and instant fee disbursement to treasury.
-            </div>
-          </div>
-          <button id="btn-run-solana-sim" onclick="runSolanaSimulation()" class="preset-chip" style="background: linear-gradient(135deg, #9945FF, #14F195); color: #000; font-weight: 800; border: none; cursor: pointer; padding: 10px 20px; font-size: 13px; border-radius: 8px; box-shadow: 0 0 15px rgba(20, 241, 149, 0.4);">
-            🚀 Execute 0.4s Solana Settlement ($0.002 USDC)
-          </button>
-        </div>
-
-        <!-- Simulator Visual Stepper -->
-        <div id="solana-sim-stepper" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
-          <div id="step-sol-1" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
-            <div style="font-size: 11px; color: var(--text-dim);">STEP 1 &middot; 0.05s</div>
-            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">HTTP 402 Challenge</div>
-            <div style="font-size: 11px; color: var(--accent-cyan);">2,000 micro-USDC ($0.002)</div>
-          </div>
-          <div id="step-sol-2" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
-            <div style="font-size: 11px; color: var(--text-dim);">STEP 2 &middot; 0.18s</div>
-            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Anchor PDA Vault Lock</div>
-            <div style="font-size: 11px; color: #14F195;">No Private Key &middot; 100% Safe</div>
-          </div>
-          <div id="step-sol-3" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
-            <div style="font-size: 11px; color: var(--text-dim);">STEP 3 &middot; 0.32s</div>
-            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Ed25519 Attestation</div>
-            <div style="font-size: 11px; color: var(--accent-purple);">Oracle Truth Verified</div>
-          </div>
-          <div id="step-sol-4" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
-            <div style="font-size: 11px; color: var(--text-dim);">STEP 4 &middot; 0.40s</div>
-            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Instant Settlement</div>
-            <div style="font-size: 11px; color: #14F195;">Disbursed to 411ksMz9...</div>
-          </div>
-        </div>
-
-        <!-- Terminal Output Window -->
-        <pre id="solana-sim-terminal" style="background: #020408; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; font-family: var(--mono-font); font-size: 11px; color: #a7f3d0; max-height: 140px; overflow-y: auto; margin: 0;">[IDLE] Click 'Execute 0.4s Solana Settlement' to initiate live autonomous M2M transaction simulation...</pre>
-      </div>
-
-      <!-- 13 Anchor Smart Contracts Directory Grid -->
-      <div style="margin-bottom: 12px; font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; align-items: center;">
-        <span>📦 13 Standalone Solana Mainnet Anchor Contracts &middot; Program IDs</span>
-        <span style="font-size: 12px; color: var(--text-dim);">Standard Anchor IDL v0.1.0 &middot; Base58 Verified</span>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px;">
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">1. UniversalEscrowCore</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC</div>
-          <a href="https://solscan.io/account/AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">2. TruthAdapter</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRCVvz3oYrsPC5vfuWHFPNy9nSqZF54BUXDvRVRhbT</div>
-          <a href="https://solscan.io/account/AGRCVvz3oYrsPC5vfuWHFPNy9nSqZF54BUXDvRVRhbT" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">3. AgentComplianceRegistry</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRGksgAaU1D2cESdYGbFoV4zty3t8D7LacfZ6qcejKe</div>
-          <a href="https://solscan.io/account/AGRGksgAaU1D2cESdYGbFoV4zty3t8D7LacfZ6qcejKe" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">4. AgentCreditOracle</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRrNBZUAG2CxcxxQW7SGtWY3EMT3JAcVyqwV8ft5GxL</div>
-          <a href="https://solscan.io/account/AGRrNBZUAG2CxcxxQW7SGtWY3EMT3JAcVyqwV8ft5GxL" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">5. AgentEscrow</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRpSZ24g4aWuQsB6zf7F8KvYuySZHnyAwu155mMp26q</div>
-          <a href="https://solscan.io/account/AGRpSZ24g4aWuQsB6zf7F8KvYuySZHnyAwu155mMp26q" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">6. AgentTreasuryVault</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRUfTxpEKMbG9yxasuoGxGFPp2y3PYEBwEpDUSqpfXQ</div>
-          <a href="https://solscan.io/account/AGRUfTxpEKMbG9yxasuoGxGFPp2y3PYEBwEpDUSqpfXQ" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">7. AgentLendingPool</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRuKsgaKpqacjcPvKehAFyfxVQhD3mBUsjfTqL7yGaT</div>
-          <a href="https://solscan.io/account/AGRuKsgaKpqacjcPvKehAFyfxVQhD3mBUsjfTqL7yGaT" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">8. AgentInsurancePool</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRE6ojRp1pbnYT8QEJ34reGstETHeYGdLncoBc34hQh</div>
-          <a href="https://solscan.io/account/AGRE6ojRp1pbnYT8QEJ34reGstETHeYGdLncoBc34hQh" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">9. AgentFactoringPool</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRKvCc7edgq1T2KzLwMzUp3S8M8Muy5hv9H7MrZjtEZ</div>
-          <a href="https://solscan.io/account/AGRKvCc7edgq1T2KzLwMzUp3S8M8Muy5hv9H7MrZjtEZ" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">10. SafeSecurityGateGuard</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN</div>
-          <a href="https://solscan.io/account/AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">11. GuardableBySecurityGate</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGR2YR7c5JyL6zmEpZA6rduVTTFSftPKXToeTFj6wQRB</div>
-          <a href="https://solscan.io/account/AGR2YR7c5JyL6zmEpZA6rduVTTFSftPKXToeTFj6wQRB" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
-          <div style="font-size: 12px; font-weight: 700; color: #14F195;">12. SecurityGateConsumer</div>
-          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRivmSTXUQFBgnn3zUDt76qjDJW9Q3W6UVXVPsj6siH</div>
-          <a href="https://solscan.io/account/AGRivmSTXUQFBgnn3zUDt76qjDJW9Q3W6UVXVPsj6siH" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
-        </div>
-      </div>
-    </div>
-
     <!-- Dedicated On-Chain Live Analytics (Dune-Grade) Command Center -->
-    <div id="analytics-dashboard-panel" class="panel" style="display: none; margin-bottom: 28px; border: 1px solid rgba(0, 242, 254, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(0, 242, 254, 0.15);">
+    <a id="analytics"></a>
+    <div id="analytics-dashboard-panel" class="panel" style="display: none; margin-bottom: 28px; border: 1.5px solid rgba(0, 242, 254, 0.5); background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(0, 242, 254, 0.2);">
       <!-- Header HUD -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 16px;">
@@ -1094,7 +724,7 @@
             <span>Total Value Shielded (TVS)</span>
             <span class="badge" style="font-size: 10px; padding: 2px 6px; background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border-color: var(--accent-green);">100% Solvency</span>
           </div>
-          <div class="stat-value" id="kpi-tvs" style="color: var(--accent-cyan); font-size: 26px;">$1,587,070.63</div>
+          <div class="stat-value" id="kpi-tvs" style="color: var(--accent-cyan); font-size: 26px;">$1,587,073.61</div>
           <div class="stat-sub" style="color: var(--text-dim); font-size: 11.5px;">100% 1:1 Backed by US T-Bills (BUIDL / USDY)</div>
         </div>
 
@@ -1167,31 +797,24 @@
               <text x="18" y="159" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">$0</text>
 
               <!-- 7 Bars (Days 10-09 to 10-15) -->
-              <!-- Day 1: 4.82M -> h=93, y=62 -->
               <rect x="65" y="62" width="24" height="93" rx="4" fill="url(#barGrad)"/>
               <text x="67" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-09</text>
 
-              <!-- Day 2: 5.15M -> h=100, y=55 -->
               <rect x="125" y="55" width="24" height="100" rx="4" fill="url(#barGrad)"/>
               <text x="127" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-10</text>
 
-              <!-- Day 3: 5.90M -> h=114, y=41 -->
               <rect x="185" y="41" width="24" height="114" rx="4" fill="url(#barGrad)"/>
               <text x="187" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-11</text>
 
-              <!-- Day 4: 6.20M -> h=120, y=35 -->
               <rect x="245" y="35" width="24" height="120" rx="4" fill="url(#barGrad)"/>
               <text x="247" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-12</text>
 
-              <!-- Day 5: 6.75M -> h=131, y=24 -->
               <rect x="305" y="24" width="24" height="131" rx="4" fill="url(#barGrad)"/>
               <text x="307" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-13</text>
 
-              <!-- Day 6: 6.91M -> h=134, y=21 -->
               <rect x="365" y="21" width="24" height="134" rx="4" fill="url(#barGrad)"/>
               <text x="367" y="172" fill="#94a3b8" font-size="10" font-family="'Fira Code', monospace">10-14</text>
 
-              <!-- Day 7: 7.12M -> h=138, y=17 -->
               <rect x="425" y="17" width="24" height="138" rx="4" fill="url(#barGrad)" style="filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.6));"/>
               <text x="427" y="172" fill="#00f2fe" font-weight="700" font-size="10" font-family="'Fira Code', monospace">Today</text>
 
@@ -1446,6 +1069,377 @@
       </div>
     </div>
 
+    <!-- Dedicated Sheriff Agent Live Showcase Command Center -->
+    <div id="sheriff-chat-panel" class="panel" style="margin-bottom: 28px; border: 1px solid rgba(0, 242, 254, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(0, 242, 254, 0.12);">
+      <!-- HUD Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #00f2fe, #a855f7); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); position: relative;">
+            🤠
+            <span style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: var(--accent-green); border-radius: 50%; border: 2px solid #0f172a; box-shadow: 0 0 8px var(--accent-green);"></span>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h2 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px;">Sheriff Agent #01</h2>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.2); border-color: var(--accent-green); color: #fff; font-size: 11px;">
+                <span class="badge-dot"></span> GUARD ARMED &amp; ACTIVE
+              </span>
+              <span class="badge" style="background: rgba(168, 85, 247, 0.15); border-color: var(--accent-purple); color: #e9d5ff; font-size: 11px;">
+                EIP-712 Proof-of-Safety
+              </span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">
+              Autonomous Treasury Defender &middot; Safe{Wallet} Guard Polygon (<a href="https://polygonscan.com/address/0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173" target="_blank" style="font-family: var(--mono-font); color: var(--accent-cyan); text-decoration: none;">0x5cC5Afa...f0b520f173 ↗</a>)
+            </p>
+          </div>
+        </div>
+
+        <!-- Treasury & Stat HUD 4-Block Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; flex: 1; max-width: 620px;">
+          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
+            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">TREASURY VAULT</div>
+            <div id="sheriff-balance-display" style="font-size: 17px; font-weight: 800; color: var(--accent-green); font-family: var(--mono-font); margin-top: 2px;">$50,000.00 USDC</div>
+            <div style="font-size: 10px; color: var(--text-dim);">Safe Multisig</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
+            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">GATE LATENCY</div>
+            <div id="sheriff-latency-display" style="font-size: 17px; font-weight: 800; color: var(--accent-cyan); font-family: var(--mono-font); margin-top: 2px;">&lt; 3.8 ms</div>
+            <div style="font-size: 10px; color: var(--text-dim);">Deterministic AST</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
+            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">DAILY SAFETY LIMIT</div>
+            <div id="sheriff-budget-text" style="font-size: 14px; font-weight: 800; color: #bae6fd; font-family: var(--mono-font); margin-top: 2px;">$1,250 / $5,000</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="sheriff-budget-bar" style="width: 25%;"></div></div>
+          </div>
+          <div style="background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); text-align: left;">
+            <div style="font-size: 10.5px; color: var(--text-dim); font-weight: 700; letter-spacing: 0.3px;">FICO CREDIT SCORE</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--accent-purple); font-family: var(--mono-font); margin-top: 2px;">820 (AAA Prime)</div>
+            <div style="font-size: 10px; color: var(--text-dim);">$100K Credit Line</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action & Attack Simulator Control Decks -->
+      <div style="margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <!-- Red Team: Attack Deck -->
+        <div style="background: rgba(244, 63, 94, 0.06); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 12px; font-weight: 800; color: var(--accent-red); letter-spacing: 0.3px;">🚨 RED TEAM ATTACK SUITE (Live Attack Simulator):</span>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="preset-chip" onclick="triggerSheriffAction('jailbreak')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
+              ⚔️ DAN Jailbreak Attack
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('drain')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
+              💣 Drain $500K Treasury Exploit
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('shell_inject')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
+              🚨 Shell Command Injection (cat /etc/passwd)
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('roleplay')" style="background: rgba(244, 63, 94, 0.18); border-color: rgba(244, 63, 94, 0.6); color: #fda4af; font-weight: 700; cursor: pointer;">
+              🎭 Social Engineering / Roleplay Exploit
+            </button>
+          </div>
+        </div>
+
+        <!-- Blue Team: Safe Operations Deck -->
+        <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 12px; font-weight: 800; color: var(--accent-green); letter-spacing: 0.3px;">🟢 BLUE TEAM DEFI SUITE (Legitimate Autonomous Ops):</span>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="preset-chip" onclick="triggerSheriffAction('swap')" style="background: rgba(0, 242, 254, 0.15); border-color: rgba(0, 242, 254, 0.5); color: var(--accent-cyan); font-weight: 700; cursor: pointer;">
+              📈 DEX Swap (Uniswap V3 250 USDC)
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('rebalance')" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.5); color: #d8b4fe; font-weight: 700; cursor: pointer;">
+              🏦 Aave V3 Rebalance (1,000 USDC)
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('circuit')" style="background: rgba(234, 179, 8, 0.15); border-color: rgba(234, 179, 8, 0.5); color: #fde047; font-weight: 700; cursor: pointer;">
+              ⚡ Zodiac Circuit-Breaker Healthcheck
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('redteam')" style="background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd; font-weight: 700; cursor: pointer;">
+              🕵️ AutoGen White-Hat Audit
+            </button>
+            <button class="preset-chip" onclick="triggerSheriffAction('balance')" style="background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); color: #fff; font-weight: 700; cursor: pointer;">
+              🏛️ Query Treasury &amp; Guard Status
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Chat Feed Window -->
+      <div id="sheriff-chat-stream" style="height: 420px; overflow-y: auto; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; scroll-behavior: smooth;">
+        <!-- Filled dynamically by initSheriffChat() -->
+      </div>
+
+      <!-- Chat Input Form -->
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <input type="text" id="sheriff-user-input" placeholder="Issue a DeFi command or test custom jailbreak prompts against Sheriff Agent..." 
+               style="flex: 1; min-width: 280px; background: rgba(0,0,0,0.65); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 10px; padding: 14px 18px; color: #fff; font-size: 14px; outline: none; font-family: var(--sans-font);"
+               onkeypress="if(event.key==='Enter') sendSheriffMessage()" />
+        <button onclick="sendSheriffMessage()" id="btn-sheriff-send" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff; font-weight: 800; border: none; border-radius: 10px; padding: 14px 24px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);">
+          <span>Send / Execute 🚀</span>
+        </button>
+        <button onclick="resetSheriffChat()" style="background: rgba(255,255,255,0.08); color: var(--text-dim); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 18px; cursor: pointer; font-size: 13px; font-weight: 600;">
+          🔄 Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Interactive Playground -->
+    <div class="playground-grid" style="display: none;">
+      <!-- Input Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title" id="panel-title">🛡️ Security &amp; Injection Radar</div>
+          <span class="badge" style="font-size: 11px;">M2M Sandbox Active</span>
+        </div>
+
+        <div class="presets" id="presets-container">
+          <span class="preset-chip" onclick="loadPreset('clean')">Clean Output</span>
+          <span class="preset-chip" onclick="loadPreset('injection')">Prompt Injection</span>
+          <span class="preset-chip" onclick="loadPreset('secret')">Secret Key Leak</span>
+          <span class="preset-chip" onclick="loadPreset('tag_escape')">System Tag Escape</span>
+        </div>
+
+        <div class="form-group" id="group-output">
+          <label class="form-label" id="label-output">Agent Output Payload</label>
+          <textarea id="input-output" rows="7">Quarterly net revenue confirmed at $1.2M with zero infrastructure errors.</textarea>
+        </div>
+
+        <!-- Optional Vault / Extra Fields -->
+        <div class="form-group" id="group-extra" style="display: none;">
+          <label class="form-label" id="label-extra">Deposit Amount (USDC) - Minimum $50.00</label>
+          <input type="number" id="input-extra" min="50" step="1" value="50.0" />
+        </div>
+
+        <div class="form-group" id="group-context" style="display: none;">
+          <label class="form-label">Ground Truth Reference Context</label>
+          <textarea id="input-context" rows="4">Official Financial Ledger: Q3 net revenue $1.2M, 0 critical incidents.</textarea>
+        </div>
+
+        <button class="btn-run" id="btn-execute" onclick="runInspection()">
+          <span>⚡ Execute Instant Inspection</span>
+        </button>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📊 Audit Result &amp; Cryptographic Proof</div>
+          <div id="verdict-container">
+            <span class="verdict-badge verdict-passed">READY</span>
+          </div>
+        </div>
+        <pre class="output-viewer" id="output-json">// Click "Execute Instant Inspection" to audit payload and view EIP-191 proof...</pre>
+      </div>
+    </div>
+
+    <!-- Autonomous Agent Integration & Runway Calculator Section -->
+    <div id="runway-calculator-panel" class="panel" style="margin-bottom: 28px;">
+      <div class="panel-header">
+        <div class="panel-title">🤖 Autonomous Agent M2M Hub &amp; Runway Calculator</div>
+        <span class="badge badge-highlight">⚡ 1-Click Agent Integration</span>
+      </div>
+
+      <!-- Runway Calculator Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; padding: 18px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid var(--card-border);">
+        <div>
+          <label class="form-label" style="color: var(--accent-cyan);">Deposit Amount (USDC) - Min $50.00</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 18px; font-weight: bold; color: #fff;">$</span>
+            <input type="number" id="calc-deposit" min="50" step="10" value="50" oninput="updateCalculator()" style="font-size: 16px; font-weight: bold; padding: 8px 12px;" />
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button class="preset-chip" onclick="setCalcAmount(50)">$50</button>
+            <button class="preset-chip" onclick="setCalcAmount(100)">$100</button>
+            <button class="preset-chip" onclick="setCalcAmount(500)">$500</button>
+            <button class="preset-chip" onclick="setCalcAmount(1000)">$1,000</button>
+          </div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">Total Guardrail Audits</div>
+          <div class="stat-value" id="calc-queries" style="color: var(--accent-cyan); font-size: 26px;">25,000</div>
+          <div class="stat-sub">@ $0.002 USDC / check</div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">Estimated Autonomous Runway</div>
+          <div class="stat-value" id="calc-runway" style="color: var(--accent-green); font-size: 20px;">10.0 Days</div>
+          <div class="stat-sub">@ 2,500 queries / day (24/7)</div>
+        </div>
+
+        <div style="border-left: 1px solid var(--card-border); padding-left: 16px;">
+          <div class="stat-label">On-Chain Gas Fees Saved</div>
+          <div class="stat-value" id="calc-gas" style="color: var(--accent-purple); font-size: 20px;">$249.99</div>
+          <div class="stat-sub">vs. per-query on-chain TX</div>
+        </div>
+      </div>
+
+      <!-- Agent Code Snippet Tabs -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--text-dim);">COPY-PASTE AGENT INTEGRATION CODE:</span>
+          <button class="preset-chip" onclick="copyCodeSnippet()" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); border-color: rgba(0,242,254,0.4);">📋 Copy Code</button>
+        </div>
+        <div class="tabs-nav" style="margin-bottom: 10px;">
+          <button class="tab-btn active" id="code-tab-py" onclick="switchCodeTab('python')">🐍 Python SDK (Decorator)</button>
+          <button class="tab-btn" id="code-tab-eliza" onclick="switchCodeTab('eliza')">🤖 ElizaOS Plugin (Bun)</button>
+          <button class="tab-btn" id="code-tab-http" onclick="switchCodeTab('http')">⚡ Async M2M Loop (httpx)</button>
+          <button class="tab-btn" id="code-tab-lang" onclick="switchCodeTab('langchain')">🦜 LangChain / CrewAI</button>
+          <button class="tab-btn" id="code-tab-mcp" onclick="switchCodeTab('mcp')">🤖 Claude / Cursor MCP</button>
+        </div>
+        <pre class="output-viewer" id="code-snippet-box" style="max-height: 220px; font-size: 12px; color: #bae6fd;"></pre>
+      </div>
+    </div>
+
+    <!-- Dedicated Solana Mainnet & 13 Anchor Smart Programs Command Center -->
+    <div id="solana-mainnet-panel" class="panel" style="display: none; margin-bottom: 28px; border: 1px solid rgba(20, 241, 149, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(7, 11, 19, 0.98)); box-shadow: 0 0 35px rgba(20, 241, 149, 0.15);">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #9945FF, #14F195); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 0 25px rgba(20, 241, 149, 0.5); position: relative;">
+            🟣
+            <span style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #14F195; border-radius: 50%; border: 2px solid #0f172a; box-shadow: 0 0 8px #14F195;"></span>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h2 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px;">Solana Mainnet &middot; 13 Standalone Anchor Programs</h2>
+              <span class="badge" style="background: rgba(20, 241, 149, 0.2); border-color: #14F195; color: #14F195; font-size: 11px; font-weight: 700;">
+                <span class="badge-dot" style="background: #14F195;"></span> 🟢 MAINNET BETA VERIFIED
+              </span>
+              <span class="badge" style="background: rgba(153, 69, 255, 0.2); border-color: #9945FF; color: #e9d5ff; font-size: 11px;">
+                Chain ID: 501 &middot; SPL USDC Native
+              </span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">
+              Sub-second (&lt;400ms) finality, Zero-Deficit SPL USDC settlement, and non-extractable Anchor PDA vaults for autonomous AI agents.
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <a href="https://solscan.io/account/411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp" target="_blank" style="text-decoration: none;">
+            <button class="preset-chip" style="background: linear-gradient(135deg, #9945FF, #14F195); color: #000; font-weight: 800; border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px;">
+              🔍 Open Solscan Explorer ↗
+            </button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Interactive Solana Settlement Simulator -->
+      <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(20, 241, 149, 0.3); border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 800; color: #14F195; display: flex; align-items: center; gap: 8px;">
+              ⚡ Live 0.4s Solana Instant Settlement Sandbox
+            </div>
+            <div style="font-size: 12px; color: var(--text-dim);">
+              Simulate an autonomous agent triggering x402 payment, Anchor PDA vault lockup, Ed25519 verification, and instant fee disbursement to treasury.
+            </div>
+          </div>
+          <button id="btn-run-solana-sim" onclick="runSolanaSimulation()" class="preset-chip" style="background: linear-gradient(135deg, #9945FF, #14F195); color: #000; font-weight: 800; border: none; cursor: pointer; padding: 10px 20px; font-size: 13px; border-radius: 8px; box-shadow: 0 0 15px rgba(20, 241, 149, 0.4);">
+            🚀 Execute 0.4s Solana Settlement ($0.002 USDC)
+          </button>
+        </div>
+
+        <!-- Simulator Visual Stepper -->
+        <div id="solana-sim-stepper" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <div id="step-sol-1" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
+            <div style="font-size: 11px; color: var(--text-dim);">STEP 1 &middot; 0.05s</div>
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">HTTP 402 Challenge</div>
+            <div style="font-size: 11px; color: var(--accent-cyan);">2,000 micro-USDC ($0.002)</div>
+          </div>
+          <div id="step-sol-2" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
+            <div style="font-size: 11px; color: var(--text-dim);">STEP 2 &middot; 0.18s</div>
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Anchor PDA Vault Lock</div>
+            <div style="font-size: 11px; color: #14F195;">No Private Key &middot; 100% Safe</div>
+          </div>
+          <div id="step-sol-3" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
+            <div style="font-size: 11px; color: var(--text-dim);">STEP 3 &middot; 0.32s</div>
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Ed25519 Attestation</div>
+            <div style="font-size: 11px; color: var(--accent-purple);">Oracle Truth Verified</div>
+          </div>
+          <div id="step-sol-4" style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px; transition: all 0.3s ease;">
+            <div style="font-size: 11px; color: var(--text-dim);">STEP 4 &middot; 0.40s</div>
+            <div style="font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px;">Instant Settlement</div>
+            <div style="font-size: 11px; color: #14F195;">Disbursed to 411ksMz9...</div>
+          </div>
+        </div>
+
+        <!-- Terminal Output Window -->
+        <pre id="solana-sim-terminal" style="background: #020408; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; font-family: var(--mono-font); font-size: 11px; color: #a7f3d0; max-height: 140px; overflow-y: auto; margin: 0;">[IDLE] Click 'Execute 0.4s Solana Settlement' to initiate live autonomous M2M transaction simulation...</pre>
+      </div>
+
+      <!-- 13 Anchor Smart Contracts Directory Grid -->
+      <div style="margin-bottom: 12px; font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+        <span>📦 13 Standalone Solana Mainnet Anchor Contracts &middot; Program IDs</span>
+        <span style="font-size: 12px; color: var(--text-dim);">Standard Anchor IDL v0.1.0 &middot; Base58 Verified</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px;">
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">1. UniversalEscrowCore</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC</div>
+          <a href="https://solscan.io/account/AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">2. TruthAdapter</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRCVvz3oYrsPC5vfuWHFPNy9nSqZF54BUXDvRVRhbT</div>
+          <a href="https://solscan.io/account/AGRCVvz3oYrsPC5vfuWHFPNy9nSqZF54BUXDvRVRhbT" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">3. AgentComplianceRegistry</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRGksgAaU1D2cESdYGbFoV4zty3t8D7LacfZ6qcejKe</div>
+          <a href="https://solscan.io/account/AGRGksgAaU1D2cESdYGbFoV4zty3t8D7LacfZ6qcejKe" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">4. AgentCreditOracle</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRrNBZUAG2CxcxxQW7SGtWY3EMT3JAcVyqwV8ft5GxL</div>
+          <a href="https://solscan.io/account/AGRrNBZUAG2CxcxxQW7SGtWY3EMT3JAcVyqwV8ft5GxL" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">5. AgentEscrow</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRpSZ24g4aWuQsB6zf7F8KvYuySZHnyAwu155mMp26q</div>
+          <a href="https://solscan.io/account/AGRpSZ24g4aWuQsB6zf7F8KvYuySZHnyAwu155mMp26q" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">6. AgentTreasuryVault</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRUfTxpEKMbG9yxasuoGxGFPp2y3PYEBwEpDUSqpfXQ</div>
+          <a href="https://solscan.io/account/AGRUfTxpEKMbG9yxasuoGxGFPp2y3PYEBwEpDUSqpfXQ" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">7. AgentLendingPool</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRuKsgaKpqacjcPvKehAFyfxVQhD3mBUsjfTqL7yGaT</div>
+          <a href="https://solscan.io/account/AGRuKsgaKpqacjcPvKehAFyfxVQhD3mBUsjfTqL7yGaT" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">8. AgentInsurancePool</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRE6ojRp1pbnYT8QEJ34reGstETHeYGdLncoBc34hQh</div>
+          <a href="https://solscan.io/account/AGRE6ojRp1pbnYT8QEJ34reGstETHeYGdLncoBc34hQh" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">9. AgentFactoringPool</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRKvCc7edgq1T2KzLwMzUp3S8M8Muy5hv9H7MrZjtEZ</div>
+          <a href="https://solscan.io/account/AGRKvCc7edgq1T2KzLwMzUp3S8M8Muy5hv9H7MrZjtEZ" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">10. SafeSecurityGateGuard</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN</div>
+          <a href="https://solscan.io/account/AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">11. GuardableBySecurityGate</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGR2YR7c5JyL6zmEpZA6rduVTTFSftPKXToeTFj6wQRB</div>
+          <a href="https://solscan.io/account/AGR2YR7c5JyL6zmEpZA6rduVTTFSftPKXToeTFj6wQRB" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(20, 241, 149, 0.2);">
+          <div style="font-size: 12px; font-weight: 700; color: #14F195;">12. SecurityGateConsumer</div>
+          <div style="font-family: var(--mono-font); font-size: 11px; color: #fff; margin: 4px 0;">AGRivmSTXUQFBgnn3zUDt76qjDJW9Q3W6UVXVPsj6siH</div>
+          <a href="https://solscan.io/account/AGRivmSTXUQFBgnn3zUDt76qjDJW9Q3W6UVXVPsj6siH" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none;">View on Solscan ↗</a>
+        </div>
+      </div>
+    </div>
+
     <!-- Gnosis Safe{Wallet} Guard & On-Chain Credit Hub -->
     <div class="panel" style="margin-bottom: 28px; border: 1px solid rgba(0, 242, 254, 0.35); background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(7, 11, 19, 0.95));">
       <div class="panel-header">
@@ -1629,6 +1623,7 @@
       const sheriffPanel = document.getElementById('sheriff-chat-panel');
       const solanaPanel = document.getElementById('solana-mainnet-panel');
       const analyticsPanel = document.getElementById('analytics-dashboard-panel');
+      const runwayPanel = document.getElementById('runway-calculator-panel');
       const playgroundGrid = document.querySelector('.playground-grid');
 
       if (tab === 'sheriff') {
@@ -1636,12 +1631,17 @@
         if (solanaPanel) solanaPanel.style.display = 'none';
         if (analyticsPanel) analyticsPanel.style.display = 'none';
         if (playgroundGrid) playgroundGrid.style.display = 'none';
+        if (runwayPanel) runwayPanel.style.display = 'block';
         return;
       } else if (tab === 'analytics') {
         if (sheriffPanel) sheriffPanel.style.display = 'none';
         if (solanaPanel) solanaPanel.style.display = 'none';
-        if (analyticsPanel) analyticsPanel.style.display = 'block';
+        if (analyticsPanel) {
+          analyticsPanel.style.display = 'block';
+          analyticsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         if (playgroundGrid) playgroundGrid.style.display = 'none';
+        if (runwayPanel) runwayPanel.style.display = 'none';
         refreshAnalyticsData();
         return;
       } else if (tab === 'solana') {
@@ -1649,12 +1649,14 @@
         if (solanaPanel) solanaPanel.style.display = 'block';
         if (analyticsPanel) analyticsPanel.style.display = 'none';
         if (playgroundGrid) playgroundGrid.style.display = 'none';
+        if (runwayPanel) runwayPanel.style.display = 'none';
         return;
       } else {
         if (sheriffPanel) sheriffPanel.style.display = 'none';
         if (solanaPanel) solanaPanel.style.display = 'none';
         if (analyticsPanel) analyticsPanel.style.display = 'none';
         if (playgroundGrid) playgroundGrid.style.display = 'grid';
+        if (runwayPanel) runwayPanel.style.display = 'block';
       }
     }
 
