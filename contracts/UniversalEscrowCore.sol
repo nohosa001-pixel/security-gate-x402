@@ -74,7 +74,18 @@ contract UniversalEscrowCore {
     bytes32 public constant TRUTH_SETTLEMENT_TYPEHASH = keccak256(
         "TruthSettlementAttestation(bytes32 jobId,uint8 domain,bytes32 truthHashRequirement,bytes32 recipientsHash,uint256 expiresAt)"
     );
+    bytes32 public constant BATCH_SETTLEMENT_TYPEHASH = keccak256(
+        "BatchSettlementAttestation(bytes32 merkleRoot,address token,uint256 totalAmount,uint256 totalCount,uint256 expiresAt)"
+    );
+    bytes32 public constant ADVERSARIAL_SLASH_TYPEHASH = keccak256(
+        "AdversarialExploitEvidence(address attackerAgent,address token,bytes32 payloadHash,uint8 violationType,uint256 penaltyAmount,uint256 timestamp)"
+    );
     bytes32 public immutable DOMAIN_SEPARATOR;
+
+    // Worker stake balances: worker => token => balance
+    mapping(address => mapping(address => uint256)) public workerStakes;
+    mapping(bytes32 => bool) public settledBatches;
+    uint256 public constant DEFAULT_SLASH_PENALTY = 10 * 10**6; // 10.00 USDC (6 decimals)
 
     // Events
     event EscrowDeposited(
@@ -96,6 +107,10 @@ contract UniversalEscrowCore {
     event DomainAdapterUpdated(ITruthAdapter.IndustryDomain indexed domain, address indexed adapter);
     event OracleSignerUpdated(address indexed oldSigner, address indexed newSigner);
     event TreasuryUpdated(address indexed oldTreasury, address indexed newTreasury);
+    event MicroBatchSettled(bytes32 indexed merkleRoot, address indexed token, uint256 totalAmount, uint256 totalCount);
+    event WorkerStakeDeposited(address indexed worker, address indexed token, uint256 amount);
+    event WorkerStakeWithdrawn(address indexed worker, address indexed token, uint256 amount);
+    event AdversarySlashed(address indexed attackerAgent, address indexed token, uint8 violationType, uint256 penaltyAmount, address slasher);
 
     constructor(address _oracleSigner, address _treasury) {
         require(_oracleSigner != address(0), "INVALID_ORACLE_SIGNER");
@@ -286,5 +301,111 @@ contract UniversalEscrowCore {
         require(IERC20(job.token).transfer(job.payer, amountToRefund), "REFUND_TRANSFER_FAILED");
 
         emit EscrowRefunded(jobId, job.payer, amountToRefund);
+    }
+
+    /**
+     * @notice 4. Deposit collateral stake required for agentic work and escrow claiming
+     */
+    function depositWorkerStake(address token, uint256 amount) external nonReentrant {
+        require(amount > 0, "ZERO_STAKE_AMOUNT");
+        require(IERC20(token).transferFrom(msg.sender, address(this), amount), "STAKE_TRANSFER_FAILED");
+        workerStakes[msg.sender][token] += amount;
+        emit WorkerStakeDeposited(msg.sender, token, amount);
+    }
+
+    /**
+     * @notice 5. Withdraw unslashed collateral stake
+     */
+    function withdrawWorkerStake(address token, uint256 amount) external nonReentrant {
+        require(amount > 0, "ZERO_WITHDRAW_AMOUNT");
+        require(workerStakes[msg.sender][token] >= amount, "INSUFFICIENT_WORKER_STAKE");
+        workerStakes[msg.sender][token] -= amount;
+        require(IERC20(token).transfer(msg.sender, amount), "WITHDRAW_TRANSFER_FAILED");
+        emit WorkerStakeWithdrawn(msg.sender, token, amount);
+    }
+
+    /**
+     * @notice 6. State Channel Merkle Batch Settlement: Settles hundreds of $0.002 micro-payments in 1 tx
+     */
+    function settleMicroBatch(
+        bytes32 merkleRoot,
+        address token,
+        uint256 totalAmount,
+        uint256 totalCount,
+        uint256 expiresAt,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external nonReentrant {
+        require(!settledBatches[merkleRoot], "BATCH_ALREADY_SETTLED");
+        require(block.timestamp <= expiresAt, "BATCH_ATTESTATION_EXPIRED");
+        require(totalAmount > 0 && totalCount > 0, "INVALID_BATCH_PARAMETERS");
+
+        // Verify EIP-712 Attestation from Protocol Oracle
+        bytes32 structHash = keccak256(
+            abi.encode(
+                BATCH_SETTLEMENT_TYPEHASH,
+                merkleRoot,
+                token,
+                totalAmount,
+                totalCount,
+                expiresAt
+            )
+        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+        address recoveredSigner = ecrecover(digest, v, r, s);
+        require(recoveredSigner == oracleSigner, "INVALID_BATCH_ORACLE_SIGNATURE");
+
+        settledBatches[merkleRoot] = true;
+
+        // Disburse protocol fees directly into Treasury
+        require(IERC20(token).transfer(treasury, totalAmount), "BATCH_TREASURY_TRANSFER_FAILED");
+
+        emit MicroBatchSettled(merkleRoot, token, totalAmount, totalCount);
+    }
+
+    /**
+     * @notice 7. Deterministic Slashing: Confiscates $10.00 collateral from adversarial attacking agents
+     */
+    function slashAdversary(
+        address attackerAgent,
+        address token,
+        bytes32 payloadHash,
+        uint8 violationType,
+        uint256 timestamp,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external nonReentrant {
+        require(attackerAgent != address(0), "INVALID_ATTACKER_ADDRESS");
+        require(workerStakes[attackerAgent][token] >= DEFAULT_SLASH_PENALTY, "INSUFFICIENT_COLLATERAL_TO_SLASH");
+
+        // Verify Proof-of-Exploit Evidence signed by Security Gate Oracle
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ADVERSARIAL_SLASH_TYPEHASH,
+                attackerAgent,
+                token,
+                payloadHash,
+                violationType,
+                DEFAULT_SLASH_PENALTY,
+                timestamp
+            )
+        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+        address recoveredSigner = ecrecover(digest, v, r, s);
+        require(recoveredSigner == oracleSigner, "INVALID_SLASH_ORACLE_SIGNATURE");
+
+        // Deduct penalty from attacker's staked balance
+        workerStakes[attackerAgent][token] -= DEFAULT_SLASH_PENALTY;
+
+        // Split penalty: 80% to Treasury, 20% to Reporter / Slasher as bounty
+        uint256 treasuryShare = (DEFAULT_SLASH_PENALTY * 80) / 100;
+        uint256 reporterShare = DEFAULT_SLASH_PENALTY - treasuryShare;
+
+        require(IERC20(token).transfer(treasury, treasuryShare), "SLASH_TREASURY_TRANSFER_FAILED");
+        require(IERC20(token).transfer(msg.sender, reporterShare), "SLASH_REPORTER_TRANSFER_FAILED");
+
+        emit AdversarySlashed(attackerAgent, token, violationType, DEFAULT_SLASH_PENALTY, msg.sender);
     }
 }
