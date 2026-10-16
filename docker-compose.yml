@@ -1,0 +1,245 @@
+name: agrid-5node-mesh
+
+services:
+  # ==========================================================================
+  # 1. Unified MCP Gateway (유일한 외부 인바운드 진입점)
+  # ==========================================================================
+  mesh-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-mesh-gateway
+    command: ["uvicorn", "app.unified_mesh_gateway:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--loop", "uvloop"]
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - NODE_ROLE=GATEWAY
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-ledger:6379/0
+      - SECURITY_GATE_INTERNAL_URL=http://security-gate-node:8001
+      - CLEANWEB_INTERNAL_URL=http://cleanweb-node:8002
+      - EUDR_INTERNAL_URL=http://eudr-oracle-node:8003
+      - MINERALS_INTERNAL_URL=http://minerals-oracle-node:8004
+      - LOGISTICS_INTERNAL_URL=http://logistics-oracle-node:8005
+    depends_on:
+      redis-ledger:
+        condition: service_healthy
+      security-gate-node:
+        condition: service_healthy
+    networks:
+      - public_edge
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+
+  # ==========================================================================
+  # 2. Node 1: Security-Gate-x402 (AST/DLP Engine & EIP-712 Signer)
+  # ==========================================================================
+  security-gate-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-security-gate
+    command: ["uvicorn", "app.nodes.security_gate_app:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "2", "--loop", "uvloop"]
+    env_file: .env
+    environment:
+      - NODE_ROLE=SECURITY_GATE
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-ledger:6379/0
+      - ZK_PROXY_URL=http://zk-egress-proxy:8080
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ==========================================================================
+  # 3. Node 2: x402-Cleanweb-Agent (데이터 정제 및 프롬프트 살균)
+  # ==========================================================================
+  cleanweb-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-cleanweb-oracle
+    command: ["uvicorn", "app.nodes.cleanweb_app:app", "--host", "0.0.0.0", "--port", "8002", "--workers", "2"]
+    environment:
+      - NODE_ROLE=CLEANWEB
+      - HTTP_PROXY=http://zk-egress-proxy:8080
+      - HTTPS_PROXY=http://zk-egress-proxy:8080
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 4. Node 3: EUDR Compliance Oracle (산림벌채 GeoJSON & TRACES-NT 검증)
+  # ==========================================================================
+  eudr-oracle-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-eudr-oracle
+    command: ["uvicorn", "app.nodes.eudr_app:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "2"]
+    environment:
+      - NODE_ROLE=EUDR_ORACLE
+      - ZK_PROXY_URL=http://zk-egress-proxy:8080
+      # 실제 API 키 대신 플레이스홀더만 주입 (LLM 및 컨테이너 메모리 노출 원천 차단)
+      - TRACES_API_TOKEN_HANDLE={{ZK_REF::EUDR_TRACES_API_KEY}}
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 5. Node 4: Minerals Oracle (핵심 광물 시세 & 차익거래 콜데이터)
+  # ==========================================================================
+  minerals-oracle-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-minerals-oracle
+    command: ["uvicorn", "app.nodes.minerals_app:app", "--host", "0.0.0.0", "--port", "8004", "--workers", "2"]
+    environment:
+      - NODE_ROLE=MINERALS_ORACLE
+      - ZK_PROXY_URL=http://zk-egress-proxy:8080
+      - LME_DATA_KEY_HANDLE={{ZK_REF::MINERALS_FEED_API_KEY}}
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 6. Node 5: Logistics Oracle (DCSA eBL 검증 & Proof-of-Delivery 서명)
+  # ==========================================================================
+  logistics-oracle-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-logistics-oracle
+    command: ["uvicorn", "app.nodes.logistics_app:app", "--host", "0.0.0.0", "--port", "8005", "--workers", "2"]
+    env_file: .env
+    environment:
+      - NODE_ROLE=LOGISTICS_ORACLE
+      - ZK_PROXY_URL=http://zk-egress-proxy:8080
+      - AIS_VESSEL_KEY_HANDLE={{ZK_REF::AIS_MARITIME_API_KEY}}
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 7. Zero-Knowledge Credential Egress Proxy (유일한 실제 API Key/서명 금고)
+  # ==========================================================================
+  zk-egress-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-zk-credential-proxy
+    command: ["uvicorn", "app.nodes.zk_proxy_app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
+    env_file: .env.secrets  # 실제 API 키와 프라이빗 키는 오직 이 컨테이너만 마운트
+    networks:
+      - mesh_internal
+      - egress_net          # 외부 인터넷(API, 블록체인 RPC) 통신 허용
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 8. EIP-3009 On-Chain Batch Settler (Multicall3 일괄 정산 데몬)
+  # ==========================================================================
+  x402-batch-settler:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: agrid-batch-settler
+    command: ["python", "-m", "app.nodes.batch_settler_worker"]
+    env_file:
+      - .env
+      - .env.secrets
+    environment:
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-ledger:6379/0
+    depends_on:
+      redis-ledger:
+        condition: service_healthy
+    networks:
+      - mesh_internal
+      - egress_net
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+  # ==========================================================================
+  # 9. Shared Redis Session Ledger (AOF 영속성 활성화)
+  # ==========================================================================
+  redis-ledger:
+    image: redis:7.4-alpine
+    container_name: agrid-redis-ledger
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy noeviction
+    volumes:
+      - redis_voucher_data:/data
+    networks:
+      - mesh_internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+# ============================================================================
+# 네트워크 격리 설정 (Zero-Trust Network Segmentation)
+# ============================================================================
+networks:
+  public_edge:
+    driver: bridge
+  # internal: true 설정을 통해 5대 오라클 노드가 외부 해커 서버로 직접 패킷을 쏘는 것을 커널 레벨에서 차단
+  mesh_internal:
+    driver: bridge
+    internal: true
+  egress_net:
+    driver: bridge
+
+volumes:
+  redis_voucher_data:

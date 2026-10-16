@@ -1,0 +1,45 @@
+# ============================================================================
+# Stage 1: Builder (uv 기반 고속 의존성 컴파일)
+# ============================================================================
+FROM python:3.12-slim-bookworm AS builder
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /build
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+COPY pyproject.toml ./
+RUN uv venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    uv pip install --no-cache \
+      fastapi "uvicorn[standard]" uvloop httptools \
+      httpx redis cryptography web3 eth-account pydantic
+
+COPY app/ ./app/
+COPY contracts/ ./contracts/
+COPY logistics_oracle_mcp.py ./
+COPY forensic_adjuster.py ./
+COPY mcp_server.py ./
+
+# ============================================================================
+# Stage 2: Hardened Production Runtime (Non-Root, Read-Only FS 호환)
+# ============================================================================
+FROM python:3.12-slim-bookworm AS runtime
+
+# 루트 권한 없는 전용 실행 계정 생성
+RUN groupadd -g 10001 agrid && \
+    useradd -u 10001 -g agrid -s /sbin/nologin -M agrid
+
+WORKDIR /app
+
+COPY --from=builder --chown=agrid:agrid /opt/venv /opt/venv
+COPY --from=builder --chown=agrid:agrid /build /app
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="/app"
+
+USER agrid
+EXPOSE 8000 8001 8002 8003 8004 8005 8080
