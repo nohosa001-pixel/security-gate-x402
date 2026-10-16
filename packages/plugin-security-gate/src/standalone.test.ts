@@ -77,7 +77,7 @@ describe("securityGatePlugin structure", () => {
 	it("should export valid plugin object with correct fields", () => {
 		expect(securityGatePlugin.name).toBe("security-gate");
 		expect(securityGatePlugin.description).toBeDefined();
-		expect(securityGatePlugin.actions?.length).toBe(3);
+		expect(securityGatePlugin.actions?.length).toBe(4);
 		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
 			"INSPECT_SAFETY",
 		);
@@ -86,6 +86,9 @@ describe("securityGatePlugin structure", () => {
 		);
 		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
 			"CREATE_ESCROW_TASK",
+		);
+		expect(securityGatePlugin.actions?.map((a) => a.name)).toContain(
+			"EXECUTE_GUARDED_ONCHAIN_TX",
 		);
 		expect(securityGatePlugin.evaluators?.length).toBe(1);
 		expect(securityGatePlugin.providers?.length).toBe(1);

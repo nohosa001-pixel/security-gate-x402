@@ -15,7 +15,6 @@
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"exports": {
-
 		"./package.json": "./package.json",
 		".": {
 			"eliza-source": {
@@ -40,7 +39,7 @@
 		}
 	},
 	"scripts": {
-		"build": "bun build src/index.ts --outdir dist --target node --format esm && tsc -p tsconfig.build.json",
+		"build": "tsup",
 		"test": "bun test src/standalone.test.ts",
 		"lint": "bunx @biomejs/biome check --write --unsafe src",
 		"format": "bunx @biomejs/biome format --write src"
@@ -59,6 +58,10 @@
 	"license": "MIT",
 	"peerDependencies": {
 		"@elizaos/core": ">=2.0.0-0"
+	},
+	"dependencies": {
+		"@safe-global/protocol-kit": "^4.1.7",
+		"viem": "^2.57.5"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.8",

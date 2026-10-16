@@ -13,9 +13,13 @@ import {
 } from "./preHandlers/securityGatePreHandler.js";
 import { securityStatusProvider } from "./providers/securityStatusProvider.js";
 
+import { executeGuardedOnchainAction } from "./actions/executeGuardedOnchainAction.js";
+
 export * from "./actions/auditEscrowTask.js";
 export * from "./actions/createEscrowTask.js";
 export * from "./actions/inspectSafety.js";
+export * from "./actions/executeGuardedOnchainAction.js";
+export * from "./GuardedSafeExecutor.js";
 export * from "./configIntegrity.js";
 export * from "./constants.js";
 export * from "./evaluators/securityGateEvaluator.js";
@@ -30,13 +34,13 @@ export * from "./providers/securityStatusProvider.js";
  * outbound covert-channel DLP, config tamper detection, and agent safety guardrails.
  */
 export const securityGatePlugin: Plugin & {
-	chatPreHandlers?: ChatPreHandler[];
-	chatPostHandlers?: ChatPostHandler[];
+	chatPreHandlers?: any[];
+	chatPostHandlers?: any[];
 } = {
 	name: "security-gate",
 	description:
-		"Deterministic inbound prompt injection defense, outbound covert-channel DLP, config tamper detection, dangerous code pattern detection, autonomous task escrow auditing, and agent safety guardrails.",
-	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction],
+		"Deterministic inbound prompt injection defense, outbound covert-channel DLP, config tamper detection, dangerous code pattern detection, autonomous task escrow auditing, Safe guard execution, and agent safety guardrails.",
+	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction, executeGuardedOnchainAction],
 	evaluators: [securityGateEvaluator],
 	providers: [securityStatusProvider],
 	chatPreHandlers: [securityGatePreHandler],

@@ -119,17 +119,17 @@ export interface ChatPostHandlerContext {
 	message: {
 		content?: {
 			text?: string;
-			[key: string]: unknown;
+			[key: string]: any;
 		};
-		[key: string]: unknown;
+		[key: string]: any;
 	};
-	runtime?: unknown;
-	[key: string]: unknown;
+	runtime?: any;
+	[key: string]: any;
 }
 
 export interface ChatPostHandlerResult {
 	responseText?: string;
-	[key: string]: unknown;
+	[key: string]: any;
 }
 
 export interface ChatPostHandler {

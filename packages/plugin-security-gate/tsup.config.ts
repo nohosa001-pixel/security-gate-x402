@@ -7,5 +7,5 @@ export default defineConfig({
 	clean: true,
 	format: ["esm"],
 	dts: true,
-	external: ["@elizaos/core", "node:crypto", "node:events"],
+	external: ["@elizaos/core", "@safe-global/protocol-kit", "viem", "node:crypto", "node:events"],
 });

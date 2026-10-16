@@ -1,39 +1,5 @@
-export interface ChatPreHandlerContext {
-	runtime?: {
-		getSetting?: (key: string) => string | undefined;
-		[key: string]: unknown;
-	};
-	message?: {
-		content?: {
-			text?: string;
-			[key: string]: unknown;
-		};
-		[key: string]: unknown;
-	};
-	state?: unknown;
-	signal?: AbortSignal;
-	abortSignal?: AbortSignal;
-}
-
-export interface ChatPreHandlerResult {
-	stop?: boolean;
-	content?: string;
-	error?: Error;
-	response?: unknown;
-	responseText?: string;
-}
-
-export interface ChatPreHandler {
-	id?: string;
-	name?: string;
-	description?: string;
-	order?: number;
-	priority?: number;
-	tryHandle?: (
-		context: ChatPreHandlerContext,
-	) => Promise<ChatPreHandlerResult | null | undefined>;
-	handle?: (context: ChatPreHandlerContext) => Promise<ChatPreHandlerResult>;
-}
+import type { ChatPreHandler, ChatPreHandlerContext, ChatPreHandlerResult } from "@elizaos/core";
+export type { ChatPreHandler, ChatPreHandlerContext, ChatPreHandlerResult };
 
 import { inspectPayloadLocally, isCodePayload } from "../localSecurityGate.js";
 
