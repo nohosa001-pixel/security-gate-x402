@@ -43,8 +43,8 @@ export const securityGatePlugin: Plugin & {
 	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction, executeGuardedOnchainAction],
 	evaluators: [securityGateEvaluator],
 	providers: [securityStatusProvider],
-	chatPreHandlers: [securityGatePreHandler],
-	chatPostHandlers: [securityGatePostHandler],
+	chatPreHandlers: [securityGatePreHandler as any],
+	chatPostHandlers: [securityGatePostHandler as any],
 };
 
 export default securityGatePlugin;

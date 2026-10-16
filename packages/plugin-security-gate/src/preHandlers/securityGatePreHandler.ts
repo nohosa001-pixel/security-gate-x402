@@ -1,5 +1,21 @@
-import type { ChatPreHandler, ChatPreHandlerContext, ChatPreHandlerResult } from "@elizaos/core";
-export type { ChatPreHandler, ChatPreHandlerContext, ChatPreHandlerResult };
+export interface ChatPreHandlerContext {
+	message?: any;
+	runtime?: any;
+	state?: any;
+	signal?: AbortSignal;
+	[key: string]: any;
+}
+
+export interface ChatPreHandlerResult {
+	responseText?: string;
+	[key: string]: any;
+}
+
+export interface ChatPreHandler {
+	id: string;
+	priority?: number;
+	tryHandle(ctx: any): Promise<ChatPreHandlerResult | null>;
+}
 
 import { inspectPayloadLocally, isCodePayload } from "../localSecurityGate.js";
 
