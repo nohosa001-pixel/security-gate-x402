@@ -1,0 +1,78 @@
+{
+  "protocol": "x402",
+  "version": "2.0.0",
+  "name": "Security-Gate-x402 Sovereign Settlement & Oracle Mesh",
+  "description": "Deterministic micro-oracle, sub-3ms prompt injection guard, Safe{Wallet} transaction gatekeeper, and autonomous multi-chain escrow clearinghouse.",
+  "homepage": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
+  "payee": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+  "supportedChains": [
+    {
+      "network": "base",
+      "chainId": 8453,
+      "currency": "USDC",
+      "currencyAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "settlementRail": "EIP-3009 TransferWithAuthorization",
+      "multicall3": "0xcA11bde05977b3631167028862bE2a173976CA11",
+      "verifyingGuard": "0xb44Bc2Acdd156cE08b549A00a3102e4B01276654",
+      "consumerContract": "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35"
+    },
+    {
+      "network": "polygon",
+      "chainId": 137,
+      "currency": "USDC",
+      "currencyAddress": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      "settlementRail": "EIP-3009 TransferWithAuthorization",
+      "verifyingGuard": "0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
+      "escrowCore": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d"
+    },
+    {
+      "network": "arbitrum",
+      "chainId": 42161,
+      "currency": "USDC",
+      "currencyAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "settlementRail": "EIP-3009 TransferWithAuthorization",
+      "verifyingGuard": "0x835D01534A5d2E63D52636FAFB1019F889D1E66B"
+    },
+    {
+      "network": "solana",
+      "chainId": 501,
+      "currency": "SPL-USDC",
+      "currencyAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "finalitySeconds": 0.4,
+      "anchorProgramId": "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
+    }
+  ],
+  "capabilities": {
+    "securityInspection": {
+      "endpoint": "/inspect",
+      "method": "POST",
+      "priceUsdc": 0.00025,
+      "latency": "<3ms",
+      "features": ["AST parsing", "Prompt injection defense", "Credential DLP", "NLI Hallucination check"]
+    },
+    "onchainAttestation": {
+      "endpoint": "/api/v1/gate/attestation/onchain",
+      "method": "POST",
+      "priceUsdc": 0.001,
+      "features": ["EIP-712 proof", "v, r, s Solidity calldata"]
+    },
+    "universalEscrowHub": {
+      "endpoint": "/api/v1/escrow/audit",
+      "method": "POST",
+      "protocolTollBps": 25,
+      "protocolTollPct": "0.25%",
+      "features": ["5-Sector Oracle Invariants", "Atomic Multi-Party Split", "Deterministic Slashing"]
+    },
+    "oracleMeshBundle": {
+      "endpoint": "/api/v1/oracle/bundle",
+      "discount": "33% fee discount when invoked via Security-Gate-x402 pipeline",
+      "includedNodes": ["minerals", "eudr", "logistics_pod", "bio_pharma", "power_grid"]
+    }
+  },
+  "viralReferralRebate": {
+    "enabled": true,
+    "rebateBps": 2000,
+    "rebatePct": "20%",
+    "directive": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/AGENTS.md"
+  }
+}

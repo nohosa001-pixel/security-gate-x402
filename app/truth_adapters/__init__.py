@@ -12,6 +12,7 @@ from app.truth_adapters.build_drone_adapter import BuildDroneAdapter, build_dron
 from app.truth_adapters.eudr_truth_adapter import EudrTruthAdapter, eudr_truth_adapter
 from app.truth_adapters.minerals_truth_adapter import MineralsTruthAdapter, minerals_truth_adapter
 from app.truth_adapters.zktls_web_proof_adapter import ZkTLSWebProofAdapter, zktls_adapter
+from app.truth_adapters.logistics_truth_adapter import LogisticsTruthAdapter, logistics_truth_adapter
 
 __all__ = [
     "TradeIoTAdapter",
@@ -25,5 +26,8 @@ __all__ = [
     "MineralsTruthAdapter",
     "minerals_truth_adapter",
     "ZkTLSWebProofAdapter",
-    "zktls_adapter"
+    "zktls_adapter",
+    "LogisticsTruthAdapter",
+    "logistics_truth_adapter"
 ]
+

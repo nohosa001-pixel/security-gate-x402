@@ -52,4 +52,10 @@
 - `get_onchain_security_attestation`: Cryptographic calldata for on-chain execution.
 - `audit_and_settle_escrow`: Automated Truth Oracle verification and on-chain release for `/hub`.
 - `fetch_escrow_proof_of_reserves`: Real-time cryptographic PoR solvency verification.
+- `logistics_verify_ebl`: DCSA eBL v3.0 standard verification, ISO 6346 container validation, and IMO vessel tracking.
+- `logistics_audit_telemetry`: Environmental sensor logs (temperature, humidity) Merkle root computation and SLA compliance audit.
+- `logistics_issue_pod_attestation`: EIP-712 `ProofOfDelivery` signature issuance for instant autonomous settlement on `LogisticsPoDEscrow.sol`.
+- `audit_and_sign_exploit_indemnity`: Forensic on-chain transaction log investigation and EIP-712 `ExploitClaimVerdict` signing for autonomous indemnity payout on `AgenticShieldPool.sol`.
+
+
 

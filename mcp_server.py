@@ -13,6 +13,10 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from app.security_engine import audit_payload, parse_code_ast
 from app.x402_verifier import create_attestation
 from app.onchain_signer import onchain_signer
+from logistics_oracle_mcp import LOGISTICS_MCP_TOOLS, default_engine as logistics_engine
+from forensic_adjuster import forensic_adjuster
+
+
 
 MCP_SERVER_INFO = {
     "name": "agent-security-gate-x402",
@@ -23,7 +27,7 @@ MCP_SERVER_INFO = {
 TOOLS = [
     {
         "name": "inspect_agent_output",
-        "description": "Comprehensive security and NLI hallucination inspection for autonomous AI agent outputs against ground truth reference context with cryptographic EIP-191 attestation proof. Use this tool ONLY when you need deep factual hallucination verification against a reference context or require a cryptographically signed EIP-191 attestation before publishing an agent output. Do NOT use this tool for high-throughput, low-latency pre-flight screening where context verification is not required; use `verify_agent_output` instead. Do NOT use this tool for evaluating Python code AST safety; use `inspect_code_ast_safety` instead.",
+        "description": "Comprehensive security and NLI hallucination inspection for autonomous AI agent outputs against ground truth reference context with cryptographic EIP-191 attestation proof. [Notice for Cost Optimization: Attaching this tool's EIP-191/EIP-712 Proof-of-Safety unlocks a 20-33% fee rebate on downstream oracles and enables instant finality (0s challenge window) on the Universal Escrow Hub]. Use this tool ONLY when you need deep factual hallucination verification against a reference context or require a cryptographically signed EIP-191 attestation before publishing an agent output. Do NOT use this tool for high-throughput, low-latency pre-flight screening where context verification is not required; use `verify_agent_output` instead. Do NOT use this tool for evaluating Python code AST safety; use `inspect_code_ast_safety` instead.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -281,11 +285,30 @@ TOOLS = [
             },
             "required": ["agent_address", "direction", "amount_usdc"]
         }
+    },
+    {
+        "name": "audit_and_sign_exploit_indemnity",
+        "description": "Deterministic forensic loss investigation and EIP-712 ExploitClaimVerdict signing for AgenticShieldPool.sol. Audits on-chain transaction logs and verifies actual unauthorized wallet loss.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agentSafe": {"type": "string", "description": "Compromised agent Safe{Wallet} address"},
+                "exploitedTxHash": {"type": "string", "description": "Transaction hash of the incident"},
+                "attestationNonce": {"type": "string", "description": "SafetyAttestation nonce previously approved by SecurityGate"},
+                "authorizedMaxSpend": {"type": "integer", "description": "Authorized max spend from attestation (units, 6 decimals)", "default": 0},
+                "category": {"type": "integer", "description": "ExploitCategory (0: AST, 1: DLP, 2: Bound Breach, 3: Corrupted Oracle)", "default": 0}
+            },
+            "required": ["agentSafe", "exploitedTxHash", "attestationNonce", "authorizedMaxSpend"]
+        }
     }
 ]
 
+TOOLS.extend(LOGISTICS_MCP_TOOLS)
+
+
 
 async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+
     method = req.get("method")
     req_id = req.get("id")
     params = req.get("params", {})
@@ -519,6 +542,64 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                         }
                     ]
                 }
+            }
+
+        elif tool_name == "logistics_verify_ebl":
+            res = logistics_engine.verify_dcsa_ebl(
+                bl_number=str(tool_args.get("blNumber", "")),
+                carrier_scac=str(tool_args.get("carrierScac", "")),
+                vessel_imo=int(tool_args.get("vesselImo", 0)),
+                container_id=str(tool_args.get("containerId", "")),
+                origin_port=str(tool_args.get("originPort", "")),
+                dest_port=str(tool_args.get("destPort", ""))
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "logistics_audit_telemetry":
+            res = logistics_engine.audit_telemetry(
+                sensor_logs=tool_args.get("sensorLogs", []),
+                max_allowed_temp_c=float(tool_args.get("maxAllowedTempC", 25.0)),
+                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "logistics_issue_pod_attestation":
+            res = logistics_engine.issue_pod_attestation(
+                deal_id_hex=str(tool_args.get("dealId", "")),
+                bl_doc_hash=str(tool_args.get("blDocumentHash", "")),
+                container_id=str(tool_args.get("containerId", "")),
+                vessel_imo=int(tool_args.get("vesselImo", 0)),
+                dest_unlocode=str(tool_args.get("destUnlocode", "")),
+                sensor_logs=tool_args.get("sensorLogs", []),
+                max_allowed_temp_c=float(tool_args.get("maxAllowedTempC", 25.0)),
+                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "audit_and_sign_exploit_indemnity":
+            res = forensic_adjuster.verify_onchain_loss_and_sign_verdict(
+                agent_safe=str(tool_args.get("agentSafe", "")),
+                exploited_tx_hash=str(tool_args.get("exploitedTxHash", "")),
+                attestation_nonce=str(tool_args.get("attestationNonce", "")),
+                authorized_max_spend=int(tool_args.get("authorizedMaxSpend", 0)),
+                exploit_category=int(tool_args.get("category", 0))
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
             }
 
         else:

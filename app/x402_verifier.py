@@ -175,21 +175,28 @@ class X402Verifier:
                 "step3_direct": "To execute instant query: attach 'X-402-Signature' header with chain_id."
             }
         }
+        from app.dual_engine_fee_router import DualEngineFeeRouter, FeeTier
+        pricing_headers = DualEngineFeeRouter.build_x402_headers(tier=FeeTier.TIER_1_MICRO_TOLL)
+
+        response_headers = {
+            "WWW-Authenticate": f'x402 pay_to="{challenge.pay_to}", amount="{challenge.amount_usdc}", asset="{challenge.asset}", chain_id="{challenge.chain_id}"',
+            "X-402-Quote-ID": challenge.quote_id,
+            "X-402-Expires-At": str(challenge.expires_at),
+            "X-402-Asset": challenge.asset,
+            "X-402-Amount": challenge.amount_usdc,
+            "X-Payment-Protocol": "x402",
+            "X-Payment-Network": challenge.network,
+            "X-Payment-Chain-Id": str(challenge.chain_id),
+            "X-Payment-Amount": challenge.amount_usdc,
+            "X-Payment-Address": challenge.pay_to,
+        }
+        # Inject 2-Tier dynamic pricing & proof discount headers
+        response_headers.update(pricing_headers)
+
         return JSONResponse(
             status_code=402,
             content=body,
-            headers={
-                "WWW-Authenticate": f'x402 pay_to="{challenge.pay_to}", amount="{challenge.amount_usdc}", asset="{challenge.asset}", chain_id="{challenge.chain_id}"',
-                "X-402-Quote-ID": challenge.quote_id,
-                "X-402-Expires-At": str(challenge.expires_at),
-                "X-402-Asset": challenge.asset,
-                "X-402-Amount": challenge.amount_usdc,
-                "X-Payment-Protocol": "x402",
-                "X-Payment-Network": challenge.network,
-                "X-Payment-Chain-Id": str(challenge.chain_id),
-                "X-Payment-Amount": challenge.amount_usdc,
-                "X-Payment-Address": challenge.pay_to,
-            }
+            headers=response_headers
         )
 
     @classmethod

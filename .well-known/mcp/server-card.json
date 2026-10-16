@@ -1,15 +1,15 @@
 {
   "serverInfo": {
     "name": "security-gate-x402",
-    "version": "1.2.3"
+    "version": "1.9.0"
   },
-  "description": "Zero-trust safety & settlement rail for autonomous AI agents. Sub-10ms deterministic guardrails, secret leak defense, bounded wallet controls, and on-chain Proof-of-Safety attestations via x402 on Base ($0.002).",
+  "description": "Zero-trust safety & settlement rail for autonomous AI agents. Sub-3ms deterministic guardrails, secret leak defense, bounded Safe{Wallet} controls, 5-sector truth oracle mesh (with 33% bundle discount), and on-chain Proof-of-Safety attestations via x402 on Base, Polygon, Arbitrum, and Solana ($0.00025 ~ $0.001).",
   "homepage": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
   "repository": "https://github.com/nohosa001-pixel/security-gate-x402",
   "tools": [
     {
       "name": "verify_agent_output",
-      "description": "Ultra-fast (<5ms) deterministic prompt injection, jailbreak pattern, and secret leak scanner (OpenAI, Anthropic, private keys, AWS, GitHub tokens) for autonomous agent actions.",
+      "description": "Ultra-fast (<3ms) deterministic prompt injection, jailbreak pattern, and secret leak scanner (OpenAI, Anthropic, private keys, AWS, GitHub tokens) for autonomous agent actions.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -59,30 +59,67 @@
       }
     },
     {
-      "name": "get_onchain_security_attestation",
-      "description": "Generates EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails across Polygon, Base, and Arbitrum networks.",
+      "name": "inspect_shell_command_safety",
+      "description": "Deterministic Bash/PowerShell command injection and sandbox evasion detector.",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "to": {
+          "command": {
             "type": "string",
-            "description": "Target EVM smart contract address"
-          },
-          "value": {
-            "type": "string",
-            "description": "Wei transaction value"
-          },
-          "data": {
-            "type": "string",
-            "description": "Raw transaction execution calldata (hex)"
-          },
-          "chain_id": {
-            "type": "integer",
-            "default": 8453,
-            "description": "Target EVM Chain ID (Polygon: 137, Base: 8453, Arbitrum: 42161)"
+            "description": "The shell command to validate against destructive and exfiltration patterns."
           }
         },
-        "required": ["to", "data"]
+        "required": ["command"]
+      }
+    },
+    {
+      "name": "get_onchain_security_attestation",
+      "description": "Generates EIP-712 cryptographic signatures and raw Solidity calldata (v, r, s) for smart contract-level on-chain agent guardrails across Base, Polygon, and Arbitrum networks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action_payload": {
+            "type": "string",
+            "description": "The intended agent action, transfer calldata, or delivery payload to attest."
+          }
+        },
+        "required": ["action_payload"]
+      }
+    },
+    {
+      "name": "get_agent_credit_rating",
+      "description": "Computes Moody's & S&P style Credit Rating Score (CRS: 300-850 FICO equivalent) and EU AI Act compliance passport for autonomous agent wallets.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agent_address": {
+            "type": "string",
+            "description": "The EVM address of the agent wallet to evaluate."
+          }
+        },
+        "required": ["agent_address"]
+      }
+    },
+    {
+      "name": "audit_universal_escrow_task",
+      "description": "Audits physical or digital deliverables across 5 sectors (Maritime Trade, Bio IP, BIM Construction, DePIN Compute, M2M Code) against ground truth invariants with instant slashing on failure. (Includes 33% bundle fee discount).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "integer",
+            "description": "The unique escrow job identifier."
+          },
+          "deliverable": {
+            "type": "string",
+            "description": "The JSON deliverable payload (e.g. IoT telemetry, ZK proof hash, drone LiDAR point-cloud)."
+          },
+          "ground_truth_spec": {
+            "type": "string",
+            "description": "Deterministic truth requirement specification."
+          }
+        },
+        "required": ["job_id", "deliverable", "ground_truth_spec"]
       }
     }
   ]
