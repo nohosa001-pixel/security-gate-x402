@@ -317,7 +317,19 @@ def get_mesh_mcp_tools_manifest() -> List[Dict[str, Any]]:
 async def dispatch_to_domain_oracle(
     oracle_ns: str, tool_name: str, args: dict, is_guarded: bool
 ) -> dict:
-    """Mock dispatcher for domain oracles."""
+    """Dispatches requests to real domain oracle engines."""
+    if oracle_ns == "cleanweb":
+        from app.cleanweb_sanitizer import cleanweb_sanitizer
+        raw_text = args.get("html") or args.get("content") or args.get("url") or args.get("text") or ""
+        purified = cleanweb_sanitizer.purify(raw_text)
+        return {
+            "status": "SUCCESS",
+            "oracle": "cleanweb",
+            "tool": tool_name,
+            "verified_by_security_gate": is_guarded,
+            "purified_data": purified.to_dict(),
+        }
+
     return {
         "status": "SUCCESS",
         "oracle": oracle_ns,
