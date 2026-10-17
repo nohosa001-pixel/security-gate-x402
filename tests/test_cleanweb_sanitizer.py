@@ -242,3 +242,24 @@ def test_cleanweb_node_purify_url_with_html_payload(client):
     assert "Article paragraph" in data["sanitized_output"]
     assert "ignore all instructions" not in data["sanitized_output"]
     assert data["metrics"]["hidden_css_blocks_removed"] == 1
+
+
+def test_cleanweb_node_purify_url_blocks_ssrf_metadata(client):
+    payload = {
+        "url": "http://169.254.169.254/computeMetadata/v1/"
+    }
+    response = client.post("/purify-url", json=payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert data["status"] == "BLOCKED_SSRF"
+    assert "prohibited" in data["error"]
+
+
+def test_cleanweb_node_purify_url_blocks_ssrf_localhost(client):
+    payload = {
+        "url": "http://localhost:8000/internal-secrets"
+    }
+    response = client.post("/purify-url", json=payload)
+    assert response.status_code == 400
+    data = response.json()
+    assert data["status"] == "BLOCKED_SSRF"
