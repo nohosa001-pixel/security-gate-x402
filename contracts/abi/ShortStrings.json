@@ -1,0 +1,24 @@
+{
+  "contractName": "ShortStrings",
+  "sourceFile": "node_modules/@openzeppelin/contracts/utils/ShortStrings.sol",
+  "compiler": "solc-0.8.24",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidShortString",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "str",
+          "type": "string"
+        }
+      ],
+      "name": "StringTooLong",
+      "type": "error"
+    }
+  ],
+  "bytecode": "60556032600b8282823980515f1a607314602657634e487b7160e01b5f525f60045260245ffd5b305f52607381538281f3fe730000000000000000000000000000000000000000301460806040525f80fdfea26469706673582212202a0e09a6b3bdcf0917b6276d73959debaae616d55bf637ebb48c0623f629a6f464736f6c63430008180033"
+}

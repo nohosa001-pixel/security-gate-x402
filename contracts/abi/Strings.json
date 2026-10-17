@@ -1,0 +1,34 @@
+{
+  "contractName": "Strings",
+  "sourceFile": "node_modules/@openzeppelin/contracts/utils/Strings.sol",
+  "compiler": "solc-0.8.24",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "length",
+          "type": "uint256"
+        }
+      ],
+      "name": "StringsInsufficientHexLength",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "StringsInvalidAddressFormat",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "StringsInvalidChar",
+      "type": "error"
+    }
+  ],
+  "bytecode": "60556032600b8282823980515f1a607314602657634e487b7160e01b5f525f60045260245ffd5b305f52607381538281f3fe730000000000000000000000000000000000000000301460806040525f80fdfea2646970667358221220397c1b45423d2708970f434443fdb6e00a6881f9cda3133f30e468e854d44dc564736f6c63430008180033"
+}

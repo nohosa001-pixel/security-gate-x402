@@ -56,6 +56,62 @@ POD_EIP712_TYPES = {
     ]
 }
 
+import math
+
+GLOBAL_PORT_UNLOCODE_COORDINATES: Dict[str, tuple] = {
+    "KRPUS": (35.1028, 129.0403),      # Busan, South Korea
+    "NLRTM": (51.9244, 4.4777),        # Rotterdam, Netherlands
+    "SGSIN": (1.29027, 103.851959),    # Singapore
+    "CNSHA": (31.2304, 121.4737),      # Shanghai, China
+    "USLAX": (33.7432, -118.2673),     # Los Angeles, USA
+    "USNYC": (40.7128, -74.0060),      # New York, USA
+    "DEHAM": (53.5511, 9.9937),        # Hamburg, Germany
+    "AEJEA": (24.9857, 55.0273),       # Jebel Ali, UAE
+    "JPTYO": (35.6528, 139.8394),      # Tokyo, Japan
+    "BEANR": (51.2194, 4.4025),        # Antwerp, Belgium
+    "GBSOU": (50.8993, -1.4044),       # Southampton, UK
+    "HKHKG": (22.3193, 114.1694),      # Hong Kong
+    "TWKHH": (22.6163, 120.2980),      # Kaohsiung, Taiwan
+}
+
+
+def haversine_distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    Computes the great-circle distance between two GPS coordinates in meters
+    using the spherical Haversine formula.
+    """
+    r = 6371000.0  # Mean radius of Earth in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = (
+        math.sin(delta_phi / 2.0) ** 2
+        + math.cos(phi1) * math.cos(phi2) * (math.sin(delta_lambda / 2.0) ** 2)
+    )
+    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+    return r * c
+
+
+def extract_gps_coords(log: Dict[str, Any]) -> Optional[tuple]:
+    """Helper to extract (lat, lon) float tuple from telemetry log."""
+    if "gps" in log:
+        gps_val = log["gps"]
+        if isinstance(gps_val, (list, tuple)) and len(gps_val) >= 2:
+            return float(gps_val[0]), float(gps_val[1])
+        elif isinstance(gps_val, dict):
+            lat = gps_val.get("lat") or gps_val.get("latitude")
+            lon = gps_val.get("lon") or gps_val.get("lng") or gps_val.get("longitude")
+            if lat is not None and lon is not None:
+                return float(lat), float(lon)
+    lat = log.get("lat") or log.get("latitude")
+    lon = log.get("lon") or log.get("lng") or log.get("longitude")
+    if lat is not None and lon is not None:
+        return float(lat), float(lon)
+    return None
+
+
 # ============================================================================
 # 2. 물류 검증 코어 엔진 (DCSA eBL v3.0 & Telemetry Merkle Verifier)
 # ============================================================================
@@ -137,10 +193,13 @@ class LogisticsVerificationEngine:
         self,
         sensor_logs: List[Dict[str, Any]],
         max_allowed_temp_c: float = 25.0,
-        min_allowed_temp_c: Optional[float] = None
+        min_allowed_temp_c: Optional[float] = None,
+        dest_unlocode: Optional[str] = None,
+        max_geofence_meters: float = 500.0,
+        target_coords: Optional[tuple] = None
     ) -> Dict[str, Any]:
         """
-        [Tool 2] 운송 중 환경 센서 로그(온도, 충격, 습도) 머클 루트 및 SLA 준수 감사
+        [Tool 2] 운송 중 환경 센서 로그(온도, 충격, 습도, GPS 지오펜싱, 전자봉인 E-Seal) 머클 루트 및 SLA 준수 감사
         """
         merkle_root = self.compute_merkle_root(sensor_logs)
         if not sensor_logs:
@@ -148,30 +207,99 @@ class LogisticsVerificationEngine:
                 "telemetryMerkleRoot": merkle_root,
                 "sampleCount": 0,
                 "conditionPassed": True,
-                "violations": []
+                "violations": [],
+                "geofenceAudit": {"geofencePassed": True, "note": "NO_TELEMETRY"}
             }
 
         violations = []
         observed_temps = []
+        latest_gps = None
+
         for idx, log in enumerate(sensor_logs):
-            temp = float(log.get("temp_c", 20.0))
-            observed_temps.append(temp)
-            if temp > max_allowed_temp_c:
+            # 1. 온도 SLA 검사
+            if "temp_c" in log:
+                temp = float(log["temp_c"])
+                observed_temps.append(temp)
+                if temp > max_allowed_temp_c:
+                    violations.append({
+                        "sampleIndex": idx,
+                        "type": "OVER_TEMPERATURE",
+                        "observed": temp,
+                        "threshold": max_allowed_temp_c,
+                        "log": log
+                    })
+                elif min_allowed_temp_c is not None and temp < min_allowed_temp_c:
+                    violations.append({
+                        "sampleIndex": idx,
+                        "type": "UNDER_TEMPERATURE",
+                        "observed": temp,
+                        "threshold": min_allowed_temp_c,
+                        "log": log
+                    })
+
+            # 2. 하드웨어 전자 봉인(E-Seal) 무결성 검사
+            seal_tampered = (
+                log.get("seal_tampered") is True
+                or log.get("e_seal_tampered") is True
+                or str(log.get("eseal_status", "")).upper() in ["BREACHED", "TAMPERED", "VIOLATED"]
+            )
+            if seal_tampered:
                 violations.append({
                     "sampleIndex": idx,
-                    "type": "OVER_TEMPERATURE",
-                    "observed": temp,
-                    "threshold": max_allowed_temp_c,
+                    "type": "E_SEAL_TAMPERED",
+                    "observed": log.get("eseal_status") or "TAMPERED",
                     "log": log
                 })
-            elif min_allowed_temp_c is not None and temp < min_allowed_temp_c:
+
+            # 3. GPS 좌표 추출
+            coords = extract_gps_coords(log)
+            if coords:
+                latest_gps = coords
+
+        # 4. GNSS Haversine 도착 지오펜싱 검사
+        dest_coords = None
+        if target_coords and len(target_coords) >= 2:
+            dest_coords = (float(target_coords[0]), float(target_coords[1]))
+        elif dest_unlocode:
+            dest_coords = GLOBAL_PORT_UNLOCODE_COORDINATES.get(dest_unlocode.strip().upper())
+
+        geofence_audit: Dict[str, Any] = {
+            "destPort": dest_unlocode,
+            "destCoords": list(dest_coords) if dest_coords else None,
+            "geofenceThresholdMeters": max_geofence_meters
+        }
+
+        if dest_coords and latest_gps:
+            dist_m = haversine_distance_meters(
+                latest_gps[0], latest_gps[1],
+                dest_coords[0], dest_coords[1]
+            )
+            geofence_passed = dist_m <= max_geofence_meters
+            geofence_audit.update({
+                "arrivalDistanceMeters": round(dist_m, 2),
+                "geofencePassed": geofence_passed,
+                "currentGps": list(latest_gps)
+            })
+
+            if not geofence_passed:
                 violations.append({
-                    "sampleIndex": idx,
-                    "type": "UNDER_TEMPERATURE",
-                    "observed": temp,
-                    "threshold": min_allowed_temp_c,
-                    "log": log
+                    "type": "GEOFENCE_NOT_ARRIVED",
+                    "observedDistanceMeters": round(dist_m, 2),
+                    "thresholdMeters": max_geofence_meters,
+                    "destPort": dest_unlocode,
+                    "destCoords": list(dest_coords),
+                    "currentGps": list(latest_gps)
                 })
+        elif dest_coords and not latest_gps:
+            geofence_audit.update({
+                "geofencePassed": True,
+                "note": "NO_GPS_IN_TELEMETRY"
+            })
+        else:
+            geofence_audit.update({
+                "geofencePassed": True,
+                "note": "NO_DESTINATION_SPECIFIED"
+            })
 
         condition_passed = len(violations) == 0
 
@@ -181,8 +309,9 @@ class LogisticsVerificationEngine:
             "minTempC": min(observed_temps) if observed_temps else None,
             "maxTempC": max(observed_temps) if observed_temps else None,
             "conditionPassed": condition_passed,
+            "geofenceAudit": geofence_audit,
             "violationCount": len(violations),
-            "violations": violations[:5]  # Top 5 violations
+            "violations": violations[:10]  # Top 10 violations
         }
 
     def issue_pod_attestation(
@@ -194,14 +323,23 @@ class LogisticsVerificationEngine:
         dest_unlocode: str,
         sensor_logs: List[Dict[str, Any]],
         max_allowed_temp_c: float = 25.0,
-        min_allowed_temp_c: Optional[float] = None
+        min_allowed_temp_c: Optional[float] = None,
+        max_geofence_meters: float = 500.0,
+        target_coords: Optional[tuple] = None
     ) -> Dict[str, Any]:
         """
-        [Tool 3] 목적지 도착 확인 및 스마트 컨트랙트 에스크로 즉시 해제용 EIP-712 서명 발급
+        [Tool 3] 목적지 도착 확인(지오펜싱/온도/봉인) 및 스마트 컨트랙트 에스크로 즉시 해제용 EIP-712 서명 발급
         """
         clean_container = container_id.strip().upper()
         container_hash = "0x" + hashlib.sha256(clean_container.encode("utf-8")).hexdigest()
-        telemetry_audit = self.audit_telemetry(sensor_logs, max_allowed_temp_c, min_allowed_temp_c)
+        telemetry_audit = self.audit_telemetry(
+            sensor_logs=sensor_logs,
+            max_allowed_temp_c=max_allowed_temp_c,
+            min_allowed_temp_c=min_allowed_temp_c,
+            dest_unlocode=dest_unlocode,
+            max_geofence_meters=max_geofence_meters,
+            target_coords=target_coords
+        )
         merkle_root = telemetry_audit["telemetryMerkleRoot"]
         condition_passed = telemetry_audit["conditionPassed"]
 
@@ -270,7 +408,8 @@ class LogisticsVerificationEngine:
                 "minTempC": telemetry_audit["minTempC"],
                 "maxTempC": telemetry_audit["maxTempC"],
                 "violationCount": telemetry_audit["violationCount"]
-            }
+            },
+            "geofenceAudit": telemetry_audit.get("geofenceAudit", {})
         }
 
 
@@ -301,7 +440,8 @@ LOGISTICS_MCP_TOOLS = [
     {
         "name": "logistics_audit_telemetry",
         "description": (
-            "Audits cold-chain and transit environmental sensor logs (temperature, humidity, shock), "
+            "Audits cold-chain and transit environmental sensor logs (temperature, humidity, shock, E-Seal tamper status), "
+            "verifies GPS Geofence arrival within tolerance (default 500m) of destination UN/LOCODE, "
             "calculating a deterministic Merkle Root and identifying any SLA threshold breaches."
         ),
         "inputSchema": {
@@ -309,11 +449,13 @@ LOGISTICS_MCP_TOOLS = [
             "properties": {
                 "sensorLogs": {
                     "type": "array",
-                    "description": "Array of environmental telemetry records (e.g. [{\"temp_c\": 18.2, \"timestamp\": 1700000000}])",
+                    "description": "Array of environmental telemetry records (e.g. [{\"temp_c\": 18.2, \"gps\": [35.1028, 129.0403], \"timestamp\": 1700000000}])",
                     "items": {"type": "object"}
                 },
                 "maxAllowedTempC": {"type": "number", "default": 25.0, "description": "Maximum allowed temperature in Celsius"},
-                "minAllowedTempC": {"type": "number", "description": "Minimum allowed temperature in Celsius (optional)"}
+                "minAllowedTempC": {"type": "number", "description": "Minimum allowed temperature in Celsius (optional)"},
+                "destUnlocode": {"type": "string", "description": "Destination port UN/LOCODE (e.g. KRPUS, NLRTM) for GPS geofence arrival audit"},
+                "maxGeofenceMeters": {"type": "number", "default": 500.0, "description": "Maximum allowed distance from port destination in meters"}
             },
             "required": ["sensorLogs"]
         }
@@ -321,7 +463,7 @@ LOGISTICS_MCP_TOOLS = [
     {
         "name": "logistics_issue_pod_attestation",
         "description": (
-            "Verifies terminal discharge, customs clearance, and environmental telemetry Merkle root. "
+            "Verifies terminal discharge, port GPS geofence arrival (< 500m), customs clearance, and environmental telemetry Merkle root. "
             "Issues an EIP-712 'ProofOfDelivery' signature that autonomously unlocks freight/commodity escrow funds "
             "on LogisticsPoDEscrow / SecurityGateEscrowRouter."
         ),
@@ -335,11 +477,12 @@ LOGISTICS_MCP_TOOLS = [
                 "destUnlocode": {"type": "string", "description": "5-letter UN/LOCODE (e.g. KRPUS, NLRTM)"},
                 "sensorLogs": {
                     "type": "array",
-                    "description": "Array of static/hydrostatic/temp environmental telemetry records",
+                    "description": "Array of static/hydrostatic/temp environmental telemetry records with GPS",
                     "items": {"type": "object"}
                 },
                 "maxAllowedTempC": {"type": "number", "default": 25.0, "description": "Maximum allowed temperature in Celsius"},
-                "minAllowedTempC": {"type": "number", "description": "Minimum allowed temperature in Celsius (optional)"}
+                "minAllowedTempC": {"type": "number", "description": "Minimum allowed temperature in Celsius (optional)"},
+                "maxGeofenceMeters": {"type": "number", "default": 500.0, "description": "Maximum allowed arrival geofence distance in meters"}
             },
             "required": ["dealId", "blDocumentHash", "containerId", "vesselImo", "destUnlocode", "sensorLogs"]
         }
@@ -402,7 +545,9 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             res = default_engine.audit_telemetry(
                 sensor_logs=tool_args.get("sensorLogs", []),
                 max_allowed_temp_c=float(tool_args.get("maxAllowedTempC", 25.0)),
-                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None
+                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None,
+                dest_unlocode=str(tool_args["destUnlocode"]) if "destUnlocode" in tool_args else None,
+                max_geofence_meters=float(tool_args.get("maxGeofenceMeters", 500.0))
             )
             return {
                 "jsonrpc": "2.0",
@@ -419,7 +564,8 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 dest_unlocode=str(tool_args.get("destUnlocode", "")),
                 sensor_logs=tool_args.get("sensorLogs", []),
                 max_allowed_temp_c=float(tool_args.get("maxAllowedTempC", 25.0)),
-                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None
+                min_allowed_temp_c=float(tool_args["minAllowedTempC"]) if "minAllowedTempC" in tool_args else None,
+                max_geofence_meters=float(tool_args.get("maxGeofenceMeters", 500.0))
             )
             return {
                 "jsonrpc": "2.0",

@@ -32,7 +32,10 @@ async def audit_telemetry(request: Request):
     return default_engine.audit_telemetry(
         sensor_logs=body.get("sensorLogs", []),
         max_allowed_temp_c=float(body.get("maxAllowedTempC", 25.0)),
-        min_allowed_temp_c=float(body["minAllowedTempC"]) if "minAllowedTempC" in body else None
+        min_allowed_temp_c=float(body["minAllowedTempC"]) if "minAllowedTempC" in body else None,
+        dest_unlocode=body.get("destUnlocode"),
+        max_geofence_meters=float(body.get("maxGeofenceMeters", 500.0)),
+        target_coords=body.get("targetCoords")
     )
 
 @app.post("/issue_pod")
@@ -46,5 +49,8 @@ async def issue_pod(request: Request):
         dest_unlocode=body.get("destUnlocode", ""),
         sensor_logs=body.get("sensorLogs", []),
         max_allowed_temp_c=float(body.get("maxAllowedTempC", 25.0)),
-        min_allowed_temp_c=float(body["minAllowedTempC"]) if "minAllowedTempC" in body else None
+        min_allowed_temp_c=float(body["minAllowedTempC"]) if "minAllowedTempC" in body else None,
+        max_geofence_meters=float(body.get("maxGeofenceMeters", 500.0)),
+        target_coords=body.get("targetCoords")
     )
+

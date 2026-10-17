@@ -281,9 +281,9 @@ def test_end_to_end_cross_oracle_supply_chain_pipeline():
 
     # Step 3 & 4: Transit Merkle Audit & Delivery Attestation
     transit_sensor_logs = [
-        {"temp_c": 18.2, "humidity_pct": 52, "ts": 1711000100},
-        {"temp_c": 19.0, "humidity_pct": 50, "ts": 1711000200},
-        {"temp_c": 19.5, "humidity_pct": 51, "ts": 1711000300},
+        {"temp_c": 18.2, "humidity_pct": 52, "gps": [35.1028, 129.0403], "ts": 1711000100},
+        {"temp_c": 19.0, "humidity_pct": 50, "gps": [35.1030, 129.0405], "ts": 1711000200},
+        {"temp_c": 19.5, "humidity_pct": 51, "gps": [35.1029, 129.0404], "ts": 1711000300},
     ]
 
     pod_attestation = logistics_adapter.issue_pod_attestation(
@@ -293,13 +293,16 @@ def test_end_to_end_cross_oracle_supply_chain_pipeline():
         vessel_imo=9765432,
         dest_unlocode="KRPUS",
         sensor_logs=transit_sensor_logs,
-        max_allowed_temp_c=25.0
+        max_allowed_temp_c=25.0,
+        max_geofence_meters=500.0
     )
 
     assert pod_attestation["escrowAction"] == "READY_FOR_INSTANT_RELEASE"
     assert pod_attestation["podStruct"]["blDocumentHash"] == expected_bl_hash
     assert pod_attestation["podStruct"]["containerIdHash"] == expected_container_hash
     assert pod_attestation["podStruct"]["conditionPassed"] is True
+    assert pod_attestation["geofenceAudit"]["geofencePassed"] is True
+    assert pod_attestation["geofenceAudit"]["arrivalDistanceMeters"] < 50.0
     assert pod_attestation["eip712Signature"].startswith("0x")
 
 
@@ -340,3 +343,108 @@ async def test_mcp_server_logistics_tool_dispatch():
     assert content["verified"] is True
     assert content["carrierScac"] == "MAEU"
     assert content["blDocumentHash"].startswith("0x")
+
+
+def test_haversine_distance_calculation():
+    """Validates spherical Haversine distance accuracy between known coordinates."""
+    from logistics_oracle_mcp import haversine_distance_meters, GLOBAL_PORT_UNLOCODE_COORDINATES
+
+    # Busan Port coordinates
+    busan_lat, busan_lon = GLOBAL_PORT_UNLOCODE_COORDINATES["KRPUS"]
+    # Same point distance should be 0.0
+    assert haversine_distance_meters(busan_lat, busan_lon, busan_lat, busan_lon) == 0.0
+
+    # ~100m offset roughly (0.0009 degrees latitude is ~100 meters)
+    offset_lat = busan_lat + 0.0009
+    dist = haversine_distance_meters(busan_lat, busan_lon, offset_lat, busan_lon)
+    assert 90.0 <= dist <= 110.0
+
+
+def test_telemetry_geofence_arrival_pass_and_fail(logistics_engine):
+    """
+    Validates that:
+    1. A vessel arriving within 500m of the port destination passes the geofence audit.
+    2. A vessel outside the 500m geofence fails the audit with GEOFENCE_NOT_ARRIVED.
+    """
+    from logistics_oracle_mcp import GLOBAL_PORT_UNLOCODE_COORDINATES
+    busan_lat, busan_lon = GLOBAL_PORT_UNLOCODE_COORDINATES["KRPUS"]
+
+    # 1. Arrival inside geofence (~50m from berth)
+    inside_logs = [
+        {"temp_c": 19.0, "gps": [busan_lat + 0.0003, busan_lon + 0.0002], "ts": 1712000100}
+    ]
+    res_inside = logistics_engine.audit_telemetry(
+        sensor_logs=inside_logs,
+        dest_unlocode="KRPUS",
+        max_geofence_meters=500.0
+    )
+    assert res_inside["conditionPassed"] is True
+    assert res_inside["geofenceAudit"]["geofencePassed"] is True
+    assert res_inside["geofenceAudit"]["arrivalDistanceMeters"] < 100.0
+
+    # 2. Arrival outside geofence (5km away)
+    outside_logs = [
+        {"temp_c": 19.0, "gps": [busan_lat + 0.05, busan_lon + 0.05], "ts": 1712000100}
+    ]
+    res_outside = logistics_engine.audit_telemetry(
+        sensor_logs=outside_logs,
+        dest_unlocode="KRPUS",
+        max_geofence_meters=500.0
+    )
+    assert res_outside["conditionPassed"] is False
+    assert res_outside["geofenceAudit"]["geofencePassed"] is False
+    assert res_outside["violations"][0]["type"] == "GEOFENCE_NOT_ARRIVED"
+    assert res_outside["violations"][0]["observedDistanceMeters"] > 5000.0
+
+
+def test_telemetry_eseal_tampering_rejection(logistics_engine):
+    """
+    Validates that if an Electronic Seal (E-Seal) is breached or tampered with in transit,
+    the condition is rejected and flags E_SEAL_TAMPERED.
+    """
+    tampered_logs = [
+        {"temp_c": 20.0, "seal_tampered": True, "ts": 1712000100}
+    ]
+    res = logistics_engine.audit_telemetry(
+        sensor_logs=tampered_logs,
+        dest_unlocode="NLRTM"
+    )
+    assert res["conditionPassed"] is False
+    assert res["violationCount"] == 1
+    assert res["violations"][0]["type"] == "E_SEAL_TAMPERED"
+
+
+def test_geofence_arrival_in_pod_attestation(logistics_engine):
+    """
+    End-to-end check that issue_pod_attestation includes geofenceAudit
+    and verifies arrival within 500m of Rotterdam (NLRTM).
+    """
+    from logistics_oracle_mcp import GLOBAL_PORT_UNLOCODE_COORDINATES
+    rtm_lat, rtm_lon = GLOBAL_PORT_UNLOCODE_COORDINATES["NLRTM"]
+
+    deal_id = "0x" + "88" * 32
+    bl_doc_hash = "0x" + "99" * 32
+    container_id = "MSKU9988776"
+    vessel_imo = 9432109
+
+    # Valid arrival at Rotterdam terminal (< 200m)
+    logs = [
+        {"temp_c": 18.5, "gps": [rtm_lat + 0.001, rtm_lon + 0.001], "ts": 1712000200}
+    ]
+
+    attestation = logistics_engine.issue_pod_attestation(
+        deal_id_hex=deal_id,
+        bl_doc_hash=bl_doc_hash,
+        container_id=container_id,
+        vessel_imo=vessel_imo,
+        dest_unlocode="NLRTM",
+        sensor_logs=logs,
+        max_geofence_meters=500.0
+    )
+
+    assert attestation["escrowAction"] == "READY_FOR_INSTANT_RELEASE"
+    assert attestation["podStruct"]["conditionPassed"] is True
+    assert "geofenceAudit" in attestation
+    assert attestation["geofenceAudit"]["geofencePassed"] is True
+    assert attestation["geofenceAudit"]["destPort"] == "NLRTM"
+

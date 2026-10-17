@@ -1,0 +1,13 @@
+{
+  "contractName": "ReentrancyGuard",
+  "sourceFile": "node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+  "compiler": "solc-0.8.24",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ReentrancyGuardReentrantCall",
+      "type": "error"
+    }
+  ],
+  "bytecode": ""
+}

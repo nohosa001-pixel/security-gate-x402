@@ -44,13 +44,19 @@ class LogisticsTruthAdapter:
         self,
         sensor_logs: List[Dict[str, Any]],
         max_allowed_temp_c: float = 25.0,
-        min_allowed_temp_c: Optional[float] = None
+        min_allowed_temp_c: Optional[float] = None,
+        dest_unlocode: Optional[str] = None,
+        max_geofence_meters: float = 500.0,
+        target_coords: Optional[tuple] = None
     ) -> Dict[str, Any]:
-        """Audits sensor logs and calculates Merkle Root."""
+        """Audits sensor logs, E-Seal tamper status, GPS arrival geofence, and calculates Merkle Root."""
         return self.engine.audit_telemetry(
             sensor_logs=sensor_logs,
             max_allowed_temp_c=max_allowed_temp_c,
-            min_allowed_temp_c=min_allowed_temp_c
+            min_allowed_temp_c=min_allowed_temp_c,
+            dest_unlocode=dest_unlocode,
+            max_geofence_meters=max_geofence_meters,
+            target_coords=target_coords
         )
 
     def issue_pod_attestation(
@@ -62,7 +68,9 @@ class LogisticsTruthAdapter:
         dest_unlocode: str,
         sensor_logs: List[Dict[str, Any]],
         max_allowed_temp_c: float = 25.0,
-        min_allowed_temp_c: Optional[float] = None
+        min_allowed_temp_c: Optional[float] = None,
+        max_geofence_meters: float = 500.0,
+        target_coords: Optional[tuple] = None
     ) -> Dict[str, Any]:
         """Issues EIP-712 Proof-of-Delivery attestation for on-chain settlement."""
         return self.engine.issue_pod_attestation(
@@ -73,8 +81,11 @@ class LogisticsTruthAdapter:
             dest_unlocode=dest_unlocode,
             sensor_logs=sensor_logs,
             max_allowed_temp_c=max_allowed_temp_c,
-            min_allowed_temp_c=min_allowed_temp_c
+            min_allowed_temp_c=min_allowed_temp_c,
+            max_geofence_meters=max_geofence_meters,
+            target_coords=target_coords
         )
 
 
 logistics_truth_adapter = LogisticsTruthAdapter()
+
