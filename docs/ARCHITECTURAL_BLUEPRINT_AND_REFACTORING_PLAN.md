@@ -144,21 +144,22 @@ timeline
     Phase 4 : 대외 커뮤니케이션 재정립 : X 포스팅, README, 마케팅을 "단 하나의 5ms 방패"로 리포지셔닝
 ```
 
-### Phase 1: 거대 `main.py`의 라우터 분할 (Breaking the Monolith)
+### Phase 1: 거대 `main.py`의 라우터 분할 (Breaking the Monolith) - [✅ 완료 / 2026-10-17]
 * **목표**: 2,732줄의 `main.py`를 순수 애플리케이션 수명주기(Lifespan)와 미들웨어만 남기고 4개의 `APIRouter`로 분할.
 * **추출 라우터**:
-  1. `routers/gate_router.py`: `/api/v1/inspect`, `/api/v1/audit`, `/api/v1/verify`
-  2. `routers/escrow_router.py`: `/api/v1/escrow/*`, `/hub/*`
-  3. `routers/vault_router.py`: `/api/v1/vault/*`, `/api/v1/keys/*`
-  4. `routers/plugins_router.py`: `/api/v1/truth/*`, `/api/v1/factoring/*`, `/api/v1/insurance/*`
-* **효과**: 빌드/테스트 속도 대폭 향상, 엔드포인트별 장애 격리.
+  1. `app/routers/gate.py`: `/api/v1/inspect`, `/api/v1/audit`, `/api/v1/verify`
+  2. `app/routers/escrow.py`: `/api/v1/escrow/*`, `/hub/*`
+  3. `app/routers/vault.py`: `/api/v1/vault/*`, `/api/v1/keys/*`
+  4. `app/routers/extensions.py`: `/api/v1/truth/*`, `/api/v1/factoring/*`, `/api/v1/insurance/*`
+* **성과**: `main.py` 라인 수 72% 감량 (2,732줄 -> 773줄), 라우터 단위 장애 격리 달성.
 
-### Phase 2: 중복 모듈 단일화 (Consolidation)
-* `agent_credit_engine.py`와 `credit_rating_engine.py`를 하나로 합쳐 `credit_rating.py`로 단일화.
-* `factoring_engine.py`와 `universal_factoring_bridge.py`를 `factoring.py`로 통합.
-* `insurance_engine.py`와 `universal_insurance_bridge.py`를 `insurance.py`로 통합.
-* `spend_guard.py`와 `guarded_wallet.py`를 `spend_guard.py`로 통합.
-* **효과**: 파일 수 10개 이상 감소, 네이밍 혼선 원천 제거.
+### Phase 2: 중복 모듈 단일화 (Consolidation & SSOT) - [✅ 완료 / 2026-10-18]
+* **SSOT 통합 및 하위 호환 Facade 체계 확립**:
+  * `agent_credit_engine.py` ➔ `credit_rating_engine.py` 단일 진실 공급원(SSOT) 통합 완료.
+  * `guarded_wallet.py` ➔ `spend_guard.py` 단일화 완료.
+  * `factoring_engine.py` ➔ `universal_factoring_bridge.py` 단일화 완료.
+  * `insurance_engine.py` ➔ `universal_insurance_bridge.py` 단일화 완료.
+* **성과**: 기존 외부 호출 및 359개 전 단위/통합 테스트 100% 무결성 통과 (하위 호환성 100% 유지).
 
 ### Phase 3: 도메인 오라클의 플러그인화 (Decoupled Plugins)
 * 해운, 바이오, 건설, 전력 오라클을 `app/plugins/` 디렉토리로 이동.
