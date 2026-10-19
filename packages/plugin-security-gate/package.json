@@ -1,75 +1,75 @@
 {
-	"name": "elizaos-plugin-security-gate",
-	"version": "2.3.0",
-	"description": "Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",
-		"directory": "packages/plugin-security-gate"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"type": "module",
-	"main": "dist/index.js",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"exports": {
-		"./package.json": "./package.json",
-		".": {
-			"eliza-source": {
-				"types": "./src/index.ts",
-				"import": "./src/index.ts",
-				"default": "./src/index.ts"
-			},
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			}
-		},
-		"./*": {
-			"types": "./dist/*.d.ts",
-			"eliza-source": {
-				"types": "./src/*.ts",
-				"import": "./src/*.ts",
-				"default": "./src/*.ts"
-			},
-			"import": "./dist/*.js",
-			"default": "./dist/*.js"
-		}
-	},
-	"scripts": {
-		"build": "tsup",
-		"test": "bun test src/standalone.test.ts",
-		"lint": "bunx @biomejs/biome check --write --unsafe src",
-		"format": "bunx @biomejs/biome format --write src"
-	},
-	"keywords": [
-		"elizaos",
-		"eliza",
-		"ai-agent",
-		"security",
-		"prompt-injection",
-		"guardrails",
-		"x402",
-		"safety"
-	],
-	"author": "Security Gate Team",
-	"license": "MIT",
-	"peerDependencies": {
-		"@elizaos/core": ">=2.0.0-0"
-	},
-	"dependencies": {
-		"@safe-global/protocol-kit": "^4.1.7",
-		"viem": "^2.57.5"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.5.8",
-		"@elizaos/core": "^2.0.0-beta.1",
-		"@types/node": "^22.13.0",
-		"tinyglobby": "^0.2.17",
-		"tsup": "^8.5.1",
-		"typescript": "^5.8.2",
-		"vitest": "^3.0.7"
-	}
+  "name": "elizaos-plugin-security-gate",
+  "version": "2.4.0",
+  "description": "Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",
+    "directory": "packages/plugin-security-gate"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "eliza-source": {
+        "types": "./src/index.ts",
+        "import": "./src/index.ts",
+        "default": "./src/index.ts"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "eliza-source": {
+        "types": "./src/*.ts",
+        "import": "./src/*.ts",
+        "default": "./src/*.ts"
+      },
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "bun test src/standalone.test.ts",
+    "lint": "bunx @biomejs/biome check --write --unsafe src",
+    "format": "bunx @biomejs/biome format --write src"
+  },
+  "keywords": [
+    "elizaos",
+    "eliza",
+    "ai-agent",
+    "security",
+    "prompt-injection",
+    "guardrails",
+    "x402",
+    "safety"
+  ],
+  "author": "Security Gate Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "@elizaos/core": ">=2.0.0-0"
+  },
+  "dependencies": {
+    "@safe-global/protocol-kit": "^4.1.7",
+    "viem": "^2.57.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.8",
+    "@elizaos/core": "^2.0.0-beta.1",
+    "@types/node": "^22.13.0",
+    "tinyglobby": "^0.2.17",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
 }
