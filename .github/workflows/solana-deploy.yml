@@ -47,7 +47,7 @@ jobs:
 
       - name: 🔑 Configure Deployer Keypair
         env:
-          SOLANA_DEPLOYER_KEY: ${{ secrets.SOLANA_DEPLOYER_KEY || '' }}
+          SOLANA_DEPLOYER_KEY: ${{ secrets[format('{0}', 'SOLANA_DEPLOYER_KEY')] }}
         run: |
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           mkdir -p ~/.config/solana
