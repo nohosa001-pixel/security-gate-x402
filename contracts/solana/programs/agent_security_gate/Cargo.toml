@@ -19,3 +19,4 @@ default = []
 anchor-lang = "0.29.0"
 anchor-spl = "0.29.0"
 solana-program = "~1.18.0"
+zeroize_derive = "=1.4.3"

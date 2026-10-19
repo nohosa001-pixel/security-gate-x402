@@ -4,3 +4,8 @@ members = [
     "programs/agent_security_gate",
 ]
 resolver = "2"
+
+[profile.release]
+overflow-checks = true
+lto = "fat"
+codegen-units = 1
