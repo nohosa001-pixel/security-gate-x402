@@ -41,8 +41,8 @@ jobs:
 
       - name: ⚓ Install Anchor CLI
         run: |
-          echo "Installing Anchor CLI..."
-          npm install -g @coral-xyz/anchor-cli@0.30.1 || npm install -g @coral-xyz/anchor-cli@0.29.0
+          echo "Installing Anchor CLI v0.30.1..."
+          npm install -g @coral-xyz/anchor-cli@0.30.1
           which anchor || echo "Anchor installed in npm global path"
 
       - name: 🔑 Configure Deployer Keypair
