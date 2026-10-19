@@ -27,23 +27,22 @@ jobs:
         with:
           node-version: 20
 
-      - name: 🦀 Setup Rust Toolchain (1.75.0 for Solana 1.18 compatibility)
-        uses: dtolnay/rust-toolchain@master
+      - name: 🦀 Setup Rust Toolchain (Stable with Edition 2024 support)
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.75.0
           targets: x86_64-unknown-linux-gnu
 
-      - name: 📦 Install Solana CLI (v1.18.17)
+      - name: 📦 Install Solana CLI (Stable Agave Release)
         run: |
-          echo "Installing Solana CLI v1.18.17..."
-          sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.17/install)"
+          echo "Installing latest stable Solana CLI..."
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
-      - name: ⚓ Install Anchor CLI (v0.29.0 via npm prebuilt)
+      - name: ⚓ Install Anchor CLI (v0.29.0)
         run: |
           echo "Installing Anchor CLI v0.29.0..."
           npm install -g @coral-xyz/anchor-cli@0.29.0
-          which anchor || echo "Anchor installed at: $(npm root -g)/@coral-xyz/anchor-cli"
+          which anchor || echo "Anchor installed in npm global path"
 
       - name: 🔑 Configure Deployer Keypair
         run: |
@@ -69,8 +68,6 @@ jobs:
           echo "Anchor version: $(anchor --version || true)"
           echo "Rustc version : $(rustc --version)"
           rm -f Cargo.lock
-          cargo generate-lockfile || true
-          cargo update -p zeroize_derive --precise 1.4.3 || true
           anchor build
 
       - name: 📤 Archive Compiled BPF Binaries & IDLs
