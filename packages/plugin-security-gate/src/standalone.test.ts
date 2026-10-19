@@ -200,6 +200,12 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		expect(poly.contracts.agentInsurancePool).toBe(
 			"0xE67F4BC75B11dBb3ef2C9Ad1848B4b193c2c69C6",
 		);
+		expect(poly.contracts.agenticShieldPool).toBe(
+			"0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+		);
+		expect(poly.contracts.logisticsPoDEscrow).toBe(
+			"0x95df688E42C3053a1f09A46F179A8250bEAB40aB",
+		);
 		expect(poly.tokens.usdc).toBe("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359");
 
 		// Base (8453)
@@ -208,6 +214,12 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		expect(base.contracts.safeSecurityGateGuard).toBe(
 			"0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
 		);
+		expect(base.contracts.agenticShieldPool).toBe(
+			"0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
+		);
+		expect(base.contracts.logisticsPoDEscrow).toBe(
+			"0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+		);
 		expect(base.tokens.usdc).toBe("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913");
 
 		// Arbitrum (42161)
@@ -215,6 +227,12 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		expect(arb.chainName).toBe("Arbitrum One");
 		expect(arb.contracts.agentEscrow).toBe(
 			"0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
+		);
+		expect(arb.contracts.agenticShieldPool).toBe(
+			"0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28",
+		);
+		expect(arb.contracts.logisticsPoDEscrow).toBe(
+			"0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F",
 		);
 		expect(arb.tokens.usdc).toBe("0xaf88d065e77c8cC2239327C5EDb3A432268e5831");
 

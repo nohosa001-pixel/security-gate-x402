@@ -21,6 +21,9 @@ export interface SecurityGateContractAddresses {
 		agentFactoringPool: string;
 		agentTreasuryVault: string;
 		securityGateConsumer: string;
+		// V2 Autonomous Economic & Shield Protocol Contracts
+		agenticShieldPool: string;
+		logisticsPoDEscrow: string;
 	};
 	tokens: {
 		usdc: string;
@@ -50,6 +53,8 @@ export const SECURITY_GATE_REGISTRY: Record<
 			agentFactoringPool: "0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0",
 			agentTreasuryVault: "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638",
 			securityGateConsumer: "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA",
+			agenticShieldPool: "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+			logisticsPoDEscrow: "0x95df688E42C3053a1f09A46F179A8250bEAB40aB",
 		},
 		tokens: {
 			usdc: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
@@ -72,6 +77,8 @@ export const SECURITY_GATE_REGISTRY: Record<
 			agentFactoringPool: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
 			agentTreasuryVault: "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
 			securityGateConsumer: "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35",
+			agenticShieldPool: "0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
+			logisticsPoDEscrow: "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
 		},
 		tokens: {
 			usdc: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -94,6 +101,8 @@ export const SECURITY_GATE_REGISTRY: Record<
 			agentFactoringPool: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
 			agentTreasuryVault: "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
 			securityGateConsumer: "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35",
+			agenticShieldPool: "0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28",
+			logisticsPoDEscrow: "0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F",
 		},
 		tokens: {
 			usdc: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",

@@ -1,4 +1,4 @@
-__version__ = "1.9.0"
+__version__ = "2.0.0"
 
 from app.spend_guard import (
     spend_guard,
@@ -9,12 +9,14 @@ from app.spend_guard import (
 )
 from app.guarded_wallet import GuardedSafeWallet
 from app.safe_guard_automator import guard_automator
+from app.security_gate_middleware import SecurityGateMiddleware
 
 __all__ = [
     "spend_guard",
     "SpendGuard",
     "GuardedSafeWallet",
     "guard_automator",
+    "SecurityGateMiddleware",
     "SecurityGateViolationError",
     "SpendLimitExceededError",
     "UnboundedLoopError",

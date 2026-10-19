@@ -1,0 +1,68 @@
+{
+  "polygon": {
+    "network": "Polygon Mainnet",
+    "chain_id": 137,
+    "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "deployed_at": "2026-10-19T00:58:23Z",
+    "contracts": {
+      "AgenticShieldPool": {
+        "address": "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+        "tx_hash": "0xb0a50bec0bb9d47adc604724f7cffe3089198bfd0df8a718c76816809c42b375",
+        "block_number": 95777395,
+        "gas_used": 2335848,
+        "explorer_url": "https://polygonscan.com/address/0x0343e9Fff9451346767D6cca2C249d82667E7dE0"
+      },
+      "LogisticsPoDEscrow": {
+        "address": "0x95df688E42C3053a1f09A46F179A8250bEAB40aB",
+        "tx_hash": "4a6231a190087d74ce1b85fd5eb4f9e4f50f3726812176b7a92e75338034392b",
+        "block_number": 95777438,
+        "gas_used": 1181733,
+        "explorer_url": "https://polygonscan.com/address/0x95df688E42C3053a1f09A46F179A8250bEAB40aB"
+      }
+    }
+  },
+  "arbitrum": {
+    "network": "Arbitrum One",
+    "chain_id": 42161,
+    "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "deployed_at": "2026-10-19T00:58:55Z",
+    "contracts": {
+      "AgenticShieldPool": {
+        "address": "0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28",
+        "tx_hash": "b2341d9577cb1e53ac26fd100927bb97e333a16d3755370b33663ee00a182b6a",
+        "block_number": 516136398,
+        "gas_used": 2314537,
+        "explorer_url": "https://arbiscan.io/address/0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28"
+      },
+      "LogisticsPoDEscrow": {
+        "address": "0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F",
+        "tx_hash": "d5966b1427acdd7a538e8aa68cd81720dd66411d5b5f050b1b348bada82dd7dd",
+        "block_number": 516136417,
+        "gas_used": 1177303,
+        "explorer_url": "https://arbiscan.io/address/0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F"
+      }
+    }
+  },
+  "base": {
+    "network": "Base Mainnet",
+    "chain_id": 8453,
+    "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+    "deployed_at": "2026-10-19T01:12:32Z",
+    "contracts": {
+      "AgenticShieldPool": {
+        "address": "0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
+        "tx_hash": "efb31d834ee3053a8470b4e375f6a4fe96fe5ecaca17db4708d9865e96a86edf",
+        "block_number": 52791500,
+        "gas_used": 2308956,
+        "explorer_url": "https://basescan.org/address/0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE"
+      },
+      "LogisticsPoDEscrow": {
+        "address": "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+        "tx_hash": "8b60694d87a4e54a4b32b62129bcd100649ceeea4cb266fe0880ea5c2835a317",
+        "block_number": 52791502,
+        "gas_used": 1174173,
+        "explorer_url": "https://basescan.org/address/0x0343e9Fff9451346767D6cca2C249d82667E7dE0"
+      }
+    }
+  }
+}

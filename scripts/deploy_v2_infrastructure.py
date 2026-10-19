@@ -59,9 +59,9 @@ NETWORK_CONFIGS: Dict[str, Dict[str, Any]] = {
         "name": "Polygon Mainnet",
         "chain_id": 137,
         "rpcs": [
-            "https://polygon-rpc.com",
-            "https://polygon-bor-rpc.publicnode.com",
-            "https://1rpc.io/matic"
+            "https://1rpc.io/matic",
+            "https://polygon.gateway.tenderly.co",
+            "https://rpc.ankr.com/polygon"
         ],
         "explorer": "https://polygonscan.com",
         "symbol": "POL",
@@ -188,9 +188,14 @@ def deploy_contract(
     try:
         fee_history = w3.eth.fee_history(1, "latest", [50])
         base_fee = fee_history["baseFeePerGas"][-1]
-        priority_fee = w3.to_wei(0.001, "gwei")
-        tx_params["maxFeePerGas"] = int(base_fee * 1.5) + priority_fee
-        tx_params["maxPriorityFeePerGas"] = priority_fee
+        if chain_id == 137:
+            priority_fee = max(w3.eth.max_priority_fee, w3.to_wei(35, "gwei"))
+            tx_params["maxFeePerGas"] = int(base_fee * 1.6) + priority_fee
+            tx_params["maxPriorityFeePerGas"] = priority_fee
+        else:
+            priority_fee = w3.to_wei(0.001, "gwei")
+            tx_params["maxFeePerGas"] = int(base_fee * 1.5) + priority_fee
+            tx_params["maxPriorityFeePerGas"] = priority_fee
     except Exception:
         tx_params["gasPrice"] = int(w3.eth.gas_price * 1.2)
 

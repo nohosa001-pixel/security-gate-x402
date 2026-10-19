@@ -141,6 +141,8 @@ console.log("Native USDC:", arb.tokens.usdc);
 | **AgentFactoringPool** | [`0xd0Aa...5BB0`](https://polygonscan.com/address/0xd0Aa4Aed2AeDE14611B53C3e93CF784F3Fe05BB0#code) | [`0x6418...aB93`](https://basescan.org/address/0x6418f408cFf03F862D7691f01fAb00a895E6aB93#code) | [`0x6418...aB93`](https://arbiscan.io/address/0x6418f408cFf03F862D7691f01fAb00a895E6aB93#code) |
 | **AgentTreasuryVault** | [`0xfCf3...C638`](https://polygonscan.com/address/0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638#code) | [`0xF8e1...ae55`](https://basescan.org/address/0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55#code) | [`0xF8e1...ae55`](https://arbiscan.io/address/0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55#code) |
 | **SecurityGateConsumer** | [`0x9E3d...1DDA`](https://polygonscan.com/address/0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA#code) | [`0xdC6C...aB35`](https://basescan.org/address/0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35#code) | [`0xdC6C...aB35`](https://arbiscan.io/address/0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35#code) |
+| **AgenticShieldPool (V2 ERC-4626)** | [`0x0343...7dE0`](https://polygonscan.com/address/0x0343e9Fff9451346767D6cca2C249d82667E7dE0#code) | [`0x7F14...A1AE`](https://basescan.org/address/0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE#code) | [`0xAAde...Ac28`](https://arbiscan.io/address/0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28#code) |
+| **LogisticsPoDEscrow (V2 PoD)** | [`0x95df...40aB`](https://polygonscan.com/address/0x95df688E42C3053a1f09A46F179A8250bEAB40aB#code) | [`0x0343...7dE0`](https://basescan.org/address/0x0343e9Fff9451346767D6cca2C249d82667E7dE0#code) | [`0x3A86...978F`](https://arbiscan.io/address/0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F#code) |
 
 ---
 
