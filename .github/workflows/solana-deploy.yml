@@ -46,15 +46,17 @@ jobs:
           which anchor || echo "Anchor installed in npm global path"
 
       - name: 🔑 Configure Deployer Keypair
+        env:
+          SOLANA_DEPLOYER_KEY: ${{ secrets.SOLANA_DEPLOYER_KEY }}
         run: |
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           mkdir -p ~/.config/solana
           if [ "${{ github.event.inputs.cluster }}" = "mainnet" ]; then
-            if [ -z "${{ secrets.SOLANA_DEPLOYER_KEY }}" ]; then
+            if [ -z "$SOLANA_DEPLOYER_KEY" ]; then
               echo "::error::SOLANA_DEPLOYER_KEY secret is not set! Required for mainnet deployment."
               exit 1
             fi
-            echo "${{ secrets.SOLANA_DEPLOYER_KEY }}" > ~/.config/solana/id.json
+            echo "$SOLANA_DEPLOYER_KEY" > ~/.config/solana/id.json
           else
             echo "Generating fresh keypair for ${{ github.event.inputs.cluster }}..."
             solana-keygen new --no-bip39-passphrase --silent -o ~/.config/solana/id.json --force
