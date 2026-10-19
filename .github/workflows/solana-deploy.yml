@@ -67,6 +67,7 @@ jobs:
         working-directory: contracts/solana
         run: |
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
+          export RUSTFLAGS="-A unexpected_cfgs -A unused_imports"
           ln -sf $(which cargo-build-sbf) $(dirname $(which cargo-build-sbf))/cargo-build-bpf || true
           echo "Solana version: $(solana --version)"
           echo "Anchor version: $(anchor --version || true)"
