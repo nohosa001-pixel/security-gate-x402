@@ -21,7 +21,6 @@ export interface SecurityGateContractAddresses {
 		agentFactoringPool: string;
 		agentTreasuryVault: string;
 		securityGateConsumer: string;
-		// V2 Autonomous Economic & Shield Protocol Contracts
 		agenticShieldPool: string;
 		logisticsPoDEscrow: string;
 	};
@@ -46,7 +45,7 @@ export const SECURITY_GATE_REGISTRY: Record<
 		contracts: {
 			safeSecurityGateGuard: "0x8c2a8B9Ff05a92ad16E0ED58ac83aD6C11cb18Cb",
 			agentCreditOracle: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
-			agentComplianceRegistry: "0x28292D76E07E5539F15F3b97935dE8E0432E76DD",
+			agentComplianceRegistry: "0xF0A781372cd7E32485603823390c791495140ca9",
 			agentEscrow: "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
 			agentInsurancePool: "0xE67F4BC75B11dBb3ef2C9Ad1848B4b193c2c69C6",
 			agentLendingPool: "0xe43a9C368808B2dfF139D27789C40A3C8F2282cF",
@@ -68,15 +67,15 @@ export const SECURITY_GATE_REGISTRY: Record<
 		chainName: "Base Mainnet",
 		explorerUrl: "https://basescan.org",
 		contracts: {
-			safeSecurityGateGuard: "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
-			agentCreditOracle: "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
-			agentComplianceRegistry: "0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
-			agentEscrow: "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
-			agentInsurancePool: "0x90308AedEe6430D11e5214cf9d2F563333D33Ef2",
-			agentLendingPool: "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
-			agentFactoringPool: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
-			agentTreasuryVault: "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
-			securityGateConsumer: "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35",
+			safeSecurityGateGuard: "0x5F565115441188b5dCa06539615Fc154BC7f3028",
+			agentCreditOracle: "0xd1F37196A1fe73Caa89ce7f4a58D6Fe49FD47655",
+			agentComplianceRegistry: "0x4693a3644ac4E215Bed9ADb841212D4ee83D0675",
+			agentEscrow: "0x5eE3C093D8D473670A5F67306d75316123A019a9",
+			agentInsurancePool: "0x4f747fae13AeF51b7F9523157c6be70Ba3B6Cb55",
+			agentLendingPool: "0x402E95B6aE9BBD26A227A1AE2aC7f52E14E1A314",
+			agentFactoringPool: "0x984C25Ff74fE9bAb094D1F60085b0Ced8eA0f2e9",
+			agentTreasuryVault: "0x5501083317AdA8f7CA3456EC8F8773d37dc59b1e",
+			securityGateConsumer: "0xD067DF08B2ee8C1B5a38d17C1C443C233249dE90",
 			agenticShieldPool: "0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
 			logisticsPoDEscrow: "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
 		},
@@ -92,15 +91,15 @@ export const SECURITY_GATE_REGISTRY: Record<
 		chainName: "Arbitrum One",
 		explorerUrl: "https://arbiscan.io",
 		contracts: {
-			safeSecurityGateGuard: "0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
-			agentCreditOracle: "0x227e1129Ba9B39a50fb9E0802bA13A7F77Debe93",
-			agentComplianceRegistry: "0x821d88Df97F6063a32fDff85FBad9784B9B7292D",
-			agentEscrow: "0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
-			agentInsurancePool: "0x90308AedEe6430D11e5214cf9d2F563333D33Ef2",
-			agentLendingPool: "0x5cC5Afa2a97599d492A3E408Fdd95fD0b520f173",
-			agentFactoringPool: "0x6418f408cFf03F862D7691f01fAb00a895E6aB93",
-			agentTreasuryVault: "0xF8e1439F61c9F2d5FdbA382D524FabB35e12ae55",
-			securityGateConsumer: "0xdC6Cb774d51681Fcbba0E67Ca677dEc5705aaB35",
+			safeSecurityGateGuard: "0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
+			agentCreditOracle: "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+			agentComplianceRegistry: "0x95df688E42C3053a1f09A46F179A8250bEAB40aB",
+			agentEscrow: "0x8eB40eF1f032dd66CD54c6e1D0C29980C31d5E57",
+			agentInsurancePool: "0xF0A781372cd7E32485603823390c791495140ca9",
+			agentLendingPool: "0xbFc79F55E410508aBCa2FF8ebA1120de4F209f68",
+			agentFactoringPool: "0x5F565115441188b5dCa06539615Fc154BC7f3028",
+			agentTreasuryVault: "0xd1F37196A1fe73Caa89ce7f4a58D6Fe49FD47655",
+			securityGateConsumer: "0x4693a3644ac4E215Bed9ADb841212D4ee83D0675",
 			agenticShieldPool: "0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28",
 			logisticsPoDEscrow: "0x3A863A2b1018B47FE79041FCDF56efEa3f8b978F",
 		},
@@ -111,10 +110,6 @@ export const SECURITY_GATE_REGISTRY: Record<
 	},
 };
 
-/**
- * Retrieves verified Security Gate contracts for a given chainId.
- * Defaults to Polygon (137) if chain is not explicitly specified.
- */
 export function getSecurityGateContracts(
 	chainId: number = 137,
 ): SecurityGateContractAddresses {
@@ -129,9 +124,6 @@ export function getSecurityGateContracts(
 	return config;
 }
 
-/**
- * Checks if a blockchain network is supported by Security Gate x402
- */
 export function isChainSupported(chainId: number): boolean {
 	return chainId in SECURITY_GATE_REGISTRY;
 }

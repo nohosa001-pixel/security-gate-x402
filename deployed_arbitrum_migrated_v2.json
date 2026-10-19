@@ -1,0 +1,20 @@
+{
+  "chain_id": 42161,
+  "chain_name": "Arbitrum One",
+  "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+  "deployed_at": "2026-10-19T03:17:54Z",
+  "contracts": {
+    "AgentPaymentVault": "0xC089E5f72a7F5550Bb383C31B04Bf430a4E31372",
+    "MineralsOracleConsumer": "0x75F36e1682f283feBfB683dD40e93785715cE404",
+    "MineralTradeEscrow": "0x1884025dD7E510a4490533eC46A362fCb08D3822",
+    "SafeSecurityGateGuard": "0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
+    "AgentCreditOracle": "0x0343e9Fff9451346767D6cca2C249d82667E7dE0",
+    "AgentComplianceRegistry": "0x95df688E42C3053a1f09A46F179A8250bEAB40aB",
+    "AgentEscrow": "0x8eB40eF1f032dd66CD54c6e1D0C29980C31d5E57",
+    "AgentInsurancePool": "0xF0A781372cd7E32485603823390c791495140ca9",
+    "AgentLendingPool": "0xbFc79F55E410508aBCa2FF8ebA1120de4F209f68",
+    "AgentFactoringPool": "0x5F565115441188b5dCa06539615Fc154BC7f3028",
+    "AgentTreasuryVault": "0xd1F37196A1fe73Caa89ce7f4a58D6Fe49FD47655",
+    "SecurityGateConsumer": "0x4693a3644ac4E215Bed9ADb841212D4ee83D0675"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "chain_id": 137,
+  "chain_name": "Polygon Mainnet",
+  "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+  "deployed_at": "2026-10-19T03:19:42Z",
+  "contracts": {
+    "MineralTradeEscrow": "0x8eB40eF1f032dd66CD54c6e1D0C29980C31d5E57",
+    "AgentComplianceRegistry": "0xF0A781372cd7E32485603823390c791495140ca9"
+  }
+}

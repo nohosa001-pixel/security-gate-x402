@@ -1,0 +1,20 @@
+{
+  "chain_id": 8453,
+  "chain_name": "Base Mainnet",
+  "deployer": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+  "deployed_at": "2026-10-19T03:09:40Z",
+  "contracts": {
+    "AgentPaymentVault": "0x8eB40eF1f032dd66CD54c6e1D0C29980C31d5E57",
+    "MineralsOracleConsumer": "0xF0A781372cd7E32485603823390c791495140ca9",
+    "MineralTradeEscrow": "0xbFc79F55E410508aBCa2FF8ebA1120de4F209f68",
+    "SafeSecurityGateGuard": "0x5F565115441188b5dCa06539615Fc154BC7f3028",
+    "AgentCreditOracle": "0xd1F37196A1fe73Caa89ce7f4a58D6Fe49FD47655",
+    "AgentComplianceRegistry": "0x4693a3644ac4E215Bed9ADb841212D4ee83D0675",
+    "AgentEscrow": "0x5eE3C093D8D473670A5F67306d75316123A019a9",
+    "AgentInsurancePool": "0x4f747fae13AeF51b7F9523157c6be70Ba3B6Cb55",
+    "AgentLendingPool": "0x402E95B6aE9BBD26A227A1AE2aC7f52E14E1A314",
+    "AgentFactoringPool": "0x984C25Ff74fE9bAb094D1F60085b0Ced8eA0f2e9",
+    "AgentTreasuryVault": "0x5501083317AdA8f7CA3456EC8F8773d37dc59b1e",
+    "SecurityGateConsumer": "0xD067DF08B2ee8C1B5a38d17C1C443C233249dE90"
+  }
+}

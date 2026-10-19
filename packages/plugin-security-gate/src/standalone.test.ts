@@ -212,7 +212,7 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		const base = getSecurityGateContracts(8453);
 		expect(base.chainName).toBe("Base Mainnet");
 		expect(base.contracts.safeSecurityGateGuard).toBe(
-			"0x306e69E59E5bCEa769C6CeA76A79AFA8f2A5F408",
+			"0x5F565115441188b5dCa06539615Fc154BC7f3028",
 		);
 		expect(base.contracts.agenticShieldPool).toBe(
 			"0x7F14ed4F8C08ee694b4f143144bb8cC51BF4A1AE",
@@ -226,7 +226,7 @@ describe("Multi-Chain Constants & Contract Registry", () => {
 		const arb = getSecurityGateContracts(42161);
 		expect(arb.chainName).toBe("Arbitrum One");
 		expect(arb.contracts.agentEscrow).toBe(
-			"0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278",
+			"0x8eB40eF1f032dd66CD54c6e1D0C29980C31d5E57",
 		);
 		expect(arb.contracts.agenticShieldPool).toBe(
 			"0xAAde57ABf49A52bC2981Ff64dc54dE27d8c8Ac28",
