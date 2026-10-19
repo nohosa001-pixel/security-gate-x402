@@ -73,7 +73,12 @@ jobs:
           echo "Anchor version: $(anchor --version || true)"
           echo "Rustc version : $(rustc --version)"
           rm -f Cargo.lock
-          anchor build
+          if ! anchor build 2>&1 | tee build.log; then
+            echo "====================== BUILD ERROR SUMMARY ======================"
+            tail -n 80 build.log
+            echo "=================================================================="
+            exit 1
+          fi
 
       - name: 📤 Archive Compiled BPF Binaries & IDLs
         uses: actions/upload-artifact@v4
