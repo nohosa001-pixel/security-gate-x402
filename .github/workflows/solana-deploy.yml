@@ -22,43 +22,32 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🦀 Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          targets: x86_64-unknown-linux-gnu
+          node-version: 20
 
-      - name: ⚡ Cache Solana & Cargo Dependencies
-        uses: actions/cache@v4
+      - name: 🦀 Setup Rust Toolchain (1.75.0 for Solana 1.18 compatibility)
+        uses: dtolnay/rust-toolchain@master
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ~/.local/share/solana/install/
-          key: ${{ runner.os }}-solana-anchor-v1-${{ hashFiles('contracts/solana/Cargo.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-solana-anchor-v1-
+          toolchain: 1.75.0
+          targets: x86_64-unknown-linux-gnu
 
       - name: 📦 Install Solana CLI (v1.18.17)
         run: |
-          if ! command -v solana &> /dev/null; then
-            echo "Installing Solana CLI..."
-            sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.17/install)"
-            echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
-          else
-            echo "Solana CLI already installed: $(solana --version)"
-          fi
+          echo "Installing Solana CLI v1.18.17..."
+          sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.17/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
-      - name: ⚓ Install Anchor CLI (v0.29.0 via binary)
+      - name: ⚓ Install Anchor CLI (v0.29.0 via npm prebuilt)
         run: |
-          if ! command -v anchor &> /dev/null; then
-            echo "Installing Anchor CLI v0.29.0..."
-            cargo install --git https://github.com/coral-xyz/anchor --tag v0.29.0 anchor-cli --locked || true
-          fi
+          echo "Installing Anchor CLI v0.29.0..."
+          npm install -g @coral-xyz/anchor-cli@0.29.0
+          which anchor || echo "Anchor installed at: $(npm root -g)/@coral-xyz/anchor-cli"
 
       - name: 🔑 Configure Deployer Keypair
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           mkdir -p ~/.config/solana
           if [ "${{ github.event.inputs.cluster }}" = "mainnet" ]; then
             if [ -z "${{ secrets.SOLANA_DEPLOYER_KEY }}" ]; then
@@ -68,21 +57,19 @@ jobs:
             echo "${{ secrets.SOLANA_DEPLOYER_KEY }}" > ~/.config/solana/id.json
           else
             echo "Generating fresh keypair for ${{ github.event.inputs.cluster }}..."
-            $HOME/.local/share/solana/install/active_release/bin/solana-keygen new --no-bip39-passphrase --silent -o ~/.config/solana/id.json --force
+            solana-keygen new --no-bip39-passphrase --silent -o ~/.config/solana/id.json --force
           fi
-          $HOME/.local/share/solana/install/active_release/bin/solana-keygen pubkey ~/.config/solana/id.json
+          solana-keygen pubkey ~/.config/solana/id.json
 
       - name: 🔨 Build Anchor Programs
         working-directory: contracts/solana
         run: |
           export PATH="$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
           echo "Solana version: $(solana --version)"
-          if command -v anchor &> /dev/null; then
-            anchor build
-          else
-            echo "Anchor CLI not found in path, using cargo build-sbf fallback..."
-            cargo build-sbf
-          fi
+          echo "Anchor version: $(anchor --version || true)"
+          echo "Rustc version : $(rustc --version)"
+          rm -f Cargo.lock
+          anchor build
 
       - name: 📤 Archive Compiled BPF Binaries & IDLs
         uses: actions/upload-artifact@v4
@@ -103,12 +90,12 @@ jobs:
           echo "Deployer Address: $PUBKEY"
           
           echo "Requesting Devnet Airdrop..."
-          solana airdrop 2 $PUBKEY || solana airdrop 1 $PUBKEY || echo "Airdrop rate limit reached, checking balance..."
+          solana airdrop 2 $PUBKEY || solana airdrop 1 $PUBKEY || echo "Airdrop rate limit reached, continuing..."
           solana balance $PUBKEY
           
-          if command -v anchor &> /dev/null; then
-            anchor deploy --provider.cluster devnet || echo "Devnet deployment step completed with network status."
-          fi
+          echo "Deploying via Anchor..."
+          anchor deploy --provider.cluster devnet || true
+          echo "Devnet deploy execution finished."
 
       - name: 🚀 Deploy to Solana Mainnet
         if: ${{ github.event.inputs.cluster == 'mainnet' }}
@@ -120,13 +107,5 @@ jobs:
           echo "Mainnet Deployer Address: $PUBKEY"
           solana balance $PUBKEY
           
-          if command -v anchor &> /dev/null; then
-            anchor deploy --provider.cluster mainnet
-          else
-            for so_file in target/deploy/*.so; do
-              if [ -f "$so_file" ]; then
-                echo "Deploying $so_file to Mainnet..."
-                solana program deploy "$so_file"
-              fi
-            done
-          fi
+          echo "Deploying via Anchor to Mainnet..."
+          anchor deploy --provider.cluster mainnet
