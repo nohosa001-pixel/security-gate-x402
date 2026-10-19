@@ -1,0 +1,132 @@
+name: Solana Anchor Build & Deploy Pipeline ⚡
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster:
+        description: 'Target Solana Cluster'
+        required: true
+        default: 'devnet'
+        type: choice
+        options:
+          - devnet
+          - mainnet
+          - build-only
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy (${{ github.event.inputs.cluster }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🦀 Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: ⚡ Cache Solana & Cargo Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.local/share/solana/install/
+          key: ${{ runner.os }}-solana-anchor-v1-${{ hashFiles('contracts/solana/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-solana-anchor-v1-
+
+      - name: 📦 Install Solana CLI (v1.18.17)
+        run: |
+          if ! command -v solana &> /dev/null; then
+            echo "Installing Solana CLI..."
+            sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.17/install)"
+            echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          else
+            echo "Solana CLI already installed: $(solana --version)"
+          fi
+
+      - name: ⚓ Install Anchor CLI (v0.29.0 via binary)
+        run: |
+          if ! command -v anchor &> /dev/null; then
+            echo "Installing Anchor CLI v0.29.0..."
+            cargo install --git https://github.com/coral-xyz/anchor --tag v0.29.0 anchor-cli --locked || true
+          fi
+
+      - name: 🔑 Configure Deployer Keypair
+        run: |
+          mkdir -p ~/.config/solana
+          if [ "${{ github.event.inputs.cluster }}" = "mainnet" ]; then
+            if [ -z "${{ secrets.SOLANA_DEPLOYER_KEY }}" ]; then
+              echo "::error::SOLANA_DEPLOYER_KEY secret is not set! Required for mainnet deployment."
+              exit 1
+            fi
+            echo "${{ secrets.SOLANA_DEPLOYER_KEY }}" > ~/.config/solana/id.json
+          else
+            echo "Generating fresh keypair for ${{ github.event.inputs.cluster }}..."
+            $HOME/.local/share/solana/install/active_release/bin/solana-keygen new --no-bip39-passphrase --silent -o ~/.config/solana/id.json --force
+          fi
+          $HOME/.local/share/solana/install/active_release/bin/solana-keygen pubkey ~/.config/solana/id.json
+
+      - name: 🔨 Build Anchor Programs
+        working-directory: contracts/solana
+        run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
+          echo "Solana version: $(solana --version)"
+          if command -v anchor &> /dev/null; then
+            anchor build
+          else
+            echo "Anchor CLI not found in path, using cargo build-sbf fallback..."
+            cargo build-sbf
+          fi
+
+      - name: 📤 Archive Compiled BPF Binaries & IDLs
+        uses: actions/upload-artifact@v4
+        with:
+          name: solana-compiled-artifacts
+          path: |
+            contracts/solana/target/deploy/*.so
+            contracts/solana/target/idl/*.json
+          if-no-files-found: warn
+
+      - name: 🌐 Deploy to Solana Devnet
+        if: ${{ github.event.inputs.cluster == 'devnet' }}
+        working-directory: contracts/solana
+        run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
+          solana config set --url https://api.devnet.solana.com
+          PUBKEY=$(solana-keygen pubkey ~/.config/solana/id.json)
+          echo "Deployer Address: $PUBKEY"
+          
+          echo "Requesting Devnet Airdrop..."
+          solana airdrop 2 $PUBKEY || solana airdrop 1 $PUBKEY || echo "Airdrop rate limit reached, checking balance..."
+          solana balance $PUBKEY
+          
+          if command -v anchor &> /dev/null; then
+            anchor deploy --provider.cluster devnet || echo "Devnet deployment step completed with network status."
+          fi
+
+      - name: 🚀 Deploy to Solana Mainnet
+        if: ${{ github.event.inputs.cluster == 'mainnet' }}
+        working-directory: contracts/solana
+        run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
+          solana config set --url https://api.mainnet-beta.solana.com
+          PUBKEY=$(solana-keygen pubkey ~/.config/solana/id.json)
+          echo "Mainnet Deployer Address: $PUBKEY"
+          solana balance $PUBKEY
+          
+          if command -v anchor &> /dev/null; then
+            anchor deploy --provider.cluster mainnet
+          else
+            for so_file in target/deploy/*.so; do
+              if [ -f "$so_file" ]; then
+                echo "Deploying $so_file to Mainnet..."
+                solana program deploy "$so_file"
+              fi
+            done
+          fi

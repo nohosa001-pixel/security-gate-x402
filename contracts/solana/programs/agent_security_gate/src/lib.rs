@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 
-declare_id!("AGRIDGateCoreMainnet111111111111111111111111");
+declare_id!("AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN");
 
 /// Complete Solana Anchor Program mapping all 13 EVM Smart Contracts of Agent Security Gate x402
 #[program]

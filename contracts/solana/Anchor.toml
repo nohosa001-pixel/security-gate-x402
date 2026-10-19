@@ -6,8 +6,16 @@ seeds = true
 skip-lint = false
 
 [programs.mainnet]
-universal_escrow = "AGRIDEscrowUniversalMainnet111111111111111111"
-agent_security_gate = "AGRIDGateCoreMainnet111111111111111111111111"
+universal_escrow = "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
+agent_security_gate = "AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN"
+
+[programs.devnet]
+universal_escrow = "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
+agent_security_gate = "AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN"
+
+[programs.localnet]
+universal_escrow = "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
+agent_security_gate = "AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN"
 
 [registry]
 url = "https://api.apr.dev"

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "programs/universal_escrow",
+    "programs/agent_security_gate",
+]
+resolver = "2"

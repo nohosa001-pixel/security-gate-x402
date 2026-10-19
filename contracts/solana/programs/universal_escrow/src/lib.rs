@@ -3,7 +3,7 @@ use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 use solana_program::ed25519_program;
 use solana_program::sysvar::instructions as ix_sysvar;
 
-declare_id!("AGRIDEscrowUniversalMainnet111111111111111111");
+declare_id!("AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC");
 
 #[program]
 pub mod universal_escrow {
