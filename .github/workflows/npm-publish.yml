@@ -61,3 +61,25 @@ jobs:
 
           echo "Publishing $PKG_NAME@$PKG_VERSION to npm (with provenance via OIDC)..."
           npm publish --access public --provenance
+
+      - name: Publish A.GRID Unified SDK to npm
+        working-directory: packages/agrid-sdk
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          PKG_NAME=$(node -p "require('./package.json').name")
+          echo "Checking if $PKG_NAME@$PKG_VERSION is already published on npm..."
+          
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "::notice ::Version $PKG_VERSION is already published on npm registry. Skipping publication step."
+            exit 0
+          fi
+
+          echo "Publishing $PKG_NAME@$PKG_VERSION to npm..."
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+            npm publish --access public
+          else
+            npm publish --access public --provenance || echo "::warning ::Trusted Publisher or NPM_TOKEN required for initial publish of $PKG_NAME"
+          fi
