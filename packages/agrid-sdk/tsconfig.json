@@ -9,14 +9,8 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "types": ["node"],
-    "paths": {
-      "@elizaos/core": ["../../eliza-upstream/packages/core/src/index.node.ts"],
-      "@elizaos/core/*": ["../../eliza-upstream/packages/core/src/*"],
-      "@elizaos/agent": ["../../eliza-upstream/packages/agent/src/index.ts"],
-      "@elizaos/agent/*": ["../../eliza-upstream/packages/agent/src/*"]
-    }
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["src/**/*.test.ts"]
 }
