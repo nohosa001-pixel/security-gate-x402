@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'packages/plugin-security-gate/**'
+      - 'packages/agrid-sdk/**'
       - '.github/workflows/npm-publish.yml'
   workflow_dispatch:
 
@@ -38,6 +39,13 @@ jobs:
           bun install
           bun run build
           bun test
+
+      - name: Build and Test A.GRID Unified SDK (Strategy A)
+        working-directory: packages/agrid-sdk
+        run: |
+          npm install
+          npm run build
+          node --test test/index.test.js
 
       - name: Publish package to npm
         working-directory: packages/plugin-security-gate
