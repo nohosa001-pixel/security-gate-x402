@@ -80,15 +80,11 @@ jobs:
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
             WHOAMI_OUT=$(npm whoami --registry=https://registry.npmjs.org 2>&1 || true)
+            echo "::warning title=NPM WHOAMI::$WHOAMI_OUT"
             PUB_OUT=$(npm publish --access public 2>&1 || true)
-            echo "### NPM Publish Diagnostics" >> $GITHUB_STEP_SUMMARY
-            echo "- **npm whoami:** \`$WHOAMI_OUT\`" >> $GITHUB_STEP_SUMMARY
-            echo "- **npm publish output:**" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "$PUB_OUT" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             if echo "$PUB_OUT" | grep -q "npm error"; then
-              echo "::error title=NPM Publish Failed::$PUB_OUT"
+              ERR_MSG=$(echo "$PUB_OUT" | grep "^npm error" | tr '\r\n' ' ')
+              echo "::error title=NPM Publish Failed::$ERR_MSG"
               exit 1
             fi
           else
