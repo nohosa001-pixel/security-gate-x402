@@ -1,7 +1,7 @@
 {
   "name": "elizaos-plugin-security-gate",
-  "version": "2.4.0",
-  "description": "Deterministic local prompt injection defense, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS",
+  "version": "2.5.1",
+  "description": "Deterministic local prompt injection defense, CleanWeb token-compressed intelligence, dangerous code pattern detection, and autonomous agent safety guardrails for ElizaOS",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",
