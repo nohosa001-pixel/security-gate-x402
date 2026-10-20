@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.GRID x402 | Solana Mainnet Live Payment Tester</title>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 26, 44, 0.75);
+      --primary: #9945FF;
+      --secondary: #14F195;
+      --text: #f3f4f6;
+      --text-dim: #9ca3af;
+      --border: rgba(153, 69, 255, 0.3);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 20%, #151a2e 0%, var(--bg) 80%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(153, 69, 255, 0.15);
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(20, 241, 149, 0.15);
+      color: var(--secondary);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border: 1px solid rgba(20, 241, 149, 0.3);
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, #14F195 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.desc {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .info-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: var(--text-dim); }
+    .info-val { font-weight: 600; font-family: monospace; }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-phantom {
+      background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+      color: #000;
+      box-shadow: 0 8px 25px rgba(153, 69, 255, 0.4);
+    }
+    .btn-phantom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(20, 241, 149, 0.5);
+    }
+    .btn-phantom:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(20, 241, 149, 0.1);
+      border: 1px solid rgba(20, 241, 149, 0.3);
+      display: none;
+      text-align: left;
+    }
+    .result a {
+      color: var(--secondary);
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="badge">⚡ A.GRID x402 PROTOCOL LIVE</div>
+    <h1>Solana Mainnet Live Pay</h1>
+    <p class="desc">
+      팬텀(Phantom) 지갑으로 솔라나 메인넷 원장에 <strong>0.0001 SOL 실제 온체인 결제 트랜잭션</strong>을 전송하고 블록을 확정합니다.
+    </p>
+
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Network</span>
+        <span class="info-val" style="color: #14F195;">Solana Mainnet-Beta</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Connected Wallet</span>
+        <span class="info-val" id="wallet-addr">연결 대기 중...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Current Balance</span>
+        <span class="info-val" id="wallet-bal">- SOL</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Test Amount</span>
+        <span class="info-val">0.0001 SOL (Self-Transfer, 원금 보존)</span>
+      </div>
+    </div>
+
+    <button id="pay-btn" class="btn btn-phantom" onclick="executeSolanaLivePayment()">
+      <span>👻 팬텀 지갑 연결 & 0.0001 SOL 결제 실행</span>
+    </button>
+
+    <div id="result-box" class="result">
+      <div style="font-weight: 700; color: #14F195; margin-bottom: 6px;">🎉 블록체인 채굴 성공 (0.4s Finality)!</div>
+      <div style="font-size: 13px; color: #d1d5db; margin-bottom: 8px;">솔라나 메인넷 원장에 영구 각인되었습니다:</div>
+      <a id="solscan-link" href="#" target="_blank">Solscan에서 보기</a>
+    </div>
+  </div>
+
+  <script>
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const connection = new solanaWeb3.Connection(RPC_URL, "confirmed");
+
+    async function checkWallet() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect({ onlyIfTrusted: true });
+          updateWalletInfo(resp.publicKey);
+        } catch (e) {
+          // not connected yet
+        }
+      }
+    }
+
+    async function updateWalletInfo(pubkey) {
+      document.getElementById("wallet-addr").innerText = pubkey.toBase58().slice(0, 6) + "..." + pubkey.toBase58().slice(-4);
+      try {
+        const bal = await connection.getBalance(pubkey);
+        document.getElementById("wallet-bal").innerText = (bal / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4) + " SOL";
+      } catch (e) {}
+    }
+
+    async function executeSolanaLivePayment() {
+      const btn = document.getElementById("pay-btn");
+      const resultBox = document.getElementById("result-box");
+      const solscanLink = document.getElementById("solscan-link");
+
+      if (!window.solana || !window.solana.isPhantom) {
+        alert("브라우저에 Phantom 지갑 확장 프로그램이 설치되어 있어야 합니다!");
+        window.open("https://phantom.app/", "_blank");
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.innerText = "⏳ 지갑 승인 대기 중...";
+
+        // 1. Connect Phantom
+        const resp = await window.solana.connect();
+        const fromPubkey = resp.publicKey;
+        await updateWalletInfo(fromPubkey);
+
+        btn.innerText = "⚡ 트랜잭션 서명 및 블록체인 전송 중...";
+
+        // 2. Build Transaction (Self-transfer 0.0001 SOL, preserves 100% principal)
+        const transaction = new solanaWeb3.Transaction().add(
+          solanaWeb3.SystemProgram.transfer({
+            fromPubkey: fromPubkey,
+            toPubkey: fromPubkey,
+            lamports: 100000 // 0.0001 SOL
+          })
+        );
+
+        const { blockhash } = await connection.getLatestBlockhash("confirmed");
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = fromPubkey;
+
+        // 3. Sign & Send via Phantom
+        const { signature } = await window.solana.signAndSendTransaction(transaction);
+        
+        btn.innerText = "🔍 블록 확정 확인 중 (0.4s)...";
+        await connection.confirmTransaction(signature, "confirmed");
+
+        // 4. Show Result
+        resultBox.style.display = "block";
+        const txUrl = `https://solscan.io/tx/${signature}`;
+        solscanLink.href = txUrl;
+        solscanLink.innerText = `https://solscan.io/tx/${signature}`;
+        
+        btn.innerText = "✅ 결제 완료! (재전송 가능)";
+        btn.disabled = false;
+        updateWalletInfo(fromPubkey);
+
+      } catch (err) {
+        console.error(err);
+        alert("결제 전송 취소 또는 오류: " + (err.message || err));
+        btn.disabled = false;
+        btn.innerText = "👻 다시 시도하기";
+      }
+    }
+
+    window.addEventListener("load", checkWallet);
+  </script>
+</body>
+</html>
