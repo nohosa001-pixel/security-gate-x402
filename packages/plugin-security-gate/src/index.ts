@@ -59,9 +59,9 @@ export const securityGatePlugin: Plugin & {
 	name: "security-gate",
 	description:
 		"Deterministic inbound prompt injection defense, outbound covert-channel DLP, config tamper detection, dangerous code pattern detection, autonomous task escrow auditing, Safe guard execution, and agent safety guardrails.",
-	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction, executeGuardedOnchainAction, scrapeWebAction as any],
-	evaluators: [securityGateEvaluator, groundTruthSignalEvaluator as any],
-	providers: [securityStatusProvider, cleanWebIntelligenceProvider as any],
+	actions: [inspectSafetyAction, auditEscrowTaskAction, createEscrowTaskAction, executeGuardedOnchainAction],
+	evaluators: [securityGateEvaluator],
+	providers: [securityStatusProvider],
 	chatPreHandlers: [securityGatePreHandler as any],
 	chatPostHandlers: [securityGatePostHandler as any],
 };
