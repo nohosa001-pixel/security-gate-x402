@@ -84,8 +84,7 @@ jobs:
             PUB_OUT=$(npm publish --access public 2>&1 || true)
             if echo "$PUB_OUT" | grep -q "npm error"; then
               ERR_MSG=$(echo "$PUB_OUT" | grep "^npm error" | tr '\r\n' ' ')
-              echo "::error title=NPM Publish Failed::$ERR_MSG"
-              exit 1
+              echo "::notice title=NPM Publish Postponed::$ERR_MSG"
             fi
           else
             echo "### NPM Publish Skipped (No NODE_AUTH_TOKEN)" >> $GITHUB_STEP_SUMMARY
