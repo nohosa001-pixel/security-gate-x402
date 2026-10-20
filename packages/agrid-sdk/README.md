@@ -3,6 +3,7 @@
 > **Unified Master SDK & Runtime Substrate for Autonomous AI Agent Economies**  
 > **Ecosystem:** Solana Mainnet (0.4s) • Polygon • Base • Arbitrum • ElizaOS  
 > **Live Hub:** `https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/`  
+> **Registry:** [![npm version](https://img.shields.io/npm/v/agrid-sdk.svg?style=flat-square)](https://www.npmjs.com/package/agrid-sdk)
 
 ---
 
