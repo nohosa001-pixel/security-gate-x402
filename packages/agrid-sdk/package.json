@@ -1,0 +1,68 @@
+{
+  "name": "agrid-sdk",
+  "version": "1.0.0",
+  "description": "Unified Master SDK for A.GRID Autonomous Agent Ecosystem: Security Gate x402, CleanWeb Intelligence, and Critical Minerals Oracle",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./security": {
+      "types": "./dist/security/index.d.ts",
+      "import": "./dist/security/index.js",
+      "default": "./dist/security/index.js"
+    },
+    "./cleanweb": {
+      "types": "./dist/cleanweb/index.d.ts",
+      "import": "./dist/cleanweb/index.js",
+      "default": "./dist/cleanweb/index.js"
+    },
+    "./minerals": {
+      "types": "./dist/minerals/index.d.ts",
+      "import": "./dist/minerals/index.js",
+      "default": "./dist/minerals/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "node --test test/index.test.js"
+  },
+  "keywords": [
+    "agrid",
+    "security-gate",
+    "cleanweb",
+    "minerals-oracle",
+    "ai-agents",
+    "solana",
+    "polygon",
+    "x402"
+  ],
+  "author": "nohosa001-pixel",
+  "license": "MIT",
+  "dependencies": {
+    "@safe-global/protocol-kit": "^4.1.7",
+    "viem": "^2.23.0"
+  },
+  "peerDependencies": {
+    "@elizaos/core": ">=2.0.0-0"
+  },
+  "peerDependenciesMeta": {
+    "@elizaos/core": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "resolve-from": "^5.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.2"
+  }
+}

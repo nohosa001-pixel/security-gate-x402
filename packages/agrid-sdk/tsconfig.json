@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": false,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "paths": {
+      "@elizaos/core": ["../../eliza-upstream/packages/core/src/index.node.ts"],
+      "@elizaos/core/*": ["../../eliza-upstream/packages/core/src/*"],
+      "@elizaos/agent": ["../../eliza-upstream/packages/agent/src/index.ts"],
+      "@elizaos/agent/*": ["../../eliza-upstream/packages/agent/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}
