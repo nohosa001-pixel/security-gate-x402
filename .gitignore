@@ -70,3 +70,6 @@ specs/AGENT_NATIVE_VAULT_BLUEPRINT.md
 
 
 
+
+# NPM Pack Tarballs
+*.tgz
