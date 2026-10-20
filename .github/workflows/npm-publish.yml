@@ -79,7 +79,12 @@ jobs:
           echo "Publishing $PKG_NAME@$PKG_VERSION to npm..."
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-            npm publish --access public
+            echo "Checking authenticated npm user..."
+            npm whoami --registry=https://registry.npmjs.org || echo "npm whoami failed"
+            npm publish --access public 2>&1 | tee /tmp/npm_pub.log || {
+              echo "::error title=NPM Publish Error::$(cat /tmp/npm_pub.log | tail -n 15)"
+              exit 1
+            }
           else
             npm publish --access public --provenance || echo "::warning ::Trusted Publisher or NPM_TOKEN required for initial publish of $PKG_NAME"
           fi
