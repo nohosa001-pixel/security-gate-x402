@@ -1,4 +1,11 @@
 {
+  "name": "security-gate-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "npm:status": "node scripts/manage_npm_ecosystem.mjs status",
+    "npm:report": "node scripts/manage_npm_ecosystem.mjs report"
+  },
   "dependencies": {},
   "devDependencies": {
     "@openzeppelin/contracts": "^5.6.1"
