@@ -38,6 +38,12 @@ NETWORKS = {
         "chain_id": 42161,
         "rpc": os.getenv("ARBITRUM_RPC_URL", "https://arb1.arbitrum.io/rpc"),
         "explorer": "https://arbiscan.io/tx/0x"
+    },
+    "polygon": {
+        "name": "Polygon Mainnet",
+        "chain_id": 137,
+        "rpc": os.getenv("POLYGON_RPC_URL", "https://polygon-bor-rpc.publicnode.com"),
+        "explorer": "https://polygonscan.com/tx/0x"
     }
 }
 
@@ -96,11 +102,11 @@ def main():
     print("🤖 [A.GRID MULTI-CHAIN ON-CHAIN VOLUME DAEMON]")
     print(f"• Bot Address      : {wallet['address']}")
     print(f"• Sovereign Treasury: {TREASURY_ADDRESS}")
-    print(f"• Active Networks  : Base Mainnet & Arbitrum One")
+    print(f"• Active Networks  : Base Mainnet, Arbitrum One, & Polygon Mainnet")
     print(f"• Interval         : {args.interval}s")
     print("=" * 80)
 
-    net_keys = ["base", "arbitrum"]
+    net_keys = ["base", "arbitrum", "polygon"]
     count = 0
     try:
         while True:
