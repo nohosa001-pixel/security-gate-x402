@@ -1,5 +1,16 @@
 import { describe, expect, it } from "bun:test";
-import { securityGatePlugin } from "./index.js";
+import {
+	securityGatePlugin,
+	cleanWebPlugin,
+	mineralsPlugin,
+	eudrPlugin,
+	geoLogisticsPlugin,
+	universalSovereignSuitePlugin,
+	inspectEudrCompliance,
+	inspectMineralsTruth,
+	inspectGeoLogisticsTruth,
+	calculateHaversineMeters,
+} from "./index.js";
 import { inspectPayloadLocally } from "./localSecurityGate.js";
 
 describe("localSecurityGate (standalone deterministic analyzer)", () => {
@@ -340,3 +351,128 @@ describe("securityGatePostHandler (Outbound Covert-Channel & DLP)", async () => 
 		expect(result?.responseText).toContain("OUTBOUND LEAK BLOCKED");
 	});
 });
+
+describe("EUDR Truth Inspector (inspectEudrCompliance)", () => {
+	it("should pass compliant timber / rubber deliverable with valid GPS polygon & DDS", () => {
+		const res = inspectEudrCompliance({
+			commodity: "timber",
+			countryCode: "SE",
+			polygonCoords: [
+				[60.1282, 18.6435],
+				[60.1290, 18.6440],
+				[60.1285, 18.6450],
+			],
+			deforestationFreeAfterCutoff: true,
+			ddsReference: "DDS-2026-EU-992144",
+			legalProduction: true,
+		});
+		expect(res.verdict).toBe("PASSED");
+		expect(res.errors).toHaveLength(0);
+		expect(res.polygonPoints).toBe(3);
+	});
+
+	it("should reject deliverable with post-cutoff deforestation or missing polygon", () => {
+		const res = inspectEudrCompliance({
+			commodity: "palm_oil",
+			countryCode: "ID",
+			polygonCoords: [[-2.5, 112.9]], // Less than 3 points
+			deforestationFreeAfterCutoff: false, // Deforestation detected
+			ddsReference: "",
+			legalProduction: true,
+		});
+		expect(res.verdict).toBe("FAILED");
+		expect(res.errors.length).toBeGreaterThanOrEqual(3);
+		expect(res.errors).toContain(
+			"DEFORESTATION_DETECTED: Satellite imagery detected forest cover loss after December 31, 2020 cutoff date.",
+		);
+	});
+});
+
+describe("Critical Minerals Truth Inspector (inspectMineralsTruth)", () => {
+	it("should verify compliant Lithium/Cobalt smelter under RMI standard", () => {
+		const res = inspectMineralsTruth({
+			mineralType: "lithium",
+			smelterId: "CID002910",
+			smelterAuditStatus: "CONFORMANT",
+			mineCountryCode: "AU",
+			chainOfCustodyVerified: true,
+			childLaborFree: true,
+		});
+		expect(res.verdict).toBe("PASSED");
+		expect(res.errors).toHaveLength(0);
+		expect(res.smelterStatus).toBe("CONFORMANT");
+	});
+
+	it("should flag broken chain-of-custody and invalid smelter", () => {
+		const res = inspectMineralsTruth({
+			mineralType: "gold",
+			smelterId: "UNVERIFIED-SMELTER",
+			smelterAuditStatus: "NON_COMPLIANT",
+			mineCountryCode: "CD",
+			chainOfCustodyVerified: false,
+			childLaborFree: false,
+		});
+		expect(res.verdict).toBe("FAILED");
+		expect(res.errors).toContain(
+			"BROKEN_CHAIN_OF_CUSTODY: Upstream mass-balance / bag-and-tag verification failed.",
+		);
+		expect(res.errors).toContain(
+			"OECD_ANNEX_II_VIOLATION: Zero-tolerance child labor or severe human rights violation detected.",
+		);
+	});
+});
+
+describe("Geo-Logistics PoD Truth Inspector (inspectGeoLogisticsTruth)", () => {
+	it("should accurately compute Haversine distance in meters", () => {
+		// ~55 meters apart
+		const distance = calculateHaversineMeters([37.5665, 126.9780], [37.5670, 126.9780]);
+		expect(distance).toBeGreaterThan(50);
+		expect(distance).toBeLessThan(65);
+	});
+
+	it("should pass arrival verification within 500m geofence and untampered E-Seal", () => {
+		const res = inspectGeoLogisticsTruth({
+			containerId: "MSCU-8829104",
+			currentCoords: [51.9244, 4.4777],
+			targetCoords: [51.9250, 4.4780],
+			maxGeofenceMeters: 500,
+			sealTampered: false,
+			currentTempCelsius: -20.5,
+			minTempCelsius: -25.0,
+			maxTempCelsius: -18.0,
+		});
+		expect(res.verdict).toBe("PASSED");
+		expect(res.errors).toHaveLength(0);
+		expect(res.withinGeofence).toBe(true);
+		expect(res.sealSecure).toBe(true);
+	});
+
+	it("should fail when E-Seal is tampered and cargo outside geofence", () => {
+		const res = inspectGeoLogisticsTruth({
+			containerId: "MSCU-8829104",
+			currentCoords: [51.9244, 4.4777],
+			targetCoords: [52.5200, 13.4050], // Berlin vs Rotterdam (~600km)
+			maxGeofenceMeters: 500,
+			sealTampered: true,
+		});
+		expect(res.verdict).toBe("FAILED");
+		expect(res.errors).toContain("E_SEAL_TAMPERED: Hardware Electronic Seal integrity violated during transit.");
+	});
+});
+
+describe("Universal Sovereign Suite & Domain Plugins Structure", () => {
+	it("should correctly assemble universal sovereign suite plugin with all 8 actions", () => {
+		expect(universalSovereignSuitePlugin.name).toBe("security-gate-universal-suite");
+		expect(universalSovereignSuitePlugin.actions?.length).toBe(8);
+		expect(universalSovereignSuitePlugin.evaluators?.length).toBe(2);
+		expect(universalSovereignSuitePlugin.providers?.length).toBe(3);
+	});
+
+	it("should export modular domain plugins (CleanWeb, Minerals, EUDR, GeoLogistics)", () => {
+		expect(cleanWebPlugin.name).toBe("cleanweb-intelligence");
+		expect(mineralsPlugin.name).toBe("minerals-truth");
+		expect(eudrPlugin.name).toBe("eudr-compliance");
+		expect(geoLogisticsPlugin.name).toBe("geo-logistics-pod");
+	});
+});
+

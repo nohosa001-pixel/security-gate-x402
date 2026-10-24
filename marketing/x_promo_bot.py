@@ -96,6 +96,33 @@ GLOBAL_THREAD = [
     )
 ]
 
+# 3. 구글 클라우드 2026 Agentic AI TOS 규제 대응 스레드 (GCP TOS Compliance Thread)
+GCP_COMPLIANCE_THREAD = [
+    (
+        "🚨 Google Cloud just updated its TOS & Agentic AI Guidelines:\n\n"
+        "YOU are now legally liable for rogue actions taken by your autonomous AI agents on GCP.\n\n"
+        "Prompt injections, unauthorized shell execution, or policy violations? Your account gets terminated immediately. 🧵 (1/4)\n"
+        "#GoogleCloud #AIAgents #AIethics #Web3 #GCP"
+    ),
+    (
+        "Under Google's new Responsible Use Guidelines, cloud providers are shifting 100% of agent liability to developers.\n\n"
+        "If your agent executes tools or handles funds without deterministic guardrails, one jailbreak can wipe your cloud infrastructure and treasury. (2/4)"
+    ),
+    (
+        "This is why we built Security Gate x402 (A.GRID):\n\n"
+        "• <3ms AST static analysis: Kills unauthorized `os.system` / subprocess calls\n"
+        "• Deterministic Truth Oracle: Real-time loss & compute verification\n"
+        "• Solana (0.4s) & Safe Guard: Stops unauthorized treasury drains (3/4)"
+    ),
+    (
+        "Protect your infrastructure before the new compliance mandates hit:\n\n"
+        f"🌐 Live Escrow Hub: {GCP_URL}/hub/\n"
+        f"🐙 GitHub: {GITHUB_URL}\n"
+        "📦 PyPI: agent-security-gate-x402\n"
+        "Deploy the guardrail in 1 line of Python. (4/4)"
+    )
+]
+
 def build_status_alert_tweet() -> str:
     """실시간 서비스 보안 상태 및 대시보드 소개 단일 트윗"""
     return (
@@ -221,19 +248,22 @@ def main():
     print("==========================================================")
     print(" 1. 🇰🇷 한국어 서비스 소개 & 대시보드 스레드 게시")
     print(" 2. 🌐 글로벌(영문) 런칭 & 기능 소개 스레드 게시")
-    print(" 3. 🛡️ 실시간 보안 알림 단일 트윗 게시")
-    print(" 4. ⚡ AI 보안 브리핑 단일 트윗 게시")
-    print(" 5. ⏰ 백그라운드 정기 자동 알림 스케줄러 실행")
-    print(" 6. ⚙️ X API 연동 안내 및 상태 확인")
+    print(" 3. 🚨 구글 클라우드 2026 Agentic AI TOS 규제 대응 스레드")
+    print(" 4. 🛡️ 실시간 보안 알림 단일 트윗 게시")
+    print(" 5. ⚡ AI 보안 브리핑 단일 트윗 게시")
+    print(" 6. ⏰ 백그라운드 정기 자동 알림 스케줄러 실행")
+    print(" 7. ⚙️ X API 연동 안내 및 상태 확인")
     print("==========================================================")
 
-    choice = input("👉 원하시는 작업 번호를 입력하세요 (기본값 1): ").strip() or "1"
+    choice = input("👉 원하시는 작업 번호를 입력하세요 (기본값 3): ").strip() or "3"
 
     if choice == "1":
         run_post_thread(KOREAN_THREAD, "한국어 서비스 스레드")
     elif choice == "2":
         run_post_thread(GLOBAL_THREAD, "글로벌 런칭 스레드")
     elif choice == "3":
+        run_post_thread(GCP_COMPLIANCE_THREAD, "구글 클라우드 TOS 규제 대응 스레드")
+    elif choice == "4":
         tweet = build_status_alert_tweet()
         print("\n" + tweet)
         if X_API_KEY and X_API_SECRET:
@@ -245,7 +275,7 @@ def main():
                 open_intent_tweet(tweet)
         else:
             open_intent_tweet(tweet)
-    elif choice == "4":
+    elif choice == "5":
         tweet = build_security_bulletin_tweet()
         print("\n" + tweet)
         if X_API_KEY and X_API_SECRET:
@@ -257,10 +287,10 @@ def main():
                 open_intent_tweet(tweet)
         else:
             open_intent_tweet(tweet)
-    elif choice == "5":
+    elif choice == "6":
         hours = input("알림 주기(시간)를 입력하세요 (기본값 6): ").strip() or "6"
         run_scheduler(int(hours))
-    elif choice == "6":
+    elif choice == "7":
         print("\n[X API 연동 상태]")
         print(f" - X_API_KEY: {'✅ 설정됨' if X_API_KEY else '❌ 미설정 (Web Intent로 작동)'}")
         print(f" - X_API_SECRET: {'✅ 설정됨' if X_API_SECRET else '❌ 미설정'}")
@@ -277,6 +307,8 @@ if __name__ == "__main__":
             run_post_thread(KOREAN_THREAD, "한국어 서비스 스레드")
         elif arg == "--auto-global":
             run_post_thread(GLOBAL_THREAD, "글로벌 런칭 스레드")
+        elif arg == "--gcp-tos":
+            run_post_thread(GCP_COMPLIANCE_THREAD, "구글 클라우드 TOS 규제 대응 스레드")
         elif arg == "--status":
             t = build_status_alert_tweet()
             print(t)

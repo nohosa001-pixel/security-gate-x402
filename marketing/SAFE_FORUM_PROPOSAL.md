@@ -20,6 +20,7 @@ As autonomous AI agents (built with frameworks like ElizaOS, LangChain, AutoGen,
 - **Prompt Injection & System Breaks**: Attackers manipulate multi-turn agent conversations (e.g., via discord bots, governance forums, or indirect injections) into executing unbudgeted or unauthorized transactions.
 - **Rogue Execution Loops**: AI agent bugs or dynamic tool-calling loops repeatedly calling contracts and draining safe treasuries in gas or slippage.
 - **Blind Signer Modules**: Zodiac modules or delegate keys give agents execution rights, but the Safe contract itself cannot evaluate whether an incoming transaction was hallucinated or triggered by an adversarial jailbreak.
+- **Cloud & Legal Liability Mandates (e.g., Google Cloud Oct 2026 Agentic AI TOS)**: Major cloud infrastructure providers now hold developers and organizations 100% legally liable for actions taken by their autonomous agents. Without on-chain execution guardrails, malicious agent actions risk treasury loss and immediate cloud infrastructure suspension.
 
 #### 2. The Solution: SafeSecurityGateGuard
 

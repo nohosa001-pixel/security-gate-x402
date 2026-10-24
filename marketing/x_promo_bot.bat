@@ -5,10 +5,8 @@ echo ========================================================
 echo   Agent Security Gate x402 - X (Twitter) Promo Bot
 echo ========================================================
 
-if exist .venv\Scripts\python.exe (
-    .venv\Scripts\python.exe x_promo_bot.py
-) else (
-    python x_promo_bot.py
-)
+cd /d "%~dp0"
+
+python x_promo_bot.py %*
 
 pause
