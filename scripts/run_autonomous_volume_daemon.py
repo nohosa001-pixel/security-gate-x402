@@ -117,9 +117,11 @@ def main():
             count += 1
             if args.iterations > 0 and count >= args.iterations:
                 print(f"\n✨ Completed requested {args.iterations} volume cycles.")
+                sys.stdout.flush()
                 break
 
             print(f"  ⏳ Sleeping {args.interval}s until next on-chain cycle...")
+            sys.stdout.flush()
             time.sleep(args.interval)
     except KeyboardInterrupt:
         print("\n🛑 Daemon stopped by user.")
