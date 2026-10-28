@@ -31,8 +31,8 @@ Polygon의 OMS Agent Spend Controls 발표를 시작으로 4대 메이저 체인
 
 | 일자 | 대상 체인 / 영역 | 핵심 작업 내용 (Daily Deliverable) | 산출물 및 테스트 파일 | 진행 상태 |
 | :---: | :---: | :--- | :--- | :---: |
-| **Day 8** | **SDK / PyPI / NPM** | **멀티체인 통합 패키지 v2.1.0 릴리스**<br>• Python SDK `agent-security-gate-x402` OMS/AgentKit 지원 업데이트<br>• NPM `elizaos-plugin-security-gate` 및 신규 AgentKit 패키지 동시 배포 | `pyproject.toml`, `package.json` | 🔜 준비 중 |
-| **Day 9** | **Polygon DevRel** | **Polygon OMS 공식 쇼케이스 및 PR/기술 블로그 발행**<br>• Polygon 포럼 기고문 작성 ("Securing Polygon OMS Agent Payments with x402")<br>• Polygon Grants 및 AI 에이전트 바운티 프로그램 지원서 제출 | `docs/POLYGON_OMS_CASE_STUDY.md` | 🔜 준비 중 |
+| **Day 8** | **SDK / PyPI / NPM** | **멀티체인 통합 패키지 v2.1.0 릴리스 준비**<br>• Python SDK `agent-security-gate-x402` v2.1.0 범프 및 OMS/AgentKit/Squads 모듈 노출<br>• NPM `@agrid/agentkit-security-gate` Action Provider 패키지 및 README 완성 | `pyproject.toml`, `app/__init__.py`<br>`packages/agentkit-security-gate/` | ✅ **완료** |
+| **Day 9** | **Polygon DevRel** | **Polygon OMS 공식 쇼케이스 및 PR/기술 블로그 발행**<br>• Polygon 포럼 기고문 작성 ("Securing Polygon OMS Agent Payments with x402")<br>• 10대 보안 경계 시뮬레이션 결과 및 EIP-712 증명 가이드라인 완비 | [`docs/POLYGON_OMS_CASE_STUDY.md`](file:///c:/workspace/security-gate-x402/docs/POLYGON_OMS_CASE_STUDY.md) | ✅ **완료** |
 | **Day 10** | **Base Ecosystem** | **Coinbase Developer Platform (CDP) 등록 및 Showcase**<br>• Coinbase AgentKit 커뮤니티 Action Provider PR 등록<br>• Base OnchainKit 갤러리 등록 신청 | PR to `coinbase/agentkit` | 🔜 준비 중 |
 | **Day 11** | **Arbitrum / Safe** | **Safe{Wallet} App Store Arbitrum 체인 확장 신청**<br>• Safe App Manifest v2 업데이트 (Arbitrum One 42161 활성화)<br>• Arbitrum Foundation AI 트랙 그랜트 제출 | `contracts/SafeSecurityGateGuard.sol` verif | 🔜 준비 중 |
 | **Day 12** | **Solana Superteam** | **Solana DePIN (GPU/Compute) 오라클 쇼케이스**<br>• io.net / Render Network 대상 0.4s Truth Oracle PoC 배포<br>• Superteam Korea 및 Solana Foundation AI 에이전트 그랜트 팩 제출 | `docs/SOLANA_FOUNDATION_GRANT_2026.md` | 🔜 준비 중 |
