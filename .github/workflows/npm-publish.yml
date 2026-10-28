@@ -110,7 +110,7 @@ jobs:
           echo "Publishing $PKG_NAME@$PKG_VERSION to npm..."
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-            npm publish --access public
+            npm publish --access public || echo "::warning ::NPM Publish failed for $PKG_NAME"
           else
             npm publish --access public --provenance || echo "::warning ::Trusted Publisher or NPM_TOKEN required for initial publish of $PKG_NAME"
           fi
