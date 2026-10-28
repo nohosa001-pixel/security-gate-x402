@@ -1,0 +1,16 @@
+[package]
+name = "stylus-security-gate-verifier"
+version = "1.0.0"
+edition = "2021"
+description = "Arbitrum Stylus WASM High-Speed EIP-712 Security Gate Verifier"
+
+[dependencies]
+stylus-sdk = "0.6.0"
+alloy-primitives = "=0.7.6"
+alloy-sol-types = "=0.7.6"
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+
+[lib]
+crate-type = ["lib", "cdylib"]

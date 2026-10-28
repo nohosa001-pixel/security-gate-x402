@@ -1,0 +1,31 @@
+{
+  "name": "@agrid/agentkit-security-gate",
+  "version": "1.0.0",
+  "description": "Coinbase AgentKit Action Provider for Zero-Trust Security Gate Inspection and Base Mainnet Escrow Settlements",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "node --test"
+  },
+  "keywords": [
+    "coinbase",
+    "agentkit",
+    "base",
+    "x402",
+    "ai-agent",
+    "security-gate",
+    "escrow",
+    "slashing"
+  ],
+  "author": "A.GRID Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  }
+}
