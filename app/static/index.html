@@ -1030,8 +1030,8 @@ from app.agentkit_provider import SecurityGateAgentKitProvider
 provider = SecurityGateAgentKitProvider(chain_id=8453)
 audit = provider.inspect_deliverable(job_id=9021, deliverable="dataset.csv", ground_truth_spec="Valid CSV")`,
 
-      agentkit: `// Coinbase AgentKit Action Provider (@agrid/agentkit-security-gate)
-import { auditDeliverable, prepareBaseEscrowJob } from "@agrid/agentkit-security-gate";
+      agentkit: `// Coinbase AgentKit Action Provider (agentkit-security-gate)
+import { auditDeliverable, prepareBaseEscrowJob } from "agentkit-security-gate";
 const audit = await auditDeliverable({ jobId: 9021, deliverable: output, groundTruthSpec: spec });
 const escrow = prepareBaseEscrowJob(9021, "0xWorker...", 100.0, 1500);`,
 

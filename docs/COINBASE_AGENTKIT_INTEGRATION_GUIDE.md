@@ -1,7 +1,7 @@
 # 🔵 Coinbase AgentKit Action Provider Integration Guide
 
 > **Target Network:** Base Mainnet (Chain ID `8453`)  
-> **Official Action Provider:** [`@agrid/agentkit-security-gate`](file:///c:/workspace/security-gate-x402/packages/agentkit-security-gate/) (TypeScript) & [`app/agentkit_provider.py`](file:///c:/workspace/security-gate-x402/app/agentkit_provider.py) (Python)  
+> **Official Action Provider:** [`agentkit-security-gate`](file:///c:/workspace/security-gate-x402/packages/agentkit-security-gate/) (TypeScript) & [`app/agentkit_provider.py`](file:///c:/workspace/security-gate-x402/app/agentkit_provider.py) (Python)  
 > **Base Escrow Core:** `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278`  
 > **Treasury Toll:** 0.25% (20% Referral Rebate to Partner Agents)  
 > **Verified Demo:** [`examples/16_coinbase_agentkit_base_escrow_demo.py`](file:///c:/workspace/security-gate-x402/examples/16_coinbase_agentkit_base_escrow_demo.py)
@@ -60,7 +60,7 @@ pip install "agent-security-gate-x402>=2.1.0"
 
 ### TypeScript / Node (AgentKit Core)
 ```bash
-npm install @agrid/agentkit-security-gate viem
+npm install agentkit-security-gate viem
 ```
 
 ---

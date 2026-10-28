@@ -1,9 +1,17 @@
 {
-  "name": "@agrid/agentkit-security-gate",
+  "name": "agentkit-security-gate",
   "version": "1.0.0",
   "description": "Coinbase AgentKit Action Provider for Zero-Trust Security Gate Inspection and Base Mainnet Escrow Settlements",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",
+    "directory": "packages/agentkit-security-gate"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "bun build src/index.ts --outdir dist --target node",

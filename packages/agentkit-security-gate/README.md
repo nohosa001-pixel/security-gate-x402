@@ -1,4 +1,4 @@
-# @agrid/agentkit-security-gate
+# agentkit-security-gate
 
 > **Official Coinbase AgentKit Action Provider for A.GRID Security Gate & Base Mainnet Escrow**  
 > **Target Rail:** Base Mainnet (Chain ID `8453`)  
@@ -9,7 +9,7 @@
 
 ## 🛡️ Overview
 
-`@agrid/agentkit-security-gate` empowers AI agents built with **Coinbase AgentKit** and **Base Smart Wallets** to transact safely under a **Zero-Trust Economic Invariant**:
+`agentkit-security-gate` empowers AI agents built with **Coinbase AgentKit** and **Base Smart Wallets** to transact safely under a **Zero-Trust Economic Invariant**:
 
 1. **Pre-Flight Deliverable & Truth Inspection**: Verifies external AI code and deliverables before releasing escrowed funds (<5ms latency).
 2. **Worker Collateral Staking**: Requires workers/sub-agents to stake 10%–30% collateral to disincentivize hallucination or malicious injection.
@@ -21,9 +21,9 @@
 ## 📦 Installation
 
 ```bash
-npm install @agrid/agentkit-security-gate viem
+npm install agentkit-security-gate viem
 # or
-pnpm add @agrid/agentkit-security-gate viem
+pnpm add agentkit-security-gate viem
 ```
 
 ---
@@ -33,7 +33,7 @@ pnpm add @agrid/agentkit-security-gate viem
 ### 1. Pre-Flight Deliverable Audit
 
 ```typescript
-import { auditDeliverable } from "@agrid/agentkit-security-gate";
+import { auditDeliverable } from "agentkit-security-gate";
 
 // Audit agent deliverable before payment
 const audit = await auditDeliverable({
@@ -53,7 +53,7 @@ if (audit.verdict === "PASSED") {
 ### 2. Prepare Base Escrow Job with Collateral
 
 ```typescript
-import { prepareBaseEscrowJob } from "@agrid/agentkit-security-gate";
+import { prepareBaseEscrowJob } from "agentkit-security-gate";
 
 // Prepare a 100 USDC escrow job with 15% worker stake requirement
 const escrowTx = prepareBaseEscrowJob(

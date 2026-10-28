@@ -1,5 +1,5 @@
 /**
- * @agrid/agentkit-security-gate
+ * agentkit-security-gate
  * Official Coinbase AgentKit Action Provider for A.GRID Security Gate & Base Universal Escrow
  */
 
