@@ -14,11 +14,13 @@
 As distributed GPU clusters (io.net, Render, Akash) and autonomous AI agent swarms scale on Solana, they require an ultra-fast, micro-payment settlement layer with **sub-second finality and deterministic fraud protection**.
 
 Current off-chain escrows and slow EVM bridges create significant friction:
+
 - **Compute Fraud / Hallucination Risk**: GPU providers or worker agents may return random noise, cached results, or compromised weights without running real inference.
 - **Settlement Lag**: Awaiting 10-30 second multi-block confirmations paralyzes real-time LLM inference pipelines.
 - **High Transaction Tolls**: High L1/L2 gas makes sub-cent micro-payments economically infeasible.
 
 **A.GRID solves this on Solana Mainnet**:
+
 1. **0.4s Atomic Finality**: Micro-payments stream in real-time as chunks of compute or tokens are verified.
 2. **Deterministic Truth Oracle CPI**: The Anchor Universal Escrow Program cross-calls verification programs to validate mathematical loss convergence and AST safety before releasing lamports.
 3. **Instant Worker Slashing**: Malicious outputs or poisoned prompts forfeit worker stake instantly.
@@ -54,14 +56,14 @@ Current off-chain escrows and slow EVM bridges create significant friction:
 
 ## 3. Milestones & Requested Funding
 
-* **Total Grant Request:** $35,000 USDC / SOL equivalent
-* **Timeline:** 6 Weeks
+- **Total Grant Request:** $35,000 USDC / SOL equivalent
+- **Timeline:** 6 Weeks
 
 | Milestone | Deliverable | Funding |
 | :---: | :--- | :---: |
-| **M1** | **Anchor Program Open-Source & Solana Test Suite**<br>Full Anchor CPI integration with Squads v4 test suite (Completed). | $10,000 |
-| **M2** | **DePIN Compute Oracle Pilot (io.net / Render Network)**<br>Real-time GPU batch inference proof-of-work settlement on Solana Mainnet. | $15,000 |
-| **M3** | **Solana Agent SDK & Superteam Showcase**<br>TypeScript `@solana/agentkit-escrow` adapter and developer hackathon workshop. | $10,000 |
+| **M1** | **Anchor Program Open-Source & Solana Test Suite** — Full Anchor CPI integration with Squads v4 test suite (Completed). | $10,000 |
+| **M2** | **DePIN Compute Oracle Pilot (io.net / Render Network)** — Real-time GPU batch inference proof-of-work settlement on Solana Mainnet. | $15,000 |
+| **M3** | **Solana Agent SDK & Superteam Showcase** — TypeScript `@solana/agentkit-escrow` adapter and developer hackathon workshop. | $10,000 |
 
 ---
 

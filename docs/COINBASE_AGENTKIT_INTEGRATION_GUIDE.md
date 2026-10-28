@@ -11,11 +11,13 @@
 ## 1. Overview & Value Proposition for Coinbase AgentKit
 
 Coinbase AgentKit enables autonomous agents with crypto wallets (MPC wallets, Base Smart Wallets). However, autonomous agents transacting on Base Mainnet face severe economic risks:
+
 1. **Uncollateralized Counterparty Risk**: Hiring unknown autonomous sub-agents can lead to loss of funds if the agent fails or hallucinates.
 2. **Adversarial Code Injection**: Rogue agent outputs can contain malicious AST execution (`os.system`, `subprocess`) or credential exfiltration attempts.
 3. **Lack of Truth Anchoring**: No objective, sub-5ms proof-of-delivery oracle to verify deliverables before settlement.
 
 The **Security Gate Action Provider** solves this by enforcing the **Zero-Trust Economic Invariant**:
+
 - Workers must lock **10% ~ 30% collateral** before starting a job.
 - Deliverables are deterministically inspected in **< 3ms**.
 - Valid deliverables release payouts instantly with on-chain EIP-712 cryptographic proofs.
@@ -54,11 +56,13 @@ The **Security Gate Action Provider** solves this by enforcing the **Zero-Trust 
 ## 3. Installation & Setup
 
 ### Python (AgentKit Python SDK)
+
 ```bash
 pip install "agent-security-gate-x402>=2.1.0"
 ```
 
 ### TypeScript / Node (AgentKit Core)
+
 ```bash
 npm install agentkit-security-gate viem
 ```
@@ -68,6 +72,7 @@ npm install agentkit-security-gate viem
 ## 4. End-to-End Code Walkthrough
 
 ### Step 1: Initialize Provider & Deposit Escrow
+
 ```python
 from app.agentkit_provider import SecurityGateAgentKitProvider, BASE_ESCROW_CORE
 
@@ -87,6 +92,7 @@ escrow_calldata = provider.prepare_base_escrow_deposit(
 ```
 
 ### Step 2: Settle or Slash Based on Deliverable
+
 ```python
 # Worker submits deliverable
 worker_output = '{"dataset_cleaned": true, "records": 50000}'
@@ -108,6 +114,7 @@ else:
 ## 5. Submitting to Coinbase AgentKit Community Directory
 
 This guide and package are structured to submit directly to `coinbase/agentkit` under `cdp-langchain` / `agentkit-actions`:
+
 1. **Repository:** `nohosa001-pixel/security-gate-x402`
 2. **Action Provider Class:** `SecurityGateActionProvider`
 3. **Category:** Security, Guardrails, & On-Chain Escrow Clearing

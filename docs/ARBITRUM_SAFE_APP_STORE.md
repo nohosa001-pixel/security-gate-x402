@@ -14,6 +14,7 @@
 DAO treasuries, institutional hedge funds, and autonomous investment agents rely on **Safe{Wallet} (formerly Gnosis Safe)** for multi-sig fund custody. On Arbitrum One, sub-second execution speeds enable rapid transactions, but exposing a treasury to autonomous agents risks catastrophic fund drainage if an agent goes rogue.
 
 The **Security Gate Safe Guard** provides:
+
 1. **Pre-Execution Guarding**: Intercepts `checkTransaction` before any multi-sig proposal executes.
 2. **Arbitrum Stylus Sub-Millisecond Verification**: Offloads complex cryptographic AST hashing and EIP-712 verification to WASM Rust for 90% gas reduction.
 3. **Automated Slashing & Freezing**: Reverts unauthorized spends and freezes compromised agent keys instantly.
@@ -49,6 +50,7 @@ The **Security Gate Safe Guard** provides:
 ## 3. Stylus WASM Verification Advantage
 
 By compiling the EIP-712 verifier with **Arbitrum Stylus (Rust WASM)**:
+
 - **Gas Cost:** ~11,200 gas (vs ~85,000 in standard EVM Solidity).
 - **Execution Latency:** Sub-100 microseconds on Stylus Nitro nodes.
 - **Memory Safety:** Native Rust compile-time memory safety eliminating reentrancy attack vectors.
