@@ -723,6 +723,28 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* Zero Inline Style Component Classes */
+    .icon-arrow-sm { font-size: 10px; }
+    .safe-callout-icon { font-size: 20px; }
+    .safe-callout-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .safe-callout-actions { display: flex; gap: 8px; }
+    .preset-btn-drain { color: #12ff80; border-color: rgba(18, 255, 128, 0.4); }
+    .btn-safe-sm { font-size: 12px; padding: 6px 12px; }
+    #char-count { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); }
+    #context-box { display: none; margin-top: 12px; }
+    #context-input { min-height: 80px; }
+    .btn-subtext { font-size: 12px; opacity: 0.8; font-weight: normal; }
+    #proof-status { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+    .btn-copy-proof { background: transparent; border: none; color: var(--cyan); font-size: 11px; cursor: pointer; font-weight: 600; }
+    #code-snippet-box { max-height: 110px; margin-top: 8px; font-size: 11.5px; }
+    .btn-primary-lg { padding: 12px 24px; font-size: 14px; }
+    .telemetry-sub { font-size: 12px; color: var(--text-muted); }
+    .feed-line-init { color: var(--text-muted); font-size: 11px; }
+    .badge-ready { color: var(--green); }
+    .text-blocked { color: var(--red); }
+    .text-passed { color: var(--green); }
+    .bold { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -754,7 +776,7 @@
            target="_blank" rel="noopener noreferrer" 
            class="btn-safe" title="Open directly in official Gnosis Safe{Wallet} Web App">
           <span>🏛️ Safe{Wallet} App</span>
-          <span style="font-size: 10px;">↗</span>
+          <span class="icon-arrow-sm">↗</span>
         </a>
 
         <div class="status-pill">
@@ -784,20 +806,20 @@
     <!-- Safe Vault Callout Banner -->
     <div class="safe-vault-callout">
       <div class="safe-callout-text">
-        <span style="font-size: 20px;">🏛️</span>
+        <span class="safe-callout-icon">🏛️</span>
         <div>
           <div><strong>Gnosis Safe{Wallet} Treasury Guard Active</strong> &middot; Multi-Sig Vault Protection</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+          <div class="safe-callout-sub">
             Guarding Vault: <span class="safe-addr-badge">0x06db5A847F24d0feC5151a01937700E221d55e19</span> | Daily Limit: <strong>$5,000.00 USDC</strong>
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="preset-btn" onclick="loadPreset('drain')" style="color: #12ff80; border-color: rgba(18, 255, 128, 0.4);">
+      <div class="safe-callout-actions">
+        <button class="preset-btn preset-btn-drain" onclick="loadPreset('drain')">
           ⚡ Test Safe Drain Defense
         </button>
         <a href="https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic" 
-           target="_blank" rel="noopener noreferrer" class="btn-safe" style="font-size: 12px; padding: 6px 12px;">
+           target="_blank" rel="noopener noreferrer" class="btn-safe btn-safe-sm">
           <span>Open Safe Vault</span>
           <span>↗</span>
         </a>
@@ -833,20 +855,20 @@
 
         <div class="editor-label">
           <span>Inspection Payload (Text / Code / Intent)</span>
-          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan);" id="char-count">0 chars</span>
+          <span id="char-count">0 chars</span>
         </div>
 
         <textarea id="payload-input" rows="8" placeholder="Enter agent output, prompt, or transaction intent to audit..."></textarea>
 
-        <div id="context-box" style="display: none; margin-top: 12px;">
+        <div id="context-box">
           <div class="editor-label">Context Ground Truth (Reference Document)</div>
-          <textarea id="context-input" rows="3" style="min-height: 80px;" placeholder="Official ground truth context for hallucination verification..."></textarea>
+          <textarea id="context-input" rows="3" placeholder="Official ground truth context for hallucination verification..."></textarea>
         </div>
 
         <div class="run-btn-container">
           <button class="btn-execute" id="btn-run" onclick="executeInspection()">
             <span>🛡️ Execute Instant Gate Inspection</span>
-            <span style="font-size: 12px; opacity: 0.8; font-weight: normal;">(&lt; 3.8ms)</span>
+            <span class="btn-subtext">(&lt; 3.8ms)</span>
           </button>
         </div>
       </div>
@@ -857,7 +879,7 @@
           <div class="panel-title">
             <span>📜 Deterministic Oracle Verdict</span>
           </div>
-          <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);" id="proof-status">Ready</span>
+          <span id="proof-status">Ready</span>
         </div>
 
         <!-- Dynamic Verdict Banner -->
@@ -877,7 +899,7 @@
 
         <div class="editor-label">
           <span>Machine-Readable Attestation Receipt (EIP-712 Proof)</span>
-          <button onclick="copyOutput()" style="background: transparent; border: none; color: var(--cyan); font-size: 11px; cursor: pointer; font-weight: 600;">📋 Copy Proof</button>
+          <button onclick="copyOutput()" class="btn-copy-proof">📋 Copy Proof</button>
         </div>
         <pre class="output-viewer" id="output-json">// Gate verification response and cryptographic signature will appear here...</pre>
 
@@ -888,7 +910,7 @@
           <button class="snippet-tab-btn" id="tab-btn-curl" onclick="switchSnippetTab('curl')">cURL (x402)</button>
           <button class="snippet-tab-btn" id="tab-btn-eliza" onclick="switchSnippetTab('eliza')">ElizaOS</button>
         </div>
-        <pre class="output-viewer" id="code-snippet-box" style="max-height: 110px; margin-top: 8px; font-size: 11.5px;"></pre>
+        <pre class="output-viewer" id="code-snippet-box"></pre>
       </div>
     </div>
 
@@ -901,7 +923,7 @@
           Disburse atomic multi-chain settlement across <strong>Solana (0.4s finality)</strong>, <strong>Polygon</strong>, <strong>Base</strong>, and <strong>Arbitrum</strong> with worker collateral staking.
         </p>
       </div>
-      <a href="/escrow" class="btn-primary" style="padding: 12px 24px; font-size: 14px;">
+      <a href="/escrow" class="btn-primary btn-primary-lg">
         <span>Proceed to Step 2: Universal Escrow</span>
         <span>➔</span>
       </a>
@@ -911,7 +933,7 @@
     <section class="status-bar-section">
       <div class="section-header-compact">
         <h4><span>📊</span> System &amp; On-Chain Status Pulse</h4>
-        <span style="font-size: 12px; color: var(--text-muted);">Real-Time Network Telemetry</span>
+        <span class="telemetry-sub">Real-Time Network Telemetry</span>
       </div>
 
       <div class="metrics-bar-grid">
@@ -939,9 +961,9 @@
 
       <!-- Lightweight Live Ticker -->
       <div class="feed-terminal" id="live-feed-box">
-        <div class="feed-line" style="color: var(--text-muted); font-size: 11px;">
+        <div class="feed-line feed-line-init">
           <span>[SYSTEM BOOT] Security Gate x402 online on Cloud Run Asia-Northeast3</span>
-          <span style="color: var(--green);">READY</span>
+          <span class="badge-ready">READY</span>
         </div>
       </div>
     </section>
@@ -1176,10 +1198,10 @@ curl -X POST "https://agent-security-gate-x402-212942243360.asia-northeast3.run.
         riskEl.innerText = `Risk Score: ${(riskScore * 100).toFixed(0)}%`;
 
         if (isBlocked) {
-          title.innerHTML = `<span>🚨</span> <span style="color: var(--red);">BLOCKED BY SECURITY GATE</span>`;
+          title.innerHTML = `<span>🚨</span> <span class="text-blocked">BLOCKED BY SECURITY GATE</span>`;
           desc.innerHTML = `Threat Detected: <strong>${threatMsg || 'Zero-Trust Rule Violation'}</strong> (Execution Deflected)`;
         } else {
-          title.innerHTML = `<span>🟢</span> <span style="color: var(--green);">PASSED ZERO-TRUST INVARIANTS</span>`;
+          title.innerHTML = `<span>🟢</span> <span class="text-passed">PASSED ZERO-TRUST INVARIANTS</span>`;
           desc.innerHTML = `Zero threats detected. Cryptographic EIP-712 proof valid for Step 2 Universal Escrow settlement.`;
         }
 
@@ -1197,7 +1219,7 @@ curl -X POST "https://agent-security-gate-x402-212942243360.asia-northeast3.run.
         desc.innerText = err.message;
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span>🛡️ Execute Instant Gate Inspection</span> <span style="font-size: 12px; opacity: 0.8; font-weight: normal;">(&lt; 3.8ms)</span>';
+        btn.innerHTML = '<span>🛡️ Execute Instant Gate Inspection</span> <span class="btn-subtext">(&lt; 3.8ms)</span>';
       }
     }
 
@@ -1206,12 +1228,12 @@ curl -X POST "https://agent-security-gate-x402-212942243360.asia-northeast3.run.
       const line = document.createElement('div');
       line.className = 'feed-line';
       const isPassed = ev.verdict === 'PASSED';
-      const color = isPassed ? 'var(--green)' : 'var(--red)';
+      const verdictClass = isPassed ? 'text-passed bold' : 'text-blocked bold';
       const t = ev.timestamp ? ev.timestamp.slice(11, 19) : new Date().toTimeString().slice(0, 8);
 
       line.innerHTML = `
         <span>[${t}] Local Inspection &middot; Latency: ${ev.latency_ms}ms &middot; Risk: ${(ev.risk_score * 100).toFixed(0)}%</span>
-        <span style="color: ${color}; font-weight: bold;">${ev.verdict}</span>
+        <span class="${verdictClass}">${ev.verdict}</span>
       `;
       box.insertBefore(line, box.firstChild);
       if (box.children.length > 5) box.removeChild(box.lastChild);
