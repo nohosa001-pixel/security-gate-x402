@@ -577,6 +577,57 @@ class AgentCreditRatingEngine:
             "message": f"Worker collateral {slash_amount_usdc} USDC slashed and forfeited to protocol insurance pool."
         }
 
+    def evaluate_dynamic_stake_requirement(
+        self,
+        agent_address: str,
+        domain: str = "ESCROW",
+        brain_anomaly_flag: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Dynamically calculates worker collateral staking ratio based on:
+        1. Agent credit rating tier (AAA: 10%, AA: 15%, A: 20%, BBB: 25%, B/C: 30%)
+        2. ElizaOS Brain real-time supply shock or satellite deforestation anomaly
+        Invariant: If domain anomaly/shock is active, stake requirement escalates to minimum 30.0%.
+        """
+        score_info = self.calculate_credit_score(agent_address)
+        raw_tier = score_info.get("tier", "BBB")
+
+        if "AAA" in raw_tier:
+            base_ratio = 0.10
+            clean_tier = "AAA"
+        elif "AA" in raw_tier:
+            base_ratio = 0.15
+            clean_tier = "AA"
+        elif "A " in raw_tier or raw_tier.startswith("A"):
+            base_ratio = 0.20
+            clean_tier = "A"
+        elif "BBB" in raw_tier:
+            base_ratio = 0.25
+            clean_tier = "BBB"
+        else:
+            base_ratio = 0.35
+            clean_tier = "Subprime"
+
+        effective_ratio = base_ratio
+        anomaly_escalated = False
+
+        if brain_anomaly_flag and effective_ratio < 0.30:
+            effective_ratio = 0.30
+            anomaly_escalated = True
+
+        return {
+            "agent_address": eth_utils.to_checksum_address(agent_address),
+            "tier": clean_tier,
+            "raw_tier": raw_tier,
+            "credit_score": score_info.get("credit_score", 650),
+            "base_ratio": base_ratio,
+            "effective_collateral_ratio": effective_ratio,
+            "brain_anomaly_detected": brain_anomaly_flag,
+            "anomaly_escalation_applied": anomaly_escalated,
+            "domain": domain.upper(),
+            "directive": "Escalate stake to >= 30% under domain anomaly to disincentivize moral hazard." if anomaly_escalated else "Standard credit-rated collateral."
+        }
+
 
 # Singleton instances & aliases
 credit_engine = AgentCreditRatingEngine()

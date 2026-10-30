@@ -290,6 +290,9 @@ class EscrowAuditRequest(BaseModel):
     is_code: bool = Field(False, description="Whether deliverable is executable code")
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
     verifying_contract: str = Field("0x0000000000000000000000000000000000000000", description="Deployed AgentEscrow contract address")
+    milestones_total: Optional[int] = Field(1, ge=1, description="Total expected milestones for CFR alpha-split computation")
+    milestones_done: Optional[int] = Field(1, ge=0, description="Completed milestones achieved by worker")
+    quality_score: Optional[float] = Field(None, ge=0.0, le=1.0, description="Optional external or self-reported quality benchmark (0.0~1.0)")
 
 
 class M2MEscrowSettleRequest(BaseModel):
@@ -302,6 +305,9 @@ class M2MEscrowSettleRequest(BaseModel):
     is_code: bool = Field(False, description="Whether deliverable is executable code")
     chain_id: int = Field(137, description="EVM Chain ID (137 = Polygon)")
     referral_agent_address: Optional[str] = Field(None, description="Optional wallet address of referring agent to receive 20% protocol fee rebate")
+    milestones_total: Optional[int] = Field(1, ge=1, description="Total contracted milestone count")
+    milestones_done: Optional[int] = Field(1, ge=0, description="Completed milestone count for CFR alpha-split")
+    quality_score: Optional[float] = Field(None, ge=0.0, le=1.0, description="Subjective/objective quality score (0.0~1.0)")
 
 
 # --- Universal Modular Truth Adapter Schemas ---

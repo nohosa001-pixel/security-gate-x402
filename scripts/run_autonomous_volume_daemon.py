@@ -62,7 +62,7 @@ EVM_NETWORKS = {
     "polygon": {
         "name": "Polygon Mainnet",
         "chain_id": 137,
-        "rpcs": ["https://1rpc.io/matic", "https://polygon-rpc.com", "https://rpc.ankr.com/polygon", "https://polygon.llamarpc.com"],
+        "rpcs": ["https://polygon-bor-rpc.publicnode.com", "https://1rpc.io/matic", "https://rpc.ankr.com/polygon", "https://polygon.llamarpc.com"],
         "explorer": "https://polygonscan.com/tx/0x"
     }
 }

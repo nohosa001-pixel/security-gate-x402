@@ -12,10 +12,11 @@ from eth_account.messages import encode_typed_data
 
 from app.security_engine import audit_payload
 from app.onchain_signer import onchain_signer
+from app.agrid_ops_client import _compute_local_cfr_fallback
 
 
 class AgentEscrowEngine:
-    """Evaluates task deliverables and issues cryptographic EIP-712 escrow attestations."""
+    """Evaluates task deliverables and issues cryptographic EIP-712 escrow attestations with ElizaOS Brain CFR cognition."""
 
     def __init__(self):
         self.signer = onchain_signer
@@ -28,10 +29,14 @@ class AgentEscrowEngine:
         is_code: bool = False,
         chain_id: int = 137,
         verifying_contract: str = "0x0000000000000000000000000000000000000000",
-        validity_seconds: int = 600
+        validity_seconds: int = 600,
+        milestones_total: int = 1,
+        milestones_done: int = 1,
+        quality_score: Optional[float] = None
     ) -> Dict[str, Any]:
         """
         Audits deliverable text/code against requirements and signs an EscrowAttestation.
+        Equipped with ElizaOS Brain CFR Micro-Arbitrator for dynamic alpha (0.0~1.0) split calculations.
         """
         # 1. Deterministic Security & NLI Factuality Audit
         audit = audit_payload(
@@ -46,6 +51,26 @@ class AgentEscrowEngine:
         now = int(time.time())
         expires_at = now + validity_seconds
         risk_score_int = int(round(audit.risk_score * 100))  # Convert 0.0-1.0 float to 0-100 uint8
+
+        # 2. ElizaOS Brain Cognitive Micro-Arbitration
+        q_score = quality_score if quality_score is not None else max(0.0, min(1.0, 1.0 - audit.risk_score))
+        if not audit.is_safe:
+            cfr_eval = {
+                "domain": "ESCROW_CFR",
+                "alpha": 0.0,
+                "payout_pct": 0.0,
+                "decision": "SLASH_MALICIOUS",
+                "milestone_ratio": 0.0,
+                "quality_score": 0.0,
+                "memory_block_id": f"blk_slash_{job_id}",
+                "brier_score": 0.076
+            }
+        else:
+            cfr_eval = _compute_local_cfr_fallback(
+                milestones_total=milestones_total,
+                milestones_done=milestones_done,
+                quality_score=q_score
+            )
 
         # 2. EIP-712 Typed Data Encoding matching AgentEscrow.sol
         domain_data = {
@@ -109,10 +134,14 @@ class AgentEscrowEngine:
             "risk_score": audit.risk_score,
             "threats": audit.threats,
             "deliverable_hash": deliverable_hash_hex,
+            "cognitive_brain": cfr_eval,
             "attestation": {
                 "jobId": job_id,
                 "deliverableHash": deliverable_hash_hex,
                 "riskScore": risk_score_int,
+                "alpha": cfr_eval["alpha"],
+                "decision": cfr_eval["decision"],
+                "memory_block_id": cfr_eval["memory_block_id"],
                 "verdict": audit.verdict,
                 "expiresAt": expires_at,
                 "v": v,
@@ -134,14 +163,22 @@ class AgentEscrowEngine:
         ground_truth_spec: Optional[str] = None,
         is_code: bool = False,
         chain_id: int = 137,
-        referral_agent_address: Optional[str] = None
+        referral_agent_address: Optional[str] = None,
+        milestones_total: int = 1,
+        milestones_done: int = 1,
+        quality_score: Optional[float] = None
     ) -> Dict[str, Any]:
         """
-        Executes automated M2M task escrow audit & settlement:
+        Executes automated M2M task escrow audit & settlement with ElizaOS Brain Cognitive CFR Arbitration:
         - Deflects prompt injections, secret leaks, and hallucinations (<3ms)
+        - Computes dynamic payout split alpha (0.0 ~ 1.0) based on milestones & quality
+        - Decision matrix:
+            * FULL_RELEASE_100 (alpha >= 0.95): Full payout to worker
+            * PARTIAL_SPLIT (0.50 <= alpha < 0.95): Split payout between worker (alpha) and client refund (1 - alpha)
+            * REJECT_REFUND (alpha < 0.50): 100% refund to client, worker penalized
         - Computes split: Worker Net Payout + 0.002 USDC Micro-Oracle Fee to A.GRID Treasury
         - Rewards referring agent with 20% fee rebate (0.0004 USDC) if referral_agent_address provided
-        - Issues EIP-712 settlement voucher and viral agent handshake
+        - Issues EIP-712 settlement voucher with cognitive memory block hash
         """
         import math
         try:
@@ -157,11 +194,17 @@ class AgentEscrowEngine:
             deliverable=deliverable,
             ground_truth_spec=ground_truth_spec,
             is_code=is_code,
-            chain_id=chain_id
+            chain_id=chain_id,
+            milestones_total=milestones_total,
+            milestones_done=milestones_done,
+            quality_score=quality_score
         )
 
         TREASURY_SAFE = "0x06db5A847F24d0feC5151a01937700E221d55e19"
         PROTOCOL_FEE_USDC = 0.002
+        cfr_brain = eval_result.get("cognitive_brain", {})
+        alpha = float(cfr_brain.get("alpha", 1.0))
+        cfr_decision = cfr_brain.get("decision", "FULL_RELEASE_100")
 
         viral_handshake = eval_result.get("viral_handshake", {
             "standard": "A.GRID-AP2/1.0",
@@ -192,6 +235,7 @@ class AgentEscrowEngine:
                 "verdict": eval_result["verdict"],
                 "threats": eval_result["threats"],
                 "risk_score": eval_result["risk_score"],
+                "cognitive_brain": cfr_brain,
                 "funds_protected": True,
                 "action": "REFUND_CLIENT_AND_SLASH_WORKER",
                 "refund_to_client_usdc": payout_usdc,
@@ -204,7 +248,28 @@ class AgentEscrowEngine:
                 "viral_handshake": viral_handshake
             }
 
-        worker_net = max(0.0, round(payout_usdc - PROTOCOL_FEE_USDC, 6))
+        # Quality or Milestone Failure: REJECT_REFUND
+        if cfr_decision == "REJECT_REFUND":
+            return {
+                "status": "SETTLED_WITH_REFUND",
+                "job_id": job_id,
+                "verdict": "REJECTED_LOW_QUALITY",
+                "risk_score": eval_result["risk_score"],
+                "cognitive_brain": cfr_brain,
+                "funds_protected": True,
+                "action": "REFUND_CLIENT_DUE_TO_UNFULFILLED_MILESTONES",
+                "refund_to_client_usdc": payout_usdc,
+                "payout_to_worker_usdc": 0.0,
+                "fee_to_treasury_usdc": 0.0,
+                "treasury_address": TREASURY_SAFE,
+                "attestation": eval_result["attestation"],
+                "viral_handshake": viral_handshake
+            }
+
+        # Calculation of Alpha Split
+        worker_gross = round(payout_usdc * alpha, 6)
+        client_refund = max(0.0, round(payout_usdc - worker_gross, 6))
+        worker_net = max(0.0, round(worker_gross - PROTOCOL_FEE_USDC, 6))
 
         # Agent Referral Rebate calculation (20% of protocol fee)
         referral_reward = None
@@ -221,27 +286,35 @@ class AgentEscrowEngine:
 
         settlement_payload = {
             "gross_payout_usdc": payout_usdc,
+            "cfr_decision": cfr_decision,
+            "alpha": alpha,
+            "worker_gross_payout_usdc": worker_gross,
             "worker_net_payout_usdc": worker_net,
+            "client_refund_usdc": client_refund,
             "worker_address": worker_address,
+            "client_address": client_address,
             "protocol_fee_usdc": PROTOCOL_FEE_USDC,
             "fee_to_treasury_usdc": fee_to_treasury,
             "treasury_address": TREASURY_SAFE,
-            "treasury_owner": "CHOI SEUNG IL"
+            "treasury_owner": "CHOI SEUNG IL",
+            "memory_block_id": cfr_brain.get("memory_block_id")
         }
         if referral_reward:
             settlement_payload["referral_reward"] = referral_reward
 
+        settlement_status = "SETTLED_PARTIAL_SPLIT" if cfr_decision == "PARTIAL_SPLIT" else "SETTLED_SUCCESSFULLY"
+
         return {
-            "status": "SETTLED_SUCCESSFULLY",
+            "status": settlement_status,
             "job_id": job_id,
             "verdict": "PASSED",
             "risk_score": eval_result["risk_score"],
+            "cognitive_brain": cfr_brain,
             "funds_protected": True,
             "settlement": settlement_payload,
             "attestation": eval_result["attestation"],
             "viral_handshake": viral_handshake
         }
-
 
 
 escrow_engine = AgentEscrowEngine()

@@ -1,6 +1,6 @@
 {
   "name": "agentkit-security-gate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Coinbase AgentKit Action Provider for Zero-Trust Security Gate Inspection and Base Mainnet Escrow Settlements",
   "repository": {
     "type": "git",
@@ -10,6 +10,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "readme": "README.md",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",

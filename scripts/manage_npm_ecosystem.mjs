@@ -38,6 +38,15 @@ export const ECOSYSTEM_PACKAGES = [
     testCmd: "npm test"
   },
   {
+    id: "agentkit-security-gate",
+    name: "agentkit-security-gate",
+    repo: "security-gate-x402",
+    localPath: path.resolve(ROOT_DIR, "packages/agentkit-security-gate"),
+    role: "Coinbase AgentKit Action Provider for Base Mainnet Escrow",
+    buildCmd: "npm run build",
+    testCmd: "node --test"
+  },
+  {
     id: "agrid-sdk",
     name: "agrid-sdk",
     repo: "security-gate-x402",

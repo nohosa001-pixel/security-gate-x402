@@ -221,6 +221,15 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
             v += 27;
         }
 
+        if (v != 27 && v != 28) {
+            return address(0);
+        }
+
+        // Enforce EIP-2 / OpenZeppelin signature malleability prevention
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            return address(0);
+        }
+
         return ecrecover(digest, v, r, s);
     }
 

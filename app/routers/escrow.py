@@ -46,7 +46,10 @@ async def audit_escrow_task(
         ground_truth_spec=req.ground_truth_spec,
         is_code=req.is_code,
         chain_id=req.chain_id,
-        verifying_contract=req.verifying_contract
+        verifying_contract=req.verifying_contract,
+        milestones_total=req.milestones_total or 1,
+        milestones_done=req.milestones_done if req.milestones_done is not None else (req.milestones_total or 1),
+        quality_score=req.quality_score
     )
     return result
 
@@ -54,9 +57,10 @@ async def audit_escrow_task(
 @router.post("/api/v1/escrow/settle", tags=["Escrow"])
 async def settle_escrow_task(req: M2MEscrowSettleRequest):
     """
-    Settles an autonomous agent-to-agent task escrow:
+    Settles an autonomous agent-to-agent task escrow with ElizaOS Brain Cognitive CFR Arbitration:
     - Pre-flight security audit: Prompt injection & secret leak defense (<3ms)
     - Automatically routes 0.002 USDC micro-fee to A.GRID Treasury (Safe: 0x06db...5e19)
+    - Dynamically evaluates milestone completion and alpha payout split (FULL, PARTIAL_SPLIT, REJECT)
     - Releases net payout to worker or refunds client with 0 on-chain loss upon attack.
     """
     from app.escrow_engine import escrow_engine
@@ -69,7 +73,10 @@ async def settle_escrow_task(req: M2MEscrowSettleRequest):
         ground_truth_spec=req.ground_truth_spec,
         is_code=req.is_code,
         chain_id=req.chain_id,
-        referral_agent_address=req.referral_agent_address
+        referral_agent_address=req.referral_agent_address,
+        milestones_total=req.milestones_total or 1,
+        milestones_done=req.milestones_done if req.milestones_done is not None else (req.milestones_total or 1),
+        quality_score=req.quality_score
     )
 
 

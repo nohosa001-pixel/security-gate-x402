@@ -1,7 +1,7 @@
 {
   "name": "elizaos-plugin-security-gate",
-  "version": "2.7.0",
-  "description": "Deterministic local prompt injection defense, CleanWeb token compression, Critical Minerals provenance, EUDR deforestation compliance, Onchain Safe/Solana escrow, and Geo-Logistics PoD guardrails for ElizaOS",
+  "version": "2.8.0",
+  "description": "Deterministic local prompt injection defense, CleanWeb token compression, Critical Minerals provenance, EUDR deforestation compliance, ElizaOS Brain CFR cognition, Onchain Safe/Solana escrow, and Geo-Logistics PoD guardrails for ElizaOS",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nohosa001-pixel/security-gate-x402.git",

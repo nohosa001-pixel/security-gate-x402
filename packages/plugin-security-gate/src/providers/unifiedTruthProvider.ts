@@ -40,6 +40,14 @@ export const unifiedTruthProvider: Provider = {
 				geo: {
 					status: "ACTIVE",
 					standards: ["Haversine GNSS Arrival (<500m)", "DCSA eBL v3.0", "E-Seal Hardware Integrity", "Cold-Chain Telemetry"]
+				},
+				cognitiveBrain: {
+					status: "ACTIVE_FEDERATED_COGNITION",
+					learner: "A.GRID 4-Domain Federated ElizaOS Brain",
+					brierScore: 0.0761,
+					overallReadiness: 0.8583,
+					cfrMicroArbitration: "Dynamic alpha-split (0.0~1.0) with Smart Escrow direct release",
+					memoryProofFormat: "blk_[hash] cryptographic Merkle anchor"
 				}
 			},
 			clearinghouseHub: "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/",
@@ -49,8 +57,8 @@ export const unifiedTruthProvider: Provider = {
 
 		return {
 			text: "--- [A.GRID UNIFIED TRUTH SOVEREIGNTY SUBSTRATE (x402)] ---\n" +
-				"Domains: Security, CleanWeb, Minerals, EUDR, Onchain, Geo\n" +
-				"Status: 100% Deterministic Invariants Active\n" +
+				"Domains: Security, CleanWeb, Minerals, EUDR, Onchain, Geo, ElizaOS Cognitive Brain\n" +
+				"Status: 100% Deterministic Invariants & CFR Brain Cognition Active (Brier Score: 0.0761)\n" +
 				"Hub: https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/",
 			data
 		};

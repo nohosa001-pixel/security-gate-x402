@@ -1,3 +1,4 @@
+
 # 🔷 Safe{Wallet} App Store Integration: Arbitrum One (42161)
 
 > **Protocol:** Safe{Wallet} Transaction Guard & Arbitrum Stylus Micro-Verifier  

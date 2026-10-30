@@ -1,21 +1,20 @@
 # 🌐 A.GRID NPM Ecosystem Comprehensive Status Report
 
-> **Generated on:** 2026-10-28  
-> **Standard:** A.GRID AP2/1.0 Sovereign Machine-to-Machine Registry Network  
+> **Generated on:** 2026-10-30  
+> **Standard:** A.GRID AP2/1.0 Sovereign Machine-to-Machine NPM Network  
 > **Architecture:** OIDC Provenance Cryptographic Publishing & Multi-Repo Master Sync
 
 ---
 
-## 1. Live Packages Matrix (PyPI & NPM)
+## 1. Live NPM Packages Matrix
 
-| Package | Registry | Role | Repo | Local | Live | Dist Status | Sync Status |
-| :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
-| **`agent-security-gate-x402`** | **PyPI** | Deterministic Security Gate & Multichain Escrow Core | `security-gate-x402` | `v2.1.0` | `v2.1.0` | ✅ Ready | 🟢 Synced (Live) |
-| **`elizaos-plugin-security-gate`** | **npm** | ElizaOS Security Gate Guardrails & Multichain Escrow | `security-gate-x402` | `v2.7.0` | `v2.7.0` | ✅ Ready | 🟢 Synced (Live) |
-| **`@agrid/agentkit-security-gate`** | **npm** | Coinbase AgentKit Action Provider for Base Mainnet | `security-gate-x402` | `v1.0.0` | `CI Pipeline` | ✅ Built | 🚀 Publishing |
-| **`minerals-oracle-x402`** | **npm** | Critical Minerals Provenance & M2M Trade Protocol SDK | `minerals-oracle-x402` | `v1.5.0` | `v1.5.0` | ✅ Ready | 🟢 Synced (Live) |
-| **`cleanweb-eliza-plugin`** | **npm** | CleanWeb 87% Token Compression & Ground Truth Intelligence | `x402-micro-agent` | `v1.0.0` | `v1.0.0` | ✅ Ready | 🟢 Synced (Live) |
-| **`agrid-sdk`** | **npm** | A.GRID Master Umbrella SDK (Security + CleanWeb + Minerals) | `security-gate-x402` | `v1.0.0` | `vNot on npm` | ✅ Ready | ⏳ Pending 1st Publish |
+| Package | Role | Repo | Local | npm Live | Monthly DL | Dist Status | Sync Status |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`elizaos-plugin-security-gate`** | ElizaOS Security Gate Guardrails & Local Ingress Defense | `security-gate-x402` | `v2.8.0` | `v2.7.0` | **1,124** | ✅ Ready | 🚀 Update Ready |
+| **`minerals-oracle-x402`** | Critical Minerals Provenance & M2M Trade Protocol SDK | `minerals-oracle-x402` | `v1.6.0` | `v1.5.0` | **36** | ✅ Ready | 🚀 Update Ready |
+| **`agentkit-security-gate`** | Coinbase AgentKit Action Provider for Base Mainnet Escrow | `security-gate-x402` | `v1.0.1` | `v1.0.1` | **0** | ✅ Ready | 🟢 Synced (Live) |
+| **`agrid-sdk`** | A.GRID Master Umbrella SDK (Security + CleanWeb + Minerals) | `security-gate-x402` | `v1.0.0` | `vNot on npm` | **0** | ✅ Ready | ⏳ Pending 1st Publish |
+| **`cleanweb-eliza-plugin`** | CleanWeb 87% Token Compression & Ground Truth Intelligence | `x402-micro-agent` | `v1.0.0` | `v1.0.0` | **406** | ✅ Ready | 🟢 Synced (Live) |
 
 ---
 

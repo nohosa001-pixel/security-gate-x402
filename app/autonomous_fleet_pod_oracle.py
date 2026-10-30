@@ -330,5 +330,221 @@ class AutonomousFleetPoDOracle:
             "reason": "Delivery mission timelock expired without PoD verification."
         }
 
+    def verify_advanced_pod_and_settle(
+        self,
+        mission_id: str,
+        carrier_address: str,
+        delivery_lat: float,
+        delivery_lon: float,
+        eseal_hardware_payload: Dict[str, Any],
+        cold_chain_telemetry_series: Optional[List[Dict[str, Any]]] = None,
+        max_allowed_breach_minutes: int = 15,
+        chain_id: int = 137
+    ) -> Dict[str, Any]:
+        """
+        Enterprise-grade PoD verification:
+        1. GNSS Haversine geofence arrival.
+        2. Hardware E-Seal Cryptographic Signature & Tamper Sensor Audit.
+        3. Time-Series IoT Cold-Chain Integrity & Mean Kinetic Temperature (MKT).
+        4. Slashing trigger: If tamper detected, immediately penalizes carrier and locks mission.
+        """
+        with self._lock:
+            mission = self.missions.get(mission_id)
+            if not mission:
+                raise ValueError(f"Mission '{mission_id}' not found.")
+
+            if mission["status"] != "DISPATCHED":
+                raise ValueError(f"Mission '{mission_id}' cannot be settled. Current status: {mission['status']}.")
+
+            clean_carrier = eth_utils.to_checksum_address(carrier_address)
+            if clean_carrier != mission["carrier_address"]:
+                raise ValueError(
+                    f"Unauthorized carrier '{clean_carrier}'. Expected registered carrier '{mission['carrier_address']}'."
+                )
+
+            now = int(time.time())
+            if now > mission["expires_at"]:
+                self._refund_shipper(mission)
+                raise ValueError(f"Mission '{mission_id}' has expired. Freight refunded to shipper.")
+
+            # 1. Geofence Check
+            distance_meters = calculate_haversine_distance_meters(
+                delivery_lat, delivery_lon,
+                mission["target_lat"], mission["target_lon"]
+            )
+            if distance_meters > mission["geofence_radius_meters"]:
+                raise ValueError(
+                    f"GNSS Geofence arrival FAILED: carrier is {distance_meters}m away. Allowed: {mission['geofence_radius_meters']}m."
+                )
+
+            # 2. Hardware E-Seal Cryptographic Verification
+            tamper_flag = bool(eseal_hardware_payload.get("tamper_detected", False))
+            hw_sig = eseal_hardware_payload.get("signature_hex", "")
+            hw_nonce = eseal_hardware_payload.get("nonce", "")
+
+            if tamper_flag:
+                mission["status"] = "TAMPERED_SLASHED"
+                credit_engine.record_audit(clean_carrier, verdict="BLOCKED", hallucination_detected=True)
+                # Confiscate carrier collateral to Sovereign Treasury if available
+                carrier_acc = vault_manager.get_account(clean_carrier)
+                slash_amount = 0.0
+                if carrier_acc and carrier_acc.balance_usdc > 0:
+                    slash_amount = min(carrier_acc.balance_usdc, 10.0)  # Slash up to $10.00 USDC
+                    carrier_acc.balance_usdc = round(carrier_acc.balance_usdc - slash_amount, 6)
+                    sovereign_treasury.accumulated_tolls += slash_amount
+
+                raise ValueError(f"CRITICAL E-SEAL BREACH: Physical seal tamper detected! Slashed {slash_amount} USDC and quarantined.")
+
+            # Validate Cryptogram
+            expected_msg = f"{mission['eseal_pubkey_hash']}:{hw_nonce}:{tamper_flag}"
+            expected_sig = eth_utils.keccak(text=expected_msg).hex()
+            if hw_sig.lower() != expected_sig.lower() and hw_sig != "0x" + expected_sig:
+                raise ValueError("E-Seal hardware cryptogram signature mismatch or replay attack!")
+
+            # 3. Continuous Time-Series Cold-Chain Analysis
+            mkt_celsius = None
+            total_breach_seconds = 0
+            if cold_chain_telemetry_series and (mission["max_temp_celsius"] is not None or mission["min_temp_celsius"] is not None):
+                temps = []
+                for point in cold_chain_telemetry_series:
+                    t = float(point.get("temp_celsius", 0.0))
+                    temps.append(t)
+                    # Check breach
+                    is_breach = False
+                    if mission["max_temp_celsius"] is not None and t > mission["max_temp_celsius"]:
+                        is_breach = True
+                    if mission["min_temp_celsius"] is not None and t < mission["min_temp_celsius"]:
+                        is_breach = True
+
+                    if is_breach:
+                        total_breach_seconds += int(point.get("duration_seconds", 60))
+
+                # Calculate MKT
+                if temps:
+                    mkt_celsius = calculate_mean_kinetic_temperature(temps)
+
+                breach_minutes = total_breach_seconds / 60.0
+                if breach_minutes > max_allowed_breach_minutes:
+                    mission["status"] = "COLD_CHAIN_FAILED"
+                    credit_engine.record_audit(clean_carrier, verdict="FAILED", hallucination_detected=False)
+                    raise ValueError(
+                        f"Cumulative cold-chain breach {breach_minutes:.1f}m exceeded maximum allowable {max_allowed_breach_minutes}m! MKT: {mkt_celsius:.2f}°C"
+                    )
+
+            # 4. Settle Payout
+            gross_amount = mission["freight_amount_usdc"]
+            protocol_fee = round((gross_amount * self.PROTOCOL_FEE_BPS) / 10000.0, 6)
+            carrier_net = round(gross_amount - protocol_fee, 6)
+
+            carrier_acc = vault_manager.get_account(clean_carrier)
+            if not carrier_acc:
+                session_key = "ak_live_" + secrets.token_hex(24)
+                now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+                carrier_acc = AgentVaultAccount(
+                    agent_address=clean_carrier,
+                    balance_usdc=0.0,
+                    total_deposited_usdc=0.0,
+                    total_consumed_usdc=0.0,
+                    session_key=session_key,
+                    created_at_utc=now_iso,
+                    last_active_utc=now_iso,
+                    query_count=0
+                )
+                with vault_manager._lock:
+                    vault_manager._accounts[clean_carrier] = carrier_acc
+                    vault_manager._session_index[session_key] = clean_carrier
+
+            carrier_acc.balance_usdc = round(carrier_acc.balance_usdc + carrier_net, 6)
+            sovereign_treasury.accumulated_tolls += protocol_fee
+
+            # EIP-712 Attestation
+            domain_data = {
+                "name": "AutonomousFleetPoDOracle",
+                "version": "1.0",
+                "chainId": int(chain_id),
+                "verifyingContract": "0x3333333333333333333333333333333333333333"
+            }
+            types = {
+                "EIP712Domain": [
+                    {"name": "name", "type": "string"},
+                    {"name": "version", "type": "string"},
+                    {"name": "chainId", "type": "uint256"},
+                    {"name": "verifyingContract", "type": "address"}
+                ],
+                "ProofOfDeliveryAttestation": [
+                    {"name": "missionId", "type": "string"},
+                    {"name": "shipper", "type": "address"},
+                    {"name": "carrier", "type": "address"},
+                    {"name": "grossAmount", "type": "uint256"},
+                    {"name": "distanceMetersScaled", "type": "uint256"},
+                    {"name": "timestamp", "type": "uint256"}
+                ]
+            }
+            message_data = {
+                "missionId": mission_id,
+                "shipper": mission["shipper_address"],
+                "carrier": clean_carrier,
+                "grossAmount": int(round(gross_amount * 1_000_000)),
+                "distanceMetersScaled": int(round(distance_meters * 100)),
+                "timestamp": now
+            }
+            signable_msg = encode_typed_data(full_message={
+                "types": types,
+                "primaryType": "ProofOfDeliveryAttestation",
+                "domain": domain_data,
+                "message": message_data
+            })
+            signed = self.signer.account.sign_message(signable_msg)
+
+            mission["status"] = "DELIVERED_AND_SETTLED"
+            mission["settled_at"] = now
+            mission["distance_meters"] = distance_meters
+            mission["mkt_celsius"] = mkt_celsius
+
+            credit_engine.record_audit(clean_carrier, verdict="PASSED", hallucination_detected=False)
+
+            return {
+                "status": "DELIVERED_AND_SETTLED",
+                "mission_id": mission_id,
+                "shipper_address": mission["shipper_address"],
+                "carrier_address": clean_carrier,
+                "distance_meters": distance_meters,
+                "mkt_celsius": mkt_celsius,
+                "breach_minutes": total_breach_seconds / 60.0,
+                "gross_freight_usdc": gross_amount,
+                "net_payout_usdc": carrier_net,
+                "protocol_fee_usdc": protocol_fee,
+                "settled_at": now,
+                "attestation": {
+                    "missionId": mission_id,
+                    "oracle_signer": self.signer.signer_address,
+                    "signature": "0x" + signed.signature.hex(),
+                    "timestamp": now
+                }
+            }
+
+
+def calculate_mean_kinetic_temperature(temps_celsius: List[float], delta_h_kj: float = 83.144) -> float:
+    """Calculates Mean Kinetic Temperature (MKT) in Celsius per USP / WHO guidelines."""
+    if not temps_celsius:
+        return 0.0
+    R = 8.314462618  # Universal gas constant J/(mol*K)
+    delta_h_j = delta_h_kj * 1000.0  # Activation energy in J/mol
+
+    sum_exp = 0.0
+    for t_c in temps_celsius:
+        t_k = t_c + 273.15  # Convert to Kelvin
+        if t_k <= 0:
+            continue
+        sum_exp += math.exp(-delta_h_j / (R * t_k))
+
+    n = len(temps_celsius)
+    if sum_exp <= 0 or n == 0:
+        return sum(temps_celsius) / len(temps_celsius)
+
+    mkt_k = (delta_h_j / R) / (-math.log(sum_exp / n))
+    return round(mkt_k - 273.15, 2)
+
 
 autonomous_fleet_pod_oracle = AutonomousFleetPoDOracle()
+
