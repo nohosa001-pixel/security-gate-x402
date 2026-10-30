@@ -53,6 +53,7 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 ### 📚 Multichain Strategic Documentation Suite
 
+- 🟣 **Polygon OMS × Solana Integration Guide**: [`docs/POLYGON_OMS_SOLANA_INTEGRATION_GUIDE.md`](docs/POLYGON_OMS_SOLANA_INTEGRATION_GUIDE.md) — Regulated US 48-State Virtual Accounts, Agent Spend Controls, and single-tx Solana/Polygon routing.
 - 🟣 **Polygon OMS Case Study**: [`docs/POLYGON_OMS_CASE_STUDY.md`](docs/POLYGON_OMS_CASE_STUDY.md) — Technical report on ERC-7579 session safety.
 - 🔵 **Coinbase AgentKit Guide**: [`docs/COINBASE_AGENTKIT_INTEGRATION_GUIDE.md`](docs/COINBASE_AGENTKIT_INTEGRATION_GUIDE.md) — Base Smart Wallet & AgentKit provider tutorial.
 - 🔷 **Arbitrum Safe App Store**: [`docs/ARBITRUM_SAFE_APP_STORE.md`](docs/ARBITRUM_SAFE_APP_STORE.md) — High-value multi-sig treasury guard & Stylus WASM specification.
