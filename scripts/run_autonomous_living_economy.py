@@ -17,7 +17,7 @@ import json
 import random
 import hashlib
 import argparse
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 
 if hasattr(sys.stdout, "reconfigure"):

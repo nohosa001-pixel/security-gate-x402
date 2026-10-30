@@ -10,7 +10,7 @@ import math
 import secrets
 import threading
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 import eth_utils
 from eth_account.messages import encode_typed_data
 

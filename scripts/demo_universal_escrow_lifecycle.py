@@ -91,7 +91,7 @@ class SimulatedUniversalEscrowCore:
             "truthHashRequirement": truth_hash_requirement,
             "createdAt": now,
             "deadline": now + duration_sec,
-            "isSettled": false if "false" in locals() else False,
+            "isSettled": False,
             "isRefunded": False
         }
         self.jobs[job_id] = job
