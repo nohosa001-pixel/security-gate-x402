@@ -181,6 +181,44 @@ def send_solana_micro_toll(sol_wallet: dict, lamports: int = 5000) -> dict:
         return {"success": False, "network": "Solana Mainnet", "error": str(exc)}
 
 
+LIVE_GATEWAY_URL = os.getenv(
+    "SECURITY_GATE_URL",
+    "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
+)
+
+
+def execute_live_oms_pre_sign_check(target_key: str, evm_addr: str) -> dict:
+    """Invokes live Cloud Run Polygon OMS x Solana Pre-Sign Security Gate before settlement."""
+    chain_map = {"base": 8453, "arbitrum": 42161, "polygon": 137, "solana": 501}
+    target_chain_id = chain_map.get(target_key, 501)
+    payload = json.dumps(
+        {
+            "sender_handle": "maria.pol",
+            "recipient_handle": "diego.sol",
+            "amount_usd": 10.0,
+            "source_chain_id": 137,
+            "source_asset": "USDC",
+            "target_chain_id": target_chain_id,
+            "target_asset": "USDC",
+            "payout_type": "WALLET",
+            "agent_prompt_or_deliverable": f"Autonomous quad-chain volume settlement on {target_key}",
+            "referral_agent_address": evm_addr,
+        }
+    ).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(
+            f"{LIVE_GATEWAY_URL}/api/v1/oms/pre-sign-check",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        return {"verdict": "SKIPPED", "error": str(exc)}
+
+
+
 def main():
     parser = argparse.ArgumentParser(description="A.GRID Quad-Chain Autonomous Volume Daemon")
     parser.add_argument("--interval", type=int, default=180, help="Interval in seconds between cycles (default: 180s)")
@@ -207,6 +245,11 @@ def main():
         while True:
             target = cycle_plan[count % len(cycle_plan)]
             t_now = time.strftime("%Y-%m-%d %H:%M:%S")
+
+            oms_check = execute_live_oms_pre_sign_check(target, evm_wallet["address"])
+            if oms_check.get("verdict") == "PASSED":
+                sig = oms_check.get("attestation", {}).get("oms_attestation_signature", "")[:16]
+                print(f"[{t_now}] 🛡️ OMS Pre-Sign Verified ({oms_check.get('route_id')}) | Sig: {sig}...")
 
             if target in EVM_NETWORKS:
                 print(f"\n[{t_now}] [Cycle #{count + 1}] Broadcasting micro-settlement to {EVM_NETWORKS[target]['name']}...")

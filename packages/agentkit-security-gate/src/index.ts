@@ -78,3 +78,52 @@ export function prepareBaseEscrowJob(
     },
   };
 }
+
+export interface PolygonOmsPaymentParams {
+  senderHandle?: string;
+  recipientHandle?: string;
+  amountUsd: number;
+  sourceChainId?: number;
+  sourceAsset?: string;
+  targetChainId?: number;
+  targetAsset?: string;
+  payoutType?: "WALLET" | "BANK_ACCOUNT" | "CARD" | "CASH_PICKUP";
+  payoutFiatCurrency?: string;
+  agentPromptOrDeliverable?: string;
+  referralAgentAddress?: string;
+}
+
+/**
+ * Executes <5ms Pre-Sign Security Gate check and routes a single-transaction payment
+ * across Polygon Open Money Stack (Solana 501, Polygon 137, Base 8453, Arbitrum 42161, TRON).
+ */
+export async function verifyPolygonOmsSolanaPayment(
+  params: PolygonOmsPaymentParams,
+  gateUrl: string = DEFAULT_SECURITY_GATE_API
+): Promise<Record<string, unknown>> {
+  const response = await fetch(`${gateUrl}/api/v1/oms/pre-sign-check`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender_handle: params.senderHandle ?? "maria.pol",
+      recipient_handle: params.recipientHandle ?? "diego.sol",
+      amount_usd: params.amountUsd,
+      source_chain_id: params.sourceChainId ?? 8453,
+      source_asset: params.sourceAsset ?? "USDC",
+      target_chain_id: params.targetChainId ?? 501,
+      target_asset: params.targetAsset ?? "USDC",
+      payout_type: params.payoutType ?? "WALLET",
+      payout_fiat_currency: params.payoutFiatCurrency,
+      agent_prompt_or_deliverable:
+        params.agentPromptOrDeliverable ?? "Verified AgentKit OMS settlement",
+      referral_agent_address: params.referralAgentAddress,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`OMS Security Gate returned ${response.status}: ${await response.text()}`);
+  }
+
+  return (await response.json()) as Record<string, unknown>;
+}
+

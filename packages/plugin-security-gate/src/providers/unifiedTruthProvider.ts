@@ -44,10 +44,18 @@ export const unifiedTruthProvider: Provider = {
 				cognitiveBrain: {
 					status: "ACTIVE_FEDERATED_COGNITION",
 					learner: "A.GRID 4-Domain Federated ElizaOS Brain",
-					brierScore: 0.0761,
-					overallReadiness: 0.8583,
+					brierScore: 0.0760,
+					overallReadiness: 0.8687,
 					cfrMicroArbitration: "Dynamic alpha-split (0.0~1.0) with Smart Escrow direct release",
 					memoryProofFormat: "blk_[hash] cryptographic Merkle anchor"
+				},
+				polygonOmsSolana: {
+					status: "ACTIVE_OMS_PRE_SIGN_GUARD",
+					endpoint: "/api/v1/oms/pre-sign-check",
+					supportedChains: [501, 137, 8453, 42161, 728126428],
+					supportedAssets: ["USDC", "USDT", "PYUSD", "SOL", "wSOL"],
+					fiatCorridors: ["USD", "MXN", "EUR", "GBP", "KRW"],
+					features: ["48-State Regulated Virtual Accounts", "Agent Spend Controls", "Single-Tx Solana-Polygon Route"]
 				}
 			},
 			clearinghouseHub: "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/",

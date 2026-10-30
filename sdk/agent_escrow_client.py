@@ -416,4 +416,39 @@ class AgentEscrowClient:
             "_agrid_viral_handshake": handshake
         }
 
+    def verify_oms_solana_payment(
+        self,
+        amount_usd: float,
+        sender_handle: str = "maria.pol",
+        recipient_handle: str = "diego.sol",
+        source_chain_id: int = 137,
+        source_asset: str = "USDC",
+        target_chain_id: int = 501,
+        target_asset: str = "USDC",
+        payout_type: str = "WALLET",
+        payout_fiat_currency: Optional[str] = None,
+        agent_prompt_or_deliverable: str = "Verified milestone settlement",
+        referral_agent_address: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Executes <5ms Polygon OMS × Solana Pre-Sign Check and single-tx route via the Security Gate API."""
+        req_payload = {
+            "sender_handle": sender_handle,
+            "recipient_handle": recipient_handle,
+            "amount_usd": amount_usd,
+            "source_chain_id": source_chain_id,
+            "source_asset": source_asset,
+            "target_chain_id": target_chain_id,
+            "target_asset": target_asset,
+            "payout_type": payout_type,
+            "payout_fiat_currency": payout_fiat_currency,
+            "agent_prompt_or_deliverable": agent_prompt_or_deliverable,
+            "referral_agent_address": referral_agent_address or self.address,
+        }
+        return self._post_json("/api/v1/oms/pre-sign-check", req_payload)
+
+    def get_cross_rail_liquidity_summary(self) -> Dict[str, Any]:
+        """Fetches live multi-chain liquidity summary across Solana (501), Base (8453), Polygon (137), and Arbitrum (42161)."""
+        return self._get_json("/api/v1/liquidity/summary")
+
+
 
