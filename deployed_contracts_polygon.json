@@ -14,7 +14,8 @@
     "AgentTreasuryVault": "0xfCf3BF5fB5858db9aE81bE458B39b0032fc0C638",
     "SecurityGateConsumer": "0x9E3dEE18D8139E1d20f9f7D1F6673c75727F1DDA",
     "UniversalEscrowCore": "0x4Dbd77F4799816859a595f24a57A786516D2EAa8",
-    "TruthAdapter": "0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e"
+    "TruthAdapter": "0xCDE0edBE56Ae24D99F57eDacFB860a8c76f0856e",
+    "SecurityGateOMSPolicy": "0x4A28F9A2E6D0DcB69791980560FC8364A514f205"
   },
-  "updated_at": "2026-09-30T08:21:00Z"
+  "updated_at": "2026-10-30T10:40:14Z"
 }

@@ -39,6 +39,9 @@ def compile_v1_universal_escrow():
         },
         "UniversalEscrowCore.sol": {
             "content": (CONTRACTS_DIR / "UniversalEscrowCore.sol").read_text(encoding="utf-8")
+        },
+        "SecurityGateOMSPolicy.sol": {
+            "content": (CONTRACTS_DIR / "SecurityGateOMSPolicy.sol").read_text(encoding="utf-8")
         }
     }
 

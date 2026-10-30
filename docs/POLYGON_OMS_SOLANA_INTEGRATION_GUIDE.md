@@ -109,7 +109,8 @@ Validates safety, checks spend limits, evaluates ElizaOS Brain CFR milestone com
     "settled_asset_amount": 499.95
   },
   "attestation": {
-    "verifying_policy_contract": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
+    "verifying_policy_contract": "0x4A28F9A2E6D0DcB69791980560FC8364A514f205",
+    "verifying_escrow_hub": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
     "solana_anchor_program": "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC"
   }
 }
@@ -124,3 +125,4 @@ Run the dedicated Polygon OMS × Solana test suite:
 ```bash
 pytest tests/test_polygon_oms_solana_adapter.py -v
 ```
+

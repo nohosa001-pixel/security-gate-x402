@@ -28,6 +28,7 @@ interface ISessionPolicy {
  * @notice Polygon OMS Smart Sessions Defense Policy: "No Proof-of-Safety, No Settlement".
  *         Binds agent wallet spending limits to deterministic Security Gate Inspection & Truth Verification.
  *         Supports multichain cross-rail settlement including Solana Mainnet via Polygon Open Money Stack (OMS).
+ *         Live on Polygon Mainnet: 0x4A28F9A2E6D0DcB69791980560FC8364A514f205
  *
  * @dev Enforces:
  *      1. Task-level spending ceiling (max spend per session or lifetime).
@@ -66,6 +67,7 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
     bytes32 public DOMAIN_SEPARATOR;
 
     // Events
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SessionRegistered(bytes32 indexed sessionKey, uint256 maxLimit, uint256 expiresAt, address allowedTarget);
     event SessionRevoked(bytes32 indexed sessionKey);
     event PolicyChecked(bytes32 indexed sessionKey, address indexed target, uint256 value, uint8 riskScore);
@@ -88,8 +90,9 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
     }
 
     constructor(address _oracleSigner) {
-        owner = msg.sender;
+        owner = _oracleSigner;
         oracleSigner = _oracleSigner;
+        emit OwnershipTransferred(address(0), _oracleSigner);
 
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -247,5 +250,14 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
      */
     function setMaxAllowedRiskScore(uint8 _newScore) external onlyOwner {
         maxAllowedRiskScore = _newScore;
+    }
+
+    /**
+     * @notice Transfers ownership of the policy contract to a new owner.
+     */
+    function transferOwnership(address _newOwner) external onlyOwner {
+        require(_newOwner != address(0), "Invalid new owner");
+        emit OwnershipTransferred(owner, _newOwner);
+        owner = _newOwner;
     }
 }
