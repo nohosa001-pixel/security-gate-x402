@@ -27,6 +27,7 @@ interface ISessionPolicy {
  * @title SecurityGateOMSPolicy
  * @notice Polygon OMS Smart Sessions Defense Policy: "No Proof-of-Safety, No Settlement".
  *         Binds agent wallet spending limits to deterministic Security Gate Inspection & Truth Verification.
+ *         Supports multichain cross-rail settlement including Solana Mainnet via Polygon Open Money Stack (OMS).
  *
  * @dev Enforces:
  *      1. Task-level spending ceiling (max spend per session or lifetime).

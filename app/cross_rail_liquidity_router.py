@@ -28,6 +28,7 @@ class BridgeProtocol(str, Enum):
     CIRCLE_CCTP = "CIRCLE_CCTP"              # Native 1:1 burn & mint, 0% slippage
     DLN_INTENT = "DLN_INTENT"                # Sub-second cross-chain intent filler
     WORMHOLE_CORE = "WORMHOLE_CORE"          # Cross-chain governance message layer
+    POLYGON_OMS = "POLYGON_OMS"              # Polygon Open Money Stack (OMS) Native Solana-EVM Route (Oct 29, 2026)
 
 
 @dataclass
@@ -82,6 +83,7 @@ class AutonomousCrossRailRouter:
     # Protocol Toll for CCTP and Relay
     CCTP_PROTOCOL_TOLL_BPS = 5               # 0.05% flat bridge toll for relayer gas
     DLN_INTENT_TOLL_BPS = 12                 # 0.12% for ultra-fast intent fillers
+    POLYGON_OMS_TOLL_BPS = 3                 # 0.03% regulated OMS protocol toll for Solana-Polygon route
 
     def __init__(
         self,
@@ -252,7 +254,15 @@ class AutonomousCrossRailRouter:
                 # Choose optimal bridge protocol
                 # If bridging between Solana (501) and EVM rails:
                 is_cross_svm_evm = (deficit.chain_id == 501 or surplus.chain_id == 501)
-                if is_cross_svm_evm:
+                is_polygon_involved = (deficit.chain_id == 137 or surplus.chain_id == 137)
+
+                if is_cross_svm_evm and is_polygon_involved:
+                    # Polygon Open Money Stack (OMS) Solana Native Rail (Launched Oct 29, 2026)
+                    # Regulated single-transaction routing between Polygon and Solana
+                    protocol = BridgeProtocol.POLYGON_OMS
+                    latency = 1.2  # Sub-2-second OMS atomic routing
+                    toll = transfer_amount * (self.POLYGON_OMS_TOLL_BPS / 10000.0)
+                elif is_cross_svm_evm:
                     protocol = BridgeProtocol.CIRCLE_CCTP
                     latency = 20.0  # ~20s CCTP attestation finality
                     toll = transfer_amount * (self.CCTP_PROTOCOL_TOLL_BPS / 10000.0)

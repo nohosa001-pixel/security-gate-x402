@@ -171,3 +171,20 @@ def test_api_endpoints_liquidity_lifecycle():
     assert exec_data["status"] == "SETTLED"
     assert exec_data["amount_dispatched_usdc"] > 0
 
+
+def test_plan_rebalance_polygon_oms_to_solana(router):
+    """Test that when Polygon (137) has surplus and Solana (501) has deficit, Polygon OMS is selected."""
+    router.update_pool_reserve(137, reserve_usdc=150_000.0, reserved_in_escrow_usdc=10_000.0, pending_demand_usdc=0.0)
+    router.update_pool_reserve(8453, reserve_usdc=40_000.0, reserved_in_escrow_usdc=30_000.0, pending_demand_usdc=10_000.0)
+    router.update_pool_reserve(501, reserve_usdc=20_000.0, reserved_in_escrow_usdc=15_000.0, pending_demand_usdc=30_000.0)
+
+    routes = router.plan_rebalance_routes()
+    assert len(routes) >= 1
+
+    oms_route = next((r for r in routes if r.source_chain_id == 137 and r.target_chain_id == 501), None)
+    assert oms_route is not None
+    assert oms_route.bridge_protocol == BridgeProtocol.POLYGON_OMS
+    assert oms_route.estimated_latency_seconds == 1.2
+    assert oms_route.slippage_percent == 0.0
+
+

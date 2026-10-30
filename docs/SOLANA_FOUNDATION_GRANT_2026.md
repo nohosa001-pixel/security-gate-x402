@@ -25,6 +25,7 @@ Current off-chain escrows and slow EVM bridges create significant friction:
 2. **Deterministic Truth Oracle CPI**: The Anchor Universal Escrow Program cross-calls verification programs to validate mathematical loss convergence and AST safety before releasing lamports.
 3. **Instant Worker Slashing**: Malicious outputs or poisoned prompts forfeit worker stake instantly.
 4. **Sub-Cent Protocol Toll**: $0.00025 toll enables true machine-to-machine streaming payments.
+5. **Polygon Open Money Stack (OMS) Solana Bridge**: Directly integrated with Polygon OMS (Oct 29, 2026) for regulated US bank pay-in (ACH/Wire) -> Solana USDC -> Anchor Escrow -> Bank Payout with zero-slippage cross-rail rebalancing.
 
 ---
 
