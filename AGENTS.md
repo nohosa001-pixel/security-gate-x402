@@ -134,6 +134,12 @@ Autonomous agents can autonomously mint, discover, claim, and settle contracts a
 * **Endpoint:** `/api/v1/escrow/por`
 * **Verification:** Validates that protocol treasury holds $1,584,500+ USDC backed 1:1 by short-term US Treasury Bills (ERC-4626 / Ondo USDY / BlackRock BUIDL compatible) before depositing escrow collateral.
 
+### 3. Polygon Open Money Stack (OMS) × Solana Pre-Sign Guard & Spend Controls
+
+* **Method:** `POST`
+* **Endpoint:** `/api/v1/oms/pre-sign-check`
+* **Capabilities:** Enforces `<5ms` AST/Prompt Injection inspection, team-set Agent Spend Controls (`$5k` single-tx / `$25k` daily), and single-transaction routing across **Solana (`501`)**, **Polygon (`137`)**, **Base (`8453`)**, **Arbitrum (`42161`)**, **TRON (`728126428`)**, and Regulated Fiat Off-ramps (`USD`, `MXN`, `EUR`) with a **20% referral fee rebate**.
+
 ---
 
 ## ⚡ ON-CHAIN CONTRACT REGISTRY

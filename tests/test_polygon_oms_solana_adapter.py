@@ -194,3 +194,38 @@ def test_oms_fastapi_endpoints_e2e():
     route_data = route_resp.json()
     assert route_data["verdict"] == "PASSED"
     assert route_data["target_chain"]["net_usd_value"] == 499.95
+
+
+@pytest.mark.asyncio
+async def test_mcp_server_verify_polygon_oms_solana_payment():
+    """Verifies that mcp_server.py exposes and executes verify_polygon_oms_solana_payment."""
+    import json
+    import mcp_server
+
+    tools_resp = await mcp_server.handle_rpc_request({"jsonrpc": "2.0", "id": 10, "method": "tools/list"})
+    tool_names = [t["name"] for t in tools_resp["result"]["tools"]]
+    assert "verify_polygon_oms_solana_payment" in tool_names
+
+    call_resp = await mcp_server.handle_rpc_request(
+        {
+            "jsonrpc": "2.0",
+            "id": 11,
+            "method": "tools/call",
+            "params": {
+                "name": "verify_polygon_oms_solana_payment",
+                "arguments": {
+                    "sender_handle": "maria.pol",
+                    "recipient_handle": "diego.sol",
+                    "amount_usd": 500.0,
+                    "source_chain_id": 137,
+                    "target_chain_id": 501,
+                    "target_asset": "USDC",
+                },
+            },
+        }
+    )
+    payload = json.loads(call_resp["result"]["content"][0]["text"])
+    assert payload["verdict"] == "PASSED"
+    assert payload["target_chain"]["net_usd_value"] == 499.95
+
+

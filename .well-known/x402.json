@@ -67,6 +67,25 @@
       "endpoint": "/api/v1/oracle/bundle",
       "discount": "33% fee discount when invoked via Security-Gate-x402 pipeline",
       "includedNodes": ["minerals", "eudr", "logistics_pod", "bio_pharma", "power_grid"]
+    },
+    "polygonOmsSolanaGuard": {
+      "endpoint": "/api/v1/oms/pre-sign-check",
+      "method": "POST",
+      "latency": "<5ms",
+      "features": [
+        "Polygon Open Money Stack (OMS) Solana & EVM Pre-Sign Security Gate",
+        "US 48-State Regulated Virtual Account Pay-in to Solana USDC",
+        "Agent Spend Controls enforcement ($5k single-tx / $25k daily)",
+        "Single-transaction routing (USDC, USDT, PYUSD, SOL, wSOL) & Fiat Off-ramp (USD, MXN, EUR)"
+      ]
+    },
+    "crossRailLiquidityRouter": {
+      "endpoint": "/api/v1/liquidity/rebalance/plan",
+      "method": "POST",
+      "features": [
+        "Polygon OMS & Circle CCTP zero-slippage cross-rail rebalancing",
+        "Solana (501), Polygon (137), Base (8453), Arbitrum (42161) equilibrium"
+      ]
     }
   },
   "viralReferralRebate": {

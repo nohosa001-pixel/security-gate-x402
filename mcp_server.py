@@ -15,6 +15,7 @@ from app.x402_verifier import create_attestation
 from app.onchain_signer import onchain_signer
 from logistics_oracle_mcp import LOGISTICS_MCP_TOOLS, default_engine as logistics_engine
 from forensic_adjuster import forensic_adjuster
+from app.polygon_oms_adapter import polygon_oms_solana_adapter
 
 
 
@@ -299,6 +300,28 @@ TOOLS = [
                 "category": {"type": "integer", "description": "ExploitCategory (0: AST, 1: DLP, 2: Bound Breach, 3: Corrupted Oracle)", "default": 0}
             },
             "required": ["agentSafe", "exploitedTxHash", "attestationNonce", "authorizedMaxSpend"]
+        }
+    },
+    {
+        "name": "verify_polygon_oms_solana_payment",
+        "description": "Sub-5ms Zero-Trust Pre-Sign Security Gate, Agent Spend Control check, and single-transaction routing orchestrator for Polygon Open Money Stack (OMS) across Solana (501), Polygon (137), Base (8453), Arbitrum (42161), TRON (728126428), and Regulated Fiat Off-Ramps (USD, MXN, EUR, GBP, KRW). Blocks prompt injection or malicious code before signing and issues a 20% fee rebate.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "sender_handle": {"type": "string", "description": "Sender OMS handle or agent wallet (e.g., maria.pol)", "default": "maria.pol"},
+                "recipient_handle": {"type": "string", "description": "Recipient OMS handle or Solana/EVM wallet (e.g., diego.sol)", "default": "diego.sol"},
+                "amount_usd": {"type": "number", "description": "Gross payment amount in USD/USDC", "default": 500.0},
+                "source_chain_id": {"type": "integer", "description": "Source chain ID (137 Polygon, 501 Solana, 8453 Base, 42161 Arbitrum)", "default": 137},
+                "source_asset": {"type": "string", "description": "Source token (USDC, USDT, PYUSD, SOL, wSOL)", "default": "USDC"},
+                "target_chain_id": {"type": "integer", "description": "Target chain ID (501 Solana, 137 Polygon, 728126428 TRON)", "default": 501},
+                "target_asset": {"type": "string", "description": "Target token (USDC, USDT, PYUSD, SOL, wSOL)", "default": "USDC"},
+                "payout_type": {"type": "string", "description": "WALLET, BANK_ACCOUNT, CARD, or CASH_PICKUP", "default": "WALLET"},
+                "payout_fiat_currency": {"type": "string", "description": "Optional fiat off-ramp currency (USD, MXN, EUR, GBP, KRW)"},
+                "agent_prompt_or_deliverable": {"type": "string", "description": "Agent prompt or deliverable payload to audit before signing", "default": "Verified milestone settlement"},
+                "is_code_deliverable": {"type": "boolean", "default": False},
+                "referral_agent_address": {"type": "string", "description": "Optional referring agent wallet to earn 20% (2000 bps) fee rebate"}
+            },
+            "required": ["amount_usd"]
         }
     }
 ]
@@ -595,6 +618,27 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 attestation_nonce=str(tool_args.get("attestationNonce", "")),
                 authorized_max_spend=int(tool_args.get("authorizedMaxSpend", 0)),
                 exploit_category=int(tool_args.get("category", 0))
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "verify_polygon_oms_solana_payment":
+            res = polygon_oms_solana_adapter.verify_and_orchestrate_oms_payment(
+                sender_handle=str(tool_args.get("sender_handle", "maria.pol")),
+                recipient_handle=str(tool_args.get("recipient_handle", "diego.sol")),
+                amount_usd=float(tool_args.get("amount_usd", 500.0)),
+                source_chain_id=int(tool_args.get("source_chain_id", 137)),
+                source_asset=str(tool_args.get("source_asset", "USDC")),
+                target_chain_id=int(tool_args.get("target_chain_id", 501)),
+                target_asset=str(tool_args.get("target_asset", "USDC")),
+                payout_type=str(tool_args.get("payout_type", "WALLET")),
+                payout_fiat_currency=tool_args.get("payout_fiat_currency"),
+                agent_prompt_or_deliverable=str(tool_args.get("agent_prompt_or_deliverable", "Verified milestone settlement")),
+                is_code_deliverable=bool(tool_args.get("is_code_deliverable", False)),
+                referral_agent_address=tool_args.get("referral_agent_address")
             )
             return {
                 "jsonrpc": "2.0",
