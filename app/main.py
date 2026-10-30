@@ -61,6 +61,7 @@ from app.routers.escrow import router as escrow_router
 from app.routers.vault import router as vault_router
 from app.routers.extensions import router as extensions_router
 from app.routers.liquidity import router as liquidity_router
+from app.routers.oms import router as oms_router
 
 app = FastAPI(
     title="The Sheriff of Agent Finance (x402 Security Gate)",
@@ -687,6 +688,7 @@ app.include_router(escrow_router)
 app.include_router(vault_router)
 app.include_router(extensions_router)
 app.include_router(liquidity_router)
+app.include_router(oms_router)
 
 # MCP Tool Endpoints
 @app.get("/mcp/tools", tags=["MCP"])
