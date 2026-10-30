@@ -10,9 +10,9 @@
 
 | Package | Role | Repo | Local | npm Live | Monthly DL | Dist Status | Sync Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`elizaos-plugin-security-gate`** | ElizaOS Security Gate Guardrails & Local Ingress Defense | `security-gate-x402` | `v2.8.0` | `v2.7.0` | **1,124** | ✅ Ready | 🚀 Update Ready |
+| **`elizaos-plugin-security-gate`** | ElizaOS Security Gate Guardrails & Local Ingress Defense | `security-gate-x402` | `v2.9.0` | `v2.9.0` | **1,124** | ✅ Ready | 🟢 Synced (Live) |
 | **`minerals-oracle-x402`** | Critical Minerals Provenance & M2M Trade Protocol SDK | `minerals-oracle-x402` | `v1.6.0` | `v1.5.0` | **36** | ✅ Ready | 🚀 Update Ready |
-| **`agentkit-security-gate`** | Coinbase AgentKit Action Provider for Base Mainnet Escrow | `security-gate-x402` | `v1.0.1` | `v1.0.1` | **0** | ✅ Ready | 🟢 Synced (Live) |
+| **`agentkit-security-gate`** | Coinbase AgentKit Action Provider for Base Mainnet Escrow | `security-gate-x402` | `v1.1.0` | `v1.0.1` | **0** | ✅ Ready | 🚀 Update Ready |
 | **`agrid-sdk`** | A.GRID Master Umbrella SDK (Security + CleanWeb + Minerals) | `security-gate-x402` | `v1.0.0` | `vNot on npm` | **0** | ✅ Ready | ⏳ Pending 1st Publish |
 | **`cleanweb-eliza-plugin`** | CleanWeb 87% Token Compression & Ground Truth Intelligence | `x402-micro-agent` | `v1.0.0` | `v1.0.0` | **406** | ✅ Ready | 🟢 Synced (Live) |
 

@@ -21,7 +21,7 @@ from app.polygon_oms_adapter import polygon_oms_solana_adapter
 
 MCP_SERVER_INFO = {
     "name": "agent-security-gate-x402",
-    "version": "1.2.2",
+    "version": "2.2.0",
     "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, factual hallucination inspection micro-oracle, uncollateralized lending, and malpractice insurance for autonomous agents with EIP-191/EIP-712 attestations."
 }
 
