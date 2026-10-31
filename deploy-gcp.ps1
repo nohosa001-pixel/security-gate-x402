@@ -3,6 +3,12 @@
 # ==============================================================================
 $ErrorActionPreference = "Stop"
 
+# Ensure gcloud is on PATH even in non-interactive shells
+$GcloudBin = "C:\Users\nohos\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin"
+if ((Test-Path $GcloudBin) -and ($env:Path -notlike "*$GcloudBin*")) {
+    $env:Path = "$GcloudBin;$env:Path"
+}
+
 # Load local .env file if present
 if (Test-Path ".env") {
     Get-Content ".env" | ForEach-Object {
