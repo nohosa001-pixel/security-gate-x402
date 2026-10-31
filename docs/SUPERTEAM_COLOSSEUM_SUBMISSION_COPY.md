@@ -7,25 +7,30 @@
 ## 1. Basic Project Info (기본 정보)
 
 ### 🔹 Project Name
+
 ```text
 A.GRID & Agent Security Gate x402
 ```
 
 ### 🔹 One-Line Pitch (50~100자 요약)
+
 ```text
 Sub-5ms Pre-Sign Security Gate & 0.4s Atomic Escrow Settlement Layer for Autonomous AI Agents on Solana.
 ```
 
 ### 🔹 Short Description / Elevator Pitch (280자 트윗 길이 요약)
+
 ```text
 A.GRID (Agent Security Gate x402) is an autonomous AI agent clearinghouse on Solana. We enforce <5ms AST/prompt-injection inspection and spend controls before Squads v4 / session keys sign transactions, settling verified DePIN & M2M deliverables in 0.4s with 1,560+ monthly SDK downloads.
 ```
 
 ### 🔹 Category / Track
+
 * **Primary:** AI Agents / Infrastructure / Payments (PayFi)
 * **Secondary:** DePIN / Security & Auditing
 
 ### 🔹 Official Links (지원서 링크 입력란)
+
 * **Live Hub & Dashboard URL:** `https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/`
 * **Live API Root (OpenAPI / Swagger):** `https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs`
 * **GitHub Repository:** `https://github.com/nohosa001-pixel/security-gate-x402`
@@ -39,6 +44,7 @@ A.GRID (Agent Security Gate x402) is an autonomous AI agent clearinghouse on Sol
 ## 2. Problem & Solution (문제 정의 및 해결책)
 
 ### 🔹 What problem are you solving?
+
 ```text
 As autonomous AI agents (ElizaOS, Solana AgentKit, MCP swarms) and DePIN compute networks scale on Solana, giving agents direct access to hot wallets or session keys introduces three critical risks:
 
@@ -48,6 +54,7 @@ As autonomous AI agents (ElizaOS, Solana AgentKit, MCP swarms) and DePIN compute
 ```
 
 ### 🔹 How does A.GRID & Agent Security Gate x402 solve this on Solana?
+
 ```text
 We provide a deterministic Pre-Sign Security Gate + Universal Anchor Escrow protocol built specifically for Solana's 0.4s finality:
 
@@ -63,6 +70,7 @@ We provide a deterministic Pre-Sign Security Gate + Universal Anchor Escrow prot
 ## 3. Traction & Proof of Work (실증 지표 및 왜 지금인가?)
 
 ### 🔹 What have you built so far & what is your current traction?
+
 ```text
 Note: We were directly referred to Superteam Microgrants and Colosseum by the Solana Foundation Grants Team ("while we feel the idea is a good one... we wanted to point you in the direction of Colosseum and Superteam microgrants"). Since our initial submission, we have shipped and verified major production milestones:
 
@@ -91,11 +99,13 @@ Note: We were directly referred to Superteam Microgrants and Colosseum by the So
 ## 4. Grant Request & Milestone Breakdown (예산 및 마일스톤)
 
 ### 🔹 Requested Grant Amount (Superteam Microgrant Track)
+
 ```text
 $9,500 USDC
 ```
 
 ### 🔹 How will the funds be used? (3-Week Fast-Track Milestones)
+
 ```text
 Milestone 1 (Week 1) — $3,000 USDC: Solana Mainnet BPF Deployment & Solscan IDL Verification
 - Cover the remaining ~1.71 SOL BPF rent-exemption for deploying universal_escrow (AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC) and agent_security_gate (AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN) as immutable/verified programs on Solana Mainnet-Beta and publish verifiable IDLs on Solscan.
@@ -130,7 +140,7 @@ For your records, since submitting our initial application, we have achieved sev
 Once our dual Anchor programs (`universal_escrow` & `agent_security_gate`) complete full Mainnet BPF deployment and initial Superteam cohort traction, we look forward to sharing our progress with you again.
 
 Best regards,
-Seung Il Noh
+Seung Il Choi
 Founder, A.GRID & Agent Security Gate x402
 https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/hub/
 https://github.com/nohosa001-pixel/security-gate-x402
