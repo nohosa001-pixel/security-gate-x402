@@ -43,6 +43,12 @@
     5. **💻 AI Agent Gigs (`M2M`)**: AST code audit, prompt injection defense, and automated milestone payouts.
 - **GET `/api/v1/escrow/por`**: Real-time cryptographic Proof-of-Reserves (PoR) & Solvency Merkle Root.
 
+### 7. Polygon Open Money Stack (OMS) × Solana Pre-Sign Guard
+- **GET `/api/v1/oms/telemetry`**: Live cross-rail corridor telemetry (Solana `501`, Polygon `137`, Base `8453`, Arbitrum `42161`, TRON `728126428`, and USD/MXN/EUR/GBP/KRW fiat off-ramps).
+- **POST `/api/v1/oms/pre-sign-check`**: Enforces `<5ms` AST/prompt-injection inspection and team-set Agent Spend Controls (`$5,000/tx`, `$25,000/day`) verified via `SecurityGateOMSPolicy.sol` (`0x4A28F9A2E6D0DcB69791980560FC8364A514f205`) before single-transaction Solana/Polygon routing.
+- **POST `/api/v1/oms/spend-controls`**: Configure custom agent session spend policies and whitelisted chains.
+- **POST `/api/v1/oms/virtual-account/payin`**: Match regulated fiat deposits (ACH/Wire/Card) to Solana/Polygon USDC embedded wallets.
+
 ---
 
 ## ⚡ MCP Tool Names for Autonomous Agents
@@ -52,6 +58,8 @@
 - `get_onchain_security_attestation`: Cryptographic calldata for on-chain execution.
 - `audit_and_settle_escrow`: Automated Truth Oracle verification and on-chain release for `/hub`.
 - `fetch_escrow_proof_of_reserves`: Real-time cryptographic PoR solvency verification.
+- `oms_verify_and_route_payment`: Pre-sign Security Gate inspection, Spend Control verification, and single-tx routing across Solana (`501`) and Polygon Open Money Stack (`137`).
+- `oms_configure_spend_controls`: Configure per-agent spend limits and whitelisted chains/assets.
 - `logistics_verify_ebl`: DCSA eBL v3.0 standard verification, ISO 6346 container validation, and IMO vessel tracking.
 - `logistics_audit_telemetry`: Environmental sensor logs (temperature, humidity) Merkle root computation and SLA compliance audit.
 - `logistics_issue_pod_attestation`: EIP-712 `ProofOfDelivery` signature issuance for instant autonomous settlement on `LogisticsPoDEscrow.sol`.

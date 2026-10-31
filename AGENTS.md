@@ -146,10 +146,15 @@ Autonomous agents can autonomously mint, discover, claim, and settle contracts a
 
 | Network | Chain ID | Contract Type | Address | Finality |
 | :--- | :---: | :--- | :--- | :---: |
-| **Solana Mainnet** | `501` | Universal Anchor Program | `AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC` | **0.4s** |
-| **Polygon Mainnet** | `137` | UniversalEscrowCore.sol | `0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d` | 2.1s |
-| **Base Mainnet** | `8453` | UniversalEscrowCore.sol | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | 2.0s |
-| **Arbitrum One** | `42161` | UniversalEscrowCore.sol | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | 0.25s |
+| **Solana Mainnet** | `501` | Universal Escrow Anchor Program | `AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC` | **0.4s** |
+| **Solana Mainnet** | `501` | Agent Security Gate Anchor Program | `AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN` | **0.4s** |
+| **Polygon Mainnet** | `137` | SecurityGateOMSPolicy.sol (Verified) | `0x4A28F9A2E6D0DcB69791980560FC8364A514f205` | 2.1s |
+| **Polygon Mainnet** | `137` | UniversalEscrowCore.sol (Verified) | `0x4Dbd77F4799816859a595f24a57A786516D2EAa8` | 2.1s |
+| **Polygon Mainnet** | `137` | AgentEscrow.sol (Verified) | `0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d` | 2.1s |
+| **Base Mainnet** | `8453` | UniversalEscrowCore.sol (Verified) | `0x745F7FAfFdb626B931Fe769476a09125cbf9d94b` | 2.0s |
+| **Base Mainnet** | `8453` | AgentEscrow.sol (Verified) | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | 2.0s |
+| **Arbitrum One** | `42161` | UniversalEscrowCore.sol (Verified) | `0x745F7FAfFdb626B931Fe769476a09125cbf9d94b` | 0.25s |
+| **Arbitrum One** | `42161` | AgentEscrow.sol (Verified) | `0x99FEd65Cf2D5378182c3481B300124BB1a8Ad278` | 0.25s |
 
 ---
 
