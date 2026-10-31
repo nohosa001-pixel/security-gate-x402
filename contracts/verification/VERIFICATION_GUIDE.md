@@ -54,6 +54,22 @@ This guide provides everything required to verify and publicly display the **Age
 000000000000000000000000255f9991233f86b29db847c8d5b8cb9915e80dcf0000000000000000000000000000000000000000000000000000000000000000
 ```
 
+#### 🔹 `SecurityGateOMSPolicy.sol` (Polygon Open Money Stack × Solana Session Policy)
+
+* **Status**: ✅ **Verified on PolygonScan** (`owner == oracleSigner`)
+* **Deployed Address**: [`0x4A28F9A2E6D0DcB69791980560FC8364A514f205`](https://polygonscan.com/address/0x4A28F9A2E6D0DcB69791980560FC8364A514f205#code)
+* **Deployment Transaction**: [`0xd60adf4e36fd8f73acd27ce943c35a40e654e089deffc487ee59e9fc2f9573f1`](https://polygonscan.com/tx/0xd60adf4e36fd8f73acd27ce943c35a40e654e089deffc487ee59e9fc2f9573f1) (Block `#96434238`)
+* **Direct Verification URL**: [https://polygonscan.com/verifyContract?a=0x4A28F9A2E6D0DcB69791980560FC8364A514f205](https://polygonscan.com/verifyContract?a=0x4A28F9A2E6D0DcB69791980560FC8364A514f205)
+* **Standard JSON**: [`contracts/verification/SecurityGateOMSPolicy.standard.json`](SecurityGateOMSPolicy.standard.json)
+* **Flattened Source**: [`contracts/verification/SecurityGateOMSPolicy.flattened.sol`](SecurityGateOMSPolicy.flattened.sol)
+* **Constructor Arguments**:
+  * `_oracleSigner` (`owner`): `0xA185B43fDD19619f99952AAed6eabf1029bF36a1`
+* **Constructor Arguments (Hex)**:
+
+```text
+000000000000000000000000a185b43fdd19619f99952aaed6eabf1029bf36a1
+```
+
 ---
 
 ### 2. Base Mainnet (Chain ID: 8453)
