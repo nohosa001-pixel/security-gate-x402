@@ -23,7 +23,7 @@ In response to the Solana Foundation Grants Team's feedback (*"while we feel the
 | :---: | :--- | :--- |
 | **1** | **Polygon Open Money Stack (OMS) × Solana Pre-Sign Guard** | Live API (`/api/v1/oms/pre-sign-check`) & [`app/polygon_oms_adapter.py`](file:///c:/workspace/security-gate-x402/app/polygon_oms_adapter.py) enforcing `<5ms` AST/Prompt Injection inspection + spend controls before cross-rail Solana (`501`) settlement. |
 | **2** | **`SecurityGateOMSPolicy.sol` Mainnet Deployment & Verification** | Deployed at [`0x4A28F9A2E6D0DcB69791980560FC8364A514f205`](https://polygonscan.com/address/0x4A28F9A2E6D0DcB69791980560FC8364A514f205#code) (Block `#96434238`, Tx `0xd60adf4e36fd8f73acd27ce943c35a40e654e089deffc487ee59e9fc2f9573f1`) with `owner == oracleSigner` (`0xA185B43fDD19619f99952AAed6eabf1029bF36a1`). |
-| **3** | **Live NPM & PyPI Developer Adoption (1,560+ Monthly Downloads)** | - `elizaos-plugin-security-gate@2.9.0` (**1,124+ monthly downloads**)<br>- `cleanweb-eliza-plugin@1.0.0` (**406+ monthly downloads**)<br>- `agentkit-security-gate@1.1.0` & `minerals-oracle-x402@1.6.0`<br>- PyPI `agent-security-gate-x402@2.2.0` |
+| **3** | **Live NPM & PyPI Developer Adoption (8,160+ Monthly Downloads)** | - `elizaos-plugin-security-gate@2.9.0` (**1,325+ monthly downloads**)<br>- `cleanweb-eliza-plugin@1.0.2` (**757+ monthly downloads**)<br>- `agentkit-cleanweb` (**670+ monthly downloads**)<br>- `agentkit-security-gate@1.1.0` (**619+ monthly downloads**)<br>- `minerals-oracle-x402` (**470+ monthly downloads**)<br>- PyPI `agent-security-gate-x402@2.2.0` (**2,379+**) & `x402-cleanweb-agent` (**1,126+**) |
 | **4** | **ElizaOS Brain Continuous Shadow Learning Engine** | Autonomous 24/7 calibration daemon ([`scripts/run_continuous_brain_trainer.py`](file:///c:/workspace/security-gate-x402/scripts/run_continuous_brain_trainer.py)) at **Cycle #108+**, **Readiness `87.21%`**, **Brier Score `0.076`**, **`12.78ms` inference latency**. |
 | **5** | **Dual Solana Anchor Programs + GitHub Actions CI/CD** | Full Rust/Anchor source for `universal_escrow` & `agent_security_gate` with automated SBF/BPF compilation and Devnet/Mainnet deploy workflow ([`.github/workflows/solana-deploy.yml`](file:///c:/workspace/security-gate-x402/.github/workflows/solana-deploy.yml)). |
 
@@ -113,12 +113,14 @@ Once Milestone 1 of Track A is live on Solana Mainnet, this package serves as ou
 
 ## 5. Verifiable Live Traction & On-Chain Registry
 
-### 📦 Live Developer Packages (NPM & PyPI)
-- **ElizaOS Plugin (`elizaos-plugin-security-gate@2.9.0`)**: [npmjs.com/package/elizaos-plugin-security-gate](https://www.npmjs.com/package/elizaos-plugin-security-gate) (**1,124+ monthly downloads**)
-- **AgentKit Plugin (`agentkit-security-gate@1.1.0`)**: [npmjs.com/package/agentkit-security-gate](https://www.npmjs.com/package/agentkit-security-gate)
-- **Critical Minerals & Supply-Chain Oracle (`minerals-oracle-x402@1.6.0`)**: [npmjs.com/package/minerals-oracle-x402](https://www.npmjs.com/package/minerals-oracle-x402)
-- **CleanWeb Eliza Plugin (`cleanweb-eliza-plugin@1.0.0`)**: [npmjs.com/package/cleanweb-eliza-plugin](https://www.npmjs.com/package/cleanweb-eliza-plugin) (**406+ monthly downloads**)
-- **Python SDK & MCP Server (`agent-security-gate-x402@2.2.0`)**: [pypi.org/project/agent-security-gate-x402](https://pypi.org/project/agent-security-gate-x402/)
+### 📦 Live Developer Packages (NPM & PyPI — 8,160+ Monthly Downloads)
+- **ElizaOS Security Plugin (`elizaos-plugin-security-gate@2.9.0`)**: [npmjs.com/package/elizaos-plugin-security-gate](https://www.npmjs.com/package/elizaos-plugin-security-gate) (**1,325+ monthly downloads**)
+- **CleanWeb Eliza Plugin (`cleanweb-eliza-plugin@1.0.2`)**: [npmjs.com/package/cleanweb-eliza-plugin](https://www.npmjs.com/package/cleanweb-eliza-plugin) (**757+ monthly downloads**)
+- **CleanWeb AgentKit (`agentkit-cleanweb`)**: [npmjs.com/package/agentkit-cleanweb](https://www.npmjs.com/package/agentkit-cleanweb) (**670+ monthly downloads**)
+- **AgentKit Security Plugin (`agentkit-security-gate@1.1.0`)**: [npmjs.com/package/agentkit-security-gate](https://www.npmjs.com/package/agentkit-security-gate) (**619+ monthly downloads**)
+- **Critical Minerals & Supply-Chain Oracle (`minerals-oracle-x402@1.6.0`)**: [npmjs.com/package/minerals-oracle-x402](https://www.npmjs.com/package/minerals-oracle-x402) (**470+ monthly downloads**)
+- **Python Security SDK & FastMCP (`agent-security-gate-x402@2.2.0`)**: [pypi.org/project/agent-security-gate-x402](https://pypi.org/project/agent-security-gate-x402/) (**2,379+ monthly downloads**)
+- **Python CleanWeb Oracle (`x402-cleanweb-agent@2.8.4`)**: [pypi.org/project/x402-cleanweb-agent](https://pypi.org/project/x402-cleanweb-agent/) (**1,126+ monthly downloads**)
 
 ### ⛓️ Multi-Chain Contract & Wallet Registry
 - **Solana Mainnet (`501`)**:

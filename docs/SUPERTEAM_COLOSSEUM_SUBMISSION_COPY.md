@@ -21,7 +21,7 @@ Sub-5ms Pre-Sign Security Gate & 0.4s Atomic Escrow Settlement Layer for Autonom
 ### 🔹 Short Description / Elevator Pitch (280자 트윗 길이 요약)
 
 ```text
-A.GRID (Agent Security Gate x402) is an autonomous AI agent clearinghouse on Solana. We enforce <5ms AST/prompt-injection inspection and spend controls before Squads v4 / session keys sign transactions, settling verified DePIN & M2M deliverables in 0.4s with 1,560+ monthly SDK downloads.
+A.GRID (Agent Security Gate x402) is an autonomous AI agent clearinghouse on Solana. We enforce <5ms AST/prompt-injection inspection and spend controls before Squads v4 / session keys sign transactions, settling verified DePIN & M2M deliverables in 0.4s with 8,160+ monthly SDK downloads across NPM and PyPI.
 ```
 
 ### 🔹 Category / Track
@@ -74,11 +74,14 @@ We provide a deterministic Pre-Sign Security Gate + Universal Anchor Escrow prot
 ```text
 Note: We were directly referred to Superteam Microgrants and Colosseum by the Solana Foundation Grants Team ("while we feel the idea is a good one... we wanted to point you in the direction of Colosseum and Superteam microgrants"). Since our initial submission, we have shipped and verified major production milestones:
 
-1. Live Developer Adoption (1,560+ Monthly Package Downloads):
-   - elizaos-plugin-security-gate@2.9.0 on NPM: 1,124+ monthly downloads
-   - cleanweb-eliza-plugin@1.0.0 on NPM: 406+ monthly downloads
-   - agentkit-security-gate@1.1.0 & minerals-oracle-x402@1.6.0 on NPM
-   - agent-security-gate-x402@2.2.0 on PyPI (Python SDK & FastMCP Server)
+1. Live Developer Adoption (8,160+ Monthly Package Downloads):
+   - elizaos-plugin-security-gate@2.9.0 on NPM: 1,325+ monthly downloads
+   - cleanweb-eliza-plugin@1.0.2 on NPM: 757+ monthly downloads
+   - agentkit-cleanweb on NPM: 670+ monthly downloads
+   - agentkit-security-gate@1.1.0 on NPM: 619+ monthly downloads
+   - minerals-oracle-x402@1.6.0 on NPM: 470+ monthly downloads
+   - agent-security-gate-x402@2.2.0 on PyPI: 2,379+ monthly downloads
+   - x402-cleanweb-agent@2.8.4 on PyPI: 1,126+ monthly downloads
 
 2. Complete Solana Anchor Codebase & 410 Passing Automated Tests:
    - Full Rust/Anchor source for universal_escrow and agent_security_gate in contracts/solana/programs/
