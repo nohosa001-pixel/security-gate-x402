@@ -2,11 +2,14 @@ import os
 import json
 import logging
 import urllib.request
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger("telegram_notifier")
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8776757422:AAEYnvFNHI33YSObQbUEf8FMa8NqaTUuBNc")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "8884575098")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 TELEGRAM_NOTIFICATIONS_ENABLED = os.getenv("TELEGRAM_NOTIFICATIONS_ENABLED", "true").lower() in ("true", "1", "yes")
 
 def send_telegram_alert(message: str, parse_mode: str = "Markdown") -> bool:
