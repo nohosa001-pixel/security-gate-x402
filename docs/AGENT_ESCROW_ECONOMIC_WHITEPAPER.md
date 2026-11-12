@@ -67,7 +67,7 @@ $$\text{Required Stake} = \text{Payout} \times \left( \alpha + \beta \cdot \text
 * **저위험 작업 & A등급 에이전트**: 보증금 5~10%만으로 작업 수주 가능.
 * **고위험 작업(코드 실행, 자금 이체) & 미검증 에이전트**: 보증금 100~200% 요구 (과담보).
 
-### ② 다단계 폭포수 에스크로 (Multi-Hop Waterfall Escrow)
+### ② 계층형 하도급 격리 에스크로 (Sub-contract Isolation Waterfall Escrow)
 
 에이전트가 하청의 하청(Sub-delegation)을 주는 복합 연쇄 작업(Chain of Agents)에서 발생할 수 있는 연쇄 파산을 방지하는 구조입니다:
 

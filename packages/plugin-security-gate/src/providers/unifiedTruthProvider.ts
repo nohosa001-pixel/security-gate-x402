@@ -14,18 +14,24 @@ export const unifiedTruthProvider: Provider = {
 				},
 				cleanweb: {
 					status: "ACTIVE",
-					invariants: ["87% Token Reduced Scraping", "Ad-Free Markdown Extraction", "Merkle Proofs"]
+					invariants: ["87% Token Reduced Scraping", "Ad-Free Markdown Extraction", "Merkle Proofs"],
+					dataGovernance: "NIST-SP-800-88-Rev1 0s Immediate Ephemeral Purge (GDPR Art. 17(1))",
+					accounting: "IFRS-15 / US GAAP Enterprise Clean Invoice (0% Kickback)"
 				},
 				minerals: {
 					status: "ACTIVE",
 					commodities: ["tin", "tantalum", "tungsten", "gold", "cobalt", "lithium", "nickel", "copper"],
-					standards: ["RMI Smelter Compliance", "OECD Annex II Zero Child Labor"]
+					standards: ["RMI Smelter Compliance", "OECD Annex II Zero Child Labor"],
+					statutoryRetention: "5 Years Mandatory Audit Vault (Reg. EU 2017/821 & GDPR Art. 17(3)(b))",
+					accounting: "IFRS-15 / US GAAP Enterprise Clean Invoice (0% Kickback)"
 				},
 				eudr: {
 					status: "ACTIVE",
 					commodities: ["wood", "rubber", "palm_oil", "soy", "coffee", "cocoa", "cattle"],
 					cutoffDate: "2020-12-31",
-					standards: ["Satellite Deforestation-Free Polygon", "Traces NT DDS Trace"]
+					standards: ["Satellite Deforestation-Free Polygon", "Traces NT DDS Trace"],
+					statutoryRetention: "5 Years Mandatory Audit Vault (EUDR Art. 9(3)/12(5) & GDPR Art. 17(3)(b))",
+					accounting: "IFRS-15 / US GAAP Enterprise Clean Invoice (0% Kickback)"
 				},
 				onchain: {
 					status: "ACTIVE",

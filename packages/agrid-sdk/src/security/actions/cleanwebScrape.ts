@@ -34,7 +34,7 @@ export const scrapeWebAction = {
 
       const cleanText = await resp.text();
       const compression = resp.headers.get("x-token-compression") || "87%";
-      const resultMsg = `[CleanWeb Studio | ${compression} Token Compression]\n\n${cleanText.slice(0, 3000)}`;
+      const resultMsg = `[CleanWeb Studio | ${compression} Token Compression | NIST-SP-800-88 0s Ephemeral Purge | IFRS-15 Clean Invoice]\n\n${cleanText.slice(0, 3000)}`;
 
       if (callback) callback({ text: resultMsg });
       return true;

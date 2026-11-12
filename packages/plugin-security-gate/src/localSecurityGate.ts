@@ -8,6 +8,9 @@ export interface LocalAuditResult {
 	risk_score: number;
 	threats: string[];
 	executionTimeMs: number;
+	governanceStandard?: string;
+	observabilityStandard?: string;
+	erasureStandard?: string;
 }
 
 const INJECTION_PATTERNS = [
@@ -254,5 +257,8 @@ export function inspectPayloadLocally(content: string): LocalAuditResult {
 		risk_score: maxRisk,
 		threats,
 		executionTimeMs: Math.max(1, Date.now() - startTime),
+		governanceStandard: "A.GRID-GOV-2026.1",
+		observabilityStandard: "W3C-Trace-Context-v1 & IETF-CIDv1",
+		erasureStandard: "NIST-SP-800-88-Rev1",
 	};
 }

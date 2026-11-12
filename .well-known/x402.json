@@ -92,6 +92,30 @@
     "enabled": true,
     "rebateBps": 2000,
     "rebatePct": "20%",
+    "eligibilityScope": "INDIVIDUAL_B2C_ONLY",
+    "tierPolicy": "SINGLE_TIER_1_ONLY",
+    "b2bEnterpriseKickbackProhibited": true,
+    "multiLevelMarketingProhibited": true,
     "directive": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/AGENTS.md"
+  },
+  "institutionalGovernanceStandard": {
+    "standardId": "A.GRID-GOV-2026.1",
+    "specification": "docs/EU_STATUTORY_AND_CLEAN_INVOICE_STANDARD.md",
+    "statutoryRetentionSectors": {
+      "sectors": ["EUDR", "MINERALS", "TRADE", "CONSTRUCTION"],
+      "statutoryRetentionYears": 5,
+      "ephemeralRamKeysPurgedImmediately": true,
+      "legalBasis": "EUDR Reg. (EU) 2023/1115 Art. 9(3) & 12(5), EU Customs Code Art. 51, GDPR Art. 17(3)(b)"
+    },
+    "immediateErasureSectors": {
+      "sectors": ["BIO", "M2M", "CLEANWEB"],
+      "statutoryRetentionYears": 0,
+      "legalBasis": "GDPR Art. 17(1) & NIST SP 800-88 Rev.1"
+    },
+    "corporateCleanInvoice": {
+      "standard": "IFRS-15 / US GAAP Enterprise Clean Invoice",
+      "rebateAndKickbackFree": true,
+      "antiBriberyCompliance": "US FCPA & UK Bribery Act"
+    }
   }
 }

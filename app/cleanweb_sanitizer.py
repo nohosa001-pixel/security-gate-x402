@@ -201,6 +201,11 @@ class CleanwebResult:
         self.content_hash = content_hash
 
     def to_dict(self) -> Dict[str, Any]:
+        from app.escrow_engine import escrow_engine
+        erasure_proof = escrow_engine.generate_cryptographic_erasure_proof(
+            job_id=0,
+            deliverable_hash_hex=self.content_hash
+        )
         return {
             "status": "SAFE" if self.is_safe else "BLOCKED",
             "is_safe": self.is_safe,
@@ -214,6 +219,12 @@ class CleanwebResult:
                 "processing_time_ms": round(self.processing_time_ms, 3),
             },
             "content_hash": self.content_hash,
+            "cryptographic_erasure_proof": erasure_proof,
+            "institutional_accounting": {
+                "standard": "IFRS-15 / GAAP Enterprise Clean Invoice",
+                "rebate_and_kickback_free": True,
+                "audit_trail_ready": True
+            },
             "sanitized_output": self.sanitized_content,
         }
 

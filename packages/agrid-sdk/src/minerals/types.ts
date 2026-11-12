@@ -77,6 +77,14 @@ export interface VerificationResponse<T = VerificationVerdict> {
   verdict?: T;
   proof_hash?: string;
   onchain_signature?: string;
+  portable_audit_cid_v1?: string;
+  verifiable_agent_observability?: {
+    standard: string;
+    traceparent: string;
+    lifecycle_stages: string[];
+  };
+  cryptographic_erasure_proof?: Record<string, any>;
+  institutional_accounting?: Record<string, any>;
   timestamp?: string;
   [key: string]: any;
 }

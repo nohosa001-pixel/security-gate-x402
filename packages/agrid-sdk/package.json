@@ -1,6 +1,6 @@
 {
   "name": "agrid-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unified Master SDK for A.GRID Autonomous Agent Ecosystem: Security Gate x402, CleanWeb Intelligence, and Critical Minerals Oracle",
   "type": "module",
   "main": "./dist/index.js",

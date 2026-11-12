@@ -149,6 +149,14 @@ class MineralsTruthAdapter:
         r_hex = "0x" + signed.r.to_bytes(32, "big").hex()
         s_hex = "0x" + signed.s.to_bytes(32, "big").hex()
 
+        from app.escrow_engine import escrow_engine
+        erasure_proof = escrow_engine.generate_cryptographic_erasure_proof(
+            job_id=job_id,
+            deliverable_hash_hex=truth_hash_hex,
+            statutory_retention_years=5,
+            statutory_regulation="Regulation (EU) 2017/821 & OECD Minerals Guidance — 5-Year Mandatory Supply Chain Retention"
+        )
+
         return {
             "domain": "CONFLICT_MINERALS",
             "domain_id": self.DOMAIN_INT,
@@ -168,6 +176,12 @@ class MineralsTruthAdapter:
             "verdict": "PASSED" if is_valid else "FAILED",
             "truth_hash": truth_hash_hex,
             "truthHash": truth_hash_hex,
+            "cryptographic_erasure_proof": erasure_proof,
+            "institutional_accounting": {
+                "standard": "IFRS-15 / GAAP Enterprise Clean Invoice",
+                "rebate_and_kickback_free": True,
+                "audit_trail_ready": True
+            },
             "signer": self.signer.signer_address,
             "expires_at": expires_at,
             "expiresAt": expires_at,

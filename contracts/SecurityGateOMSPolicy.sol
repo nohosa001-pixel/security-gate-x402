@@ -78,11 +78,19 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
     error SessionExpired();
     error BudgetExceeded(uint256 attempted, uint256 remaining);
     error UnauthorizedTarget(address attempted, address expected);
+    error UnauthorizedSpender(address attemptedSpender, address expectedSpender);
     error MissingSecurityAttestation();
     error InvalidAttestationSignature();
     error AttestationExpired();
     error ExcessiveRiskScore(uint8 riskScore, uint8 maxAllowed);
     error Unauthorized();
+
+    // Standard ERC-20 & EIP-2612 Selectors (Approve + TransferFrom Bypass Defense)
+    bytes4 public constant ERC20_TRANSFER_SEL = 0xa9059cbb;           // transfer(address,uint256)
+    bytes4 public constant ERC20_APPROVE_SEL = 0x095ea7b3;            // approve(address,uint256)
+    bytes4 public constant ERC20_INCREASE_ALLOWANCE_SEL = 0x39509351; // increaseAllowance(address,uint256)
+    bytes4 public constant ERC20_TRANSFER_FROM_SEL = 0x23b872dd;      // transferFrom(address,address,uint256)
+    bytes4 public constant EIP2612_PERMIT_SEL = 0xd505accf;           // permit(address,address,uint256,uint256,uint8,bytes32,bytes32)
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert Unauthorized();
@@ -160,14 +168,49 @@ contract SecurityGateOMSPolicy is ISessionPolicy {
         if (!cfg.isActive) revert SessionInactive();
         if (block.timestamp > cfg.expiresAt) revert SessionExpired();
 
-        // 2. Check Target Whitelist
-        if (cfg.allowedTarget != address(0) && target != cfg.allowedTarget) {
-            revert UnauthorizedTarget(target, cfg.allowedTarget);
+        // 2. Check Target Whitelist & ERC-20 Approve / TransferFrom Spend Cap Enforcement
+        uint256 effectiveSpend = value;
+        if (data.length >= 68) {
+            bytes4 selector = bytes4(data[:4]);
+            if (selector == ERC20_APPROVE_SEL || selector == ERC20_INCREASE_ALLOWANCE_SEL) {
+                (address spender, uint256 allowanceAmount) = abi.decode(data[4:68], (address, uint256));
+                // Spender calling transferFrom later bypasses the wallet gate unless capped & whitelisted on approve:
+                if (cfg.allowedTarget != address(0) && spender != cfg.allowedTarget) {
+                    revert UnauthorizedSpender(spender, cfg.allowedTarget);
+                }
+                effectiveSpend += allowanceAmount;
+            } else if (selector == ERC20_TRANSFER_SEL) {
+                (address recipient, uint256 tokenAmount) = abi.decode(data[4:68], (address, uint256));
+                if (cfg.allowedTarget != address(0) && target != cfg.allowedTarget && recipient != cfg.allowedTarget) {
+                    revert UnauthorizedTarget(recipient, cfg.allowedTarget);
+                }
+                effectiveSpend += tokenAmount;
+            } else if (selector == ERC20_TRANSFER_FROM_SEL && data.length >= 100) {
+                (, address recipient, uint256 tfAmount) = abi.decode(data[4:100], (address, address, uint256));
+                if (cfg.allowedTarget != address(0) && target != cfg.allowedTarget && recipient != cfg.allowedTarget) {
+                    revert UnauthorizedTarget(recipient, cfg.allowedTarget);
+                }
+                effectiveSpend += tfAmount;
+            } else if (selector == EIP2612_PERMIT_SEL && data.length >= 100) {
+                (, address spender, uint256 permitAmount) = abi.decode(data[4:100], (address, address, uint256));
+                if (cfg.allowedTarget != address(0) && spender != cfg.allowedTarget) {
+                    revert UnauthorizedSpender(spender, cfg.allowedTarget);
+                }
+                effectiveSpend += permitAmount;
+            } else {
+                if (cfg.allowedTarget != address(0) && target != cfg.allowedTarget) {
+                    revert UnauthorizedTarget(target, cfg.allowedTarget);
+                }
+            }
+        } else {
+            if (cfg.allowedTarget != address(0) && target != cfg.allowedTarget) {
+                revert UnauthorizedTarget(target, cfg.allowedTarget);
+            }
         }
 
-        // 3. Check Budget Ceiling
-        if (cfg.currentSpent + value > cfg.maxSpendLimit) {
-            revert BudgetExceeded(value, cfg.maxSpendLimit - cfg.currentSpent);
+        // 3. Check Budget Ceiling (Native Value + ERC-20 Transfer / Approve / Permit Allowance)
+        if (cfg.currentSpent + effectiveSpend > cfg.maxSpendLimit) {
+            revert BudgetExceeded(effectiveSpend, cfg.maxSpendLimit - cfg.currentSpent);
         }
 
         // 4. Check Security Gate Attestation (Deep Inspection Defense)

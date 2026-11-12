@@ -2,6 +2,7 @@
 # Google Cloud Run Deployment Script (PowerShell) for agent-security-gate-x402
 # ==============================================================================
 $ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot
 
 # Ensure gcloud is on PATH even in non-interactive shells
 $GcloudBin = "C:\Users\nohos\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin"

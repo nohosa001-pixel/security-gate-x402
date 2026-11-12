@@ -148,6 +148,10 @@ console.log("Native USDC:", arb.tokens.usdc);
 
 ## 📚 Documentation & Specifications
 
+- [🏛️ Institutional Data Governance, EUDR 5-Year Statutory Retention & Clean-Invoice Standard (`A.GRID-GOV-2026.1`)](../../docs/EU_STATUTORY_AND_CLEAN_INVOICE_STANDARD.md)
+  - **EUDR & Minerals**: 5-Year Mandatory Statutory Audit Preservation (`EUDR Art. 9(3)/12(5)` & `GDPR Art. 17(3)(b)`) + Immediate Ephemeral RAM Key Scrub (`NIST-SP-800-88-Rev1`).
+  - **CleanWeb & Bio/M2M**: 0-Second Immediate Payload & PII Erasure (`GDPR Art. 17(1)`).
+  - **Enterprise Accounting**: 100% Rebate & Kickback Prohibited (`$0.00`) for B2B (`IFRS-15 / GAAP / FCPA Clean Invoice`); strict 1-tier direct affiliate credit (`SINGLE_TIER_1_ONLY`) for individual B2C only.
 - [🧙‍♂️ Ethereum Magicians ERC Proposal: IAgentTransactionGuard](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
 
 ---

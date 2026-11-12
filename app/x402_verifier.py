@@ -1,5 +1,6 @@
 """x402 Protocol Payment Challenge & Verification Engine with Vault & Enterprise Support."""
 
+import base64
 import hashlib
 import json
 import os
@@ -375,11 +376,21 @@ def generate_audit_proof(
     into an immutable cryptographic receipt for liability protection and audit trails.
     """
     timestamp = int(time.time())
-    data_fingerprint = hashlib.sha256(payload_text.encode("utf-8")).hexdigest()
+    data_fingerprint_bytes = hashlib.sha256(payload_text.encode("utf-8")).digest()
+    data_fingerprint = data_fingerprint_bytes.hex()
+
+    # Generate IETF Multiformats CIDv1 & W3C Trace-Context Level 1
+    cidv1_bytes = bytes([0x01, 0x55, 0x12, 0x20]) + data_fingerprint_bytes
+    portable_cid_v1 = "b" + base64.b32encode(cidv1_bytes).decode("ascii").lower().rstrip("=")
+    w3c_traceparent = f"00-{data_fingerprint[:32]}-{data_fingerprint[32:48]}-01"
 
     audit_record = {
         "caller": caller_address or "anonymous",
         "data_fingerprint": data_fingerprint,
+        "portable_audit_cid_v1": portable_cid_v1,
+        "w3c_traceparent": w3c_traceparent,
+        "erasure_standard": "NIST-SP-800-88-Rev1",
+        "accounting_standard": "IFRS-15 Clean Invoice",
         "verdict": verdict,
         "risk_score": round(float(risk_score), 2),
         "payment_ref": tx_or_payment_ref or "sandbox:free_trial",

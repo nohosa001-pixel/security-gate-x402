@@ -77,5 +77,16 @@ console.log("A.GRID Modules Initialized:", {
 
 ---
 
+## 🏛️ Institutional Legal, Accounting & Data Governance (`A.GRID-GOV-2026.1`)
+
+A.GRID is built specifically for **lawful, rational, and audit-ready enterprise adoption**:
+
+| Domain | Statutory Retention vs. Privacy Erasure | Corporate Accounting & Anti-Bribery (`IFRS-15 / GAAP / FCPA`) |
+| :--- | :--- | :--- |
+| **🌲 EUDR & ⛏️ Minerals** | **5-Year Mandatory Audit Vault (`1,825 Days`)** under `EUDR Art. 9(3)/12(5)`, `Reg. (EU) 2017/821`, and `GDPR Art. 17(3)(b)` *(Legal Obligation Exception)* + **0s Immediate RAM Key Scrub** (`NIST-SP-800-88-Rev1`) | **100% Rebate & Kickback Prohibited (`$0.00`)** — Issues clean, ERP-ready corporate invoices with zero third-party kickbacks. |
+| **⚡ CleanWeb & 🛡️ Security Gate** | **0s Immediate Payload & PII Zeroization (`0 Years`)** under `GDPR Art. 17(1)` and `NIST-SP-800-88-Rev1` — only the $O(1)$ cryptographic receipt hash remains. | **Enterprise B2B: 0% Rebate Clean Invoice**.<br>**Individual B2C Only**: Strict 1-tier direct affiliate credit (`SINGLE_TIER_1_ONLY`, no multi-level chains). |
+
+---
+
 ## 📜 License
 MIT © A.GRID & nohosa001-pixel

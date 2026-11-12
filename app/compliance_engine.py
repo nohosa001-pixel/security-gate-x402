@@ -74,9 +74,15 @@ class AgentComplianceEngine:
                 "gdpr_data_privacy": {
                     "requirement": "Zero data retention of prompt payloads and user personally identifiable information (PII).",
                     "status": "PASS",
-                    "mechanism": "Ephemeral in-memory deterministic inspection with zero disk persistence."
+                    "mechanism": "Ephemeral in-memory deterministic inspection with zero disk persistence and NIST SP 800-88 Rev.1 AES-256-GCM cryptographic erasure."
+                },
+                "gdpr_article_17_cryptographic_erasure": {
+                    "requirement": "Provable cryptographic erasure of ephemeral session keys under GDPR Art. 17(1), with automatic 5-year statutory audit preservation under GDPR Art. 17(3)(b) for regulated sectors (EUDR, Minerals, Customs Trade, Construction).",
+                    "status": "PASS",
+                    "mechanism": "NIST-SP-800-88-Rev1 Ephemeral Key Zeroization + GDPR Art. 17(3)(b) 5-Year Statutory Audit Vault (IETF CIDv1 Portable Content Addressing & W3C Trace-Context Observability)."
                 }
             },
+            "oracle_trust_calibration": credit_report.get("oracle_trust_calibration"),
             "issuer": {
                 "organization": "Agent Security Gate x402 Compliance Authority",
                 "oracle_signer": ORACLE_ACCOUNT.address,

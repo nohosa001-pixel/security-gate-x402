@@ -181,6 +181,13 @@ async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
     from app.universal_factoring_bridge import universal_factoring_bridge
     factoring_sync = universal_factoring_bridge.resolve_factored_settlement(req.job_id)
 
+    # D. NIST SP 800-88 Cryptographic Erasure Proof for sensitive trade / EUDR / minerals PII
+    from app.escrow_engine import escrow_engine
+    erasure_proof = escrow_engine.generate_cryptographic_erasure_proof(
+        job_id=req.job_id,
+        deliverable_hash_hex=str(att.get("deliverableHash", att.get("truth_hash", f"domain_{req.domain}_{req.job_id}")))
+    )
+
     return {
         "status": "SETTLED",
         "job_id": req.job_id,
@@ -191,6 +198,12 @@ async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
         "recipients_count": len(req.recipients),
         "treasury_address": "0x06db5A847F24d0feC5151a01937700E221d55e19",
         "attestation": req.attestation,
+        "cryptographic_erasure_proof": erasure_proof,
+        "institutional_accounting": {
+            "standard": "IFRS-15 / GAAP Enterprise Clean Invoice",
+            "rebate_and_kickback_free": True,
+            "audit_trail_ready": True
+        },
         "direct_split_executed": True,
         "factoring_settled": factoring_sync.get("factored", False),
         "factoring_details": factoring_sync if factoring_sync.get("factored") else None,

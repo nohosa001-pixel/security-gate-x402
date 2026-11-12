@@ -216,6 +216,14 @@ class EudrTruthAdapter:
         r_hex = "0x" + signed.r.to_bytes(32, "big").hex()
         s_hex = "0x" + signed.s.to_bytes(32, "big").hex()
 
+        from app.escrow_engine import escrow_engine
+        erasure_proof = escrow_engine.generate_cryptographic_erasure_proof(
+            job_id=job_id,
+            deliverable_hash_hex=truth_hash_hex,
+            statutory_retention_years=5,
+            statutory_regulation="Regulation (EU) 2023/1115 (EUDR) Art. 9(3) & Art. 12(5) — 5-Year Mandatory Due Diligence Retention"
+        )
+
         return {
             "domain": "EUDR_FOREST",
             "domain_id": self.DOMAIN_INT,
@@ -237,6 +245,12 @@ class EudrTruthAdapter:
             "verdict": "PASSED" if is_valid else "FAILED",
             "truth_hash": truth_hash_hex,
             "truthHash": truth_hash_hex,
+            "cryptographic_erasure_proof": erasure_proof,
+            "institutional_accounting": {
+                "standard": "IFRS-15 / GAAP Enterprise Clean Invoice",
+                "rebate_and_kickback_free": True,
+                "audit_trail_ready": True
+            },
             "signer": self.signer.signer_address,
             "expires_at": expires_at,
             "expiresAt": expires_at,

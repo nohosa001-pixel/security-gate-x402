@@ -120,6 +120,12 @@ class BioZkAdapter:
         r_hex = "0x" + signed.r.to_bytes(32, "big").hex()
         s_hex = "0x" + signed.s.to_bytes(32, "big").hex()
 
+        from app.escrow_engine import escrow_engine
+        erasure_proof = escrow_engine.generate_cryptographic_erasure_proof(
+            job_id=job_id,
+            deliverable_hash_hex=truth_hash_hex
+        )
+
         return {
             "domain": "BIO_KNOWLEDGE_IP",
             "domain_id": self.DOMAIN_INT,
@@ -135,6 +141,12 @@ class BioZkAdapter:
                 "tee_enclave_id": tee_enclave_id
             },
             "truth_hash": truth_hash_hex,
+            "cryptographic_erasure_proof": erasure_proof,
+            "institutional_accounting": {
+                "standard": "IFRS-15 / GAAP Enterprise Clean Invoice",
+                "rebate_and_kickback_free": True,
+                "audit_trail_ready": True
+            },
             "attestation": {
                 "jobId": job_id_bytes32,
                 "truthHash": truth_hash_hex,

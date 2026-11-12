@@ -173,7 +173,12 @@ class SecurityGateBrainTrainer:
                 "cfr_alpha": alpha,
                 "cfr_decision": cfr_decision,
                 "eudr_verdict": eudr_verdict,
+                "eudr_statutory_retention_years": 5,
                 "minerals_shock": shock_flag,
+                "minerals_statutory_retention_years": 5,
+                "cleanweb_statutory_retention_years": 0,
+                "b2b_enterprise_clean_invoice": "IFRS-15 / GAAP (0% Kickback)",
+                "governance_standard": "A.GRID-GOV-2026.1",
                 "effective_stake_ratio": stake_info["effective_collateral_ratio"]
             }
         }

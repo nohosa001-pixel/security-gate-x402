@@ -285,4 +285,23 @@ export class MineralsOracleClient {
       body: JSON.stringify(input)
     });
   }
+
+  /**
+   * Returns A.GRID Institutional Legal, Accounting & Statutory Retention Standard (A.GRID-GOV-2026.1)
+   */
+  getInstitutionalGovernanceStandard() {
+    return {
+      standardId: 'A.GRID-GOV-2026.1',
+      statutoryRetentionYears: 5,
+      regulation: 'Regulation (EU) 2017/821 (Conflict Minerals), Regulation (EU) 2023/1115 (EUDR Art. 9(3)/12(5))',
+      gdprLegalBasis: 'GDPR Article 17(3)(b) (Legal Obligation Exception)',
+      ephemeralRamSessionPurged: true,
+      erasureStandard: 'NIST-SP-800-88-Rev1',
+      institutionalAccounting: {
+        standard: 'IFRS-15 / US GAAP Enterprise Clean Invoice',
+        rebateAndKickbackFree: true,
+        fcpaUkBriberyActCompliant: true
+      }
+    };
+  }
 }

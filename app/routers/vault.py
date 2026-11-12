@@ -251,17 +251,22 @@ async def deposit_vault(req: VaultDepositRequest):
 
 
 @router.get("/api/v1/vault/balance/{agent_address}", response_model=VaultBalanceResponse, tags=["Agent Vault"])
-async def get_vault_balance(agent_address: str):
+async def get_vault_balance(agent_address: str, request: Request):
     acc = vault_manager.get_account(agent_address)
     if not acc:
         raise HTTPException(status_code=404, detail="Agent vault account not found.")
+    # Prevent unauthenticated viewing/session-key leakage (Zero-Trust Session Key Masking):
+    # Only return raw session_key if caller authenticated with X-Vault-Key or queried by session_key directly.
+    caller_key = request.headers.get("x-vault-key") or request.headers.get("X-Vault-Key") or ""
+    is_authenticated_owner = (caller_key == acc.session_key) or (agent_address == acc.session_key)
+    safe_session_key = acc.session_key if is_authenticated_owner else f"{acc.session_key[:14]}••••••••••••"
     return VaultBalanceResponse(
         agent_address=acc.agent_address,
         balance_usdc=acc.balance_usdc,
         total_deposited_usdc=acc.total_deposited_usdc,
         total_consumed_usdc=acc.total_consumed_usdc,
         query_count=acc.query_count,
-        session_key=acc.session_key,
+        session_key=safe_session_key,
         last_active_utc=acc.last_active_utc
     )
 
