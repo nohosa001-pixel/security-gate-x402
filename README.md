@@ -39,7 +39,13 @@ Explore the full consumer and enterprise visual interface directly in your brows
 
 ---
 
-## 🌐 Multichain Agent Spend Control & Escrow Matrix (Phase 1 Delivered)
+## 🌐 Multichain Agent Spend Control & Escrow Matrix (Phase 1 & Phase 2 Delivered)
+
+### 🚀 Phase 2 (Week 2) Security & Regulatory Upgrades
+- **ERC-20 `approve` / `permit` Drain Bypass Defense (`SecurityGateOMSPolicy.sol`)**: Decodes `approve`, `increaseAllowance`, `transferFrom`, and EIP-2612 `permit` selectors on-chain, enforcing `allowedTarget` whitelisting on spenders/recipients and counting allowances toward the cumulative `maxSpendLimit` alongside EIP-712 attestation verification.
+- **Dual-Mode Statutory Governance (`GDPR Art. 17(1)` vs. `17(3)(b)`)**: Mode A (`1,825-day` / 5-year immutable audit lock for `EUDR`, `MINERALS`, `TRADE`, `CONSTRUCTION` with `0s` `NIST-SP-800-88-Rev1` PII zeroization), Mode B (`0s` trade-secret purge), and Mode C (`IFRS-15 / US GAAP` `0%` kickback clean invoices).
+- **Continuous Threat Brain (`scripts/run_continuous_brain_trainer.py`)**: Autonomous background hardening of deterministic `<5ms` AST/injection defenses without runtime LLM latency.
+- **Week 2 Build Log & Demo Script**: [`docs/COLOSSEUM_WEEK2_BUILD_LOG.md`](docs/COLOSSEUM_WEEK2_BUILD_LOG.md)
 
 > **Zero-Trust Multi-Chain Settlement Across 4 Major Rails: Polygon · Base · Arbitrum · Solana**  
 > **Automated Test Suite:** 410 / 410 ALL PASSED (`pytest tests/`) · **Phase 1 Completion Report:** [`docs/PHASE1_COMPLETION_REPORT.md`](docs/PHASE1_COMPLETION_REPORT.md)

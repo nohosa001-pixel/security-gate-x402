@@ -1,22 +1,20 @@
-
+---
 name: agrid-security-gate
 description: Open-source deterministic prompt injection defense (<2.8ms AST) and on-chain spend policy circuit breaker for autonomous AI agents across Solana, Polygon, Base, and Arbitrum. 100% local, zero external network requests. Maintained by A.GRID Protocol Team (GitHub: <https://github.com/nohosa001-pixel/security-gate-x402>).
 tags:
-
-- security
-- prompt-injection
-- ai-agents
-- solana
-- polygon
-- guardrails
-- spend-control
+  - security
+  - prompt-injection
+  - ai-agents
+  - solana
+  - polygon
+  - guardrails
+  - spend-control
 price: 0
 license: MIT
 author: A.GRID Protocol Team
-repository: <https://github.com/nohosa001-pixel/security-gate-x402>
-npm: <https://www.npmjs.com/package/elizaos-plugin-security-gate>
-pypi: <https://pypi.org/project/agent-security-gate-x402>
-
+repository: https://github.com/nohosa001-pixel/security-gate-x402
+npm: https://www.npmjs.com/package/elizaos-plugin-security-gate
+pypi: https://pypi.org/project/agent-security-gate-x402
 ---
 
 # 🛡️ A.GRID Security Gate & Spend Policy Guard

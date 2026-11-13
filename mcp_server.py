@@ -327,6 +327,35 @@ TOOLS = [
 ]
 
 TOOLS.extend(LOGISTICS_MCP_TOOLS)
+TOOLS.extend([
+    {
+        "name": "erc8004_validate_payload",
+        "description": "Inspect an agent payload or code with A.GRID <5ms Security Gate and format as a Polygon ERC-8004 ValidationRegistry attestation.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "payload_text": {"type": "string", "description": "Agent output or code payload to inspect"},
+                "is_code": {"type": "boolean", "default": False},
+                "ground_truth": {"type": "string", "description": "Optional ground truth context"}
+            },
+            "required": ["payload_text"]
+        }
+    },
+    {
+        "name": "erc8004_build_reputation_proof",
+        "description": "Generate a Polygon ERC-8004 ReputationRegistry feedback payload linked to an x402 payment proof.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_id": {"type": "integer", "description": "ERC-8004 Agent ID"},
+                "score": {"type": "integer", "description": "Feedback score (0-100)"},
+                "x402_tx_hash": {"type": "string", "description": "x402 settlement transaction hash"},
+                "chain_id": {"type": "integer", "default": 137}
+            },
+            "required": ["agent_id", "score", "x402_tx_hash"]
+        }
+    }
+])
 
 
 
@@ -639,6 +668,33 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 agent_prompt_or_deliverable=str(tool_args.get("agent_prompt_or_deliverable", "Verified milestone settlement")),
                 is_code_deliverable=bool(tool_args.get("is_code_deliverable", False)),
                 referral_agent_address=tool_args.get("referral_agent_address")
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "erc8004_validate_payload":
+            from app.erc8004_registry import build_validation_response_payload
+            res = build_validation_response_payload(
+                payload_text=str(tool_args.get("payload_text", "")),
+                is_code=bool(tool_args.get("is_code", False)),
+                ground_truth=tool_args.get("ground_truth"),
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "erc8004_build_reputation_proof":
+            from app.erc8004_registry import build_reputation_feedback_payload
+            res = build_reputation_feedback_payload(
+                agent_id=int(tool_args.get("agent_id", 0)),
+                score=int(tool_args.get("score", 100)),
+                x402_tx_hash=str(tool_args.get("x402_tx_hash", "")),
+                chain_id=int(tool_args.get("chain_id", 137)),
             )
             return {
                 "jsonrpc": "2.0",

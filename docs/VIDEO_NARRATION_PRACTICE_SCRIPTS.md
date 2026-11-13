@@ -1,13 +1,14 @@
 # 🎙️ Colosseum Eternal | 데모 & 피칭 나레이션 실전 연습 대본 (Master Practice Guide)
 
-> **핵심 원칙**: 
+> **핵심 원칙**:
+>
 > 1. 오직 **A.GRID만의 고유 기술(솔라나 메인넷 PDA + EUDR 위성 오라클 + ElizaOS)**로만 구성 (타 팀 시비 원천 차단).
 > 2. 금융 규제 시비가 없는 **순수 비수탁 스마트 컨트랙트 에스크로(Pure Non-Custodial Escrow Protocol)** 명분 유지.
 > 3. 소리 내어 읽기 가장 편한 **친절한 한글 발음 표기 및 타임코드 수록**.
 
 ---
 
-# 🎬 [1단계 (Week 1)] 보안 기초선 & 솔라나 메인넷 PDA 가드 (약 60초)
+## 🎬 [1단계 (Week 1)] 보안 기초선 & 솔라나 메인넷 PDA 가드 (약 60초)
 
 * **실행 명령어**: `.venv\Scripts\python scripts/demo_colosseum_live.py --auto`
 * **화면 연출**: 브라우저 A.GRID Hub ➔ 터미널 인젝션 2.4ms 차단 ➔ 솔라나 메인넷 150 SOL 리버트 ➔ 410개 테스트 완료
@@ -15,7 +16,8 @@
 ---
 
 ### [1단계 - 1. 오프닝 (0:00 ~ 0:15)]
-*(브라우저 A.GRID Hub 화면을 보며)*
+
+> 💡 **화면 연출**: 브라우저 A.GRID Hub 화면을 보며 진행합니다.
 
 **English:**
 > "Hi Colosseum. This is the live product demo for A.GRID Security Gate on Solana."
@@ -32,7 +34,8 @@
 ---
 
 ### [1단계 - 2. 초고속 침투 차단 & 온체인 리버트 (0:15 ~ 0:50)]
-*(터미널 창에서 데모 실행 중 빨간색 [BLOCKED] 화면과 솔라나 Revert 화면이 뜰 때)*
+
+> 💡 **화면 연출**: 터미널 창에서 데모 실행 중 빨간색 `[BLOCKED]` 화면과 솔라나 Revert 화면이 뜰 때 진행합니다.
 
 **English:**
 > "Now, let's watch what happens when an attacker sends a prompt injection to steal wallet keys."
@@ -55,7 +58,8 @@
 ---
 
 ### [1단계 - 3. 클로징 (0:50 ~ 1:05)]
-*(솔라나 익스플로러 창을 보며)*
+
+> 💡 **화면 연출**: 솔라나 익스플로러 창을 보며 마무리합니다.
 
 **English:**
 > "Live on Solana Mainnet with 410 passing tests. Deterministic security for autonomous AI agents. Thank you."
@@ -64,9 +68,8 @@
 * **의미**: "410개 테스트를 통과하고 솔라나 메인넷에 라이브 가동 중입니다. 자율 AI 에이전트를 위한 결정론적 보안. 감사합니다."
 
 ---
----
 
-# 🎬 [2단계 (Week 2)] 실물 경제 오라클 & 비수탁 에스크로 (약 60초)
+## 🎬 [2단계 (Week 2)] 실물 경제 오라클 & 비수탁 에스크로 (약 60초)
 
 * **실행 명령어**: `.venv\Scripts\python scripts/demo_colosseum_week2.py`
 * **화면 연출**: ElizaOS 에이전트 터미널 ➔ 위성 산림 지도 ➔ 솔라나 메인넷 에스크로 정산 ➔ 클린 인보이스 영수증
@@ -74,7 +77,8 @@
 ---
 
 ### [2단계 - 1. 오프닝 & ElizaOS 지시 수신 (0:00 ~ 0:15)]
-*(브라우저나 터미널의 STEP 1 화면을 보며)*
+
+> 💡 **화면 연출**: 브라우저나 터미널의 STEP 1 화면을 보며 진행합니다.
 
 **English:**
 > "Hi Colosseum. In Week 1, we proved sub-3ms prompt injection defense. In Week 2, we show how autonomous agents execute real-world enterprise trade on Solana."
@@ -91,7 +95,8 @@
 ---
 
 ### [2단계 - 2. A.GRID 실물 진실 오라클 검증 (0:15 ~ 0:32)]
-*(터미널 STEP 2: 녹색 `[EUDR TRUTH INVARIANT: PASSED]` 화면이 뜰 때)*
+
+> 💡 **화면 연출**: 터미널 STEP 2: 녹색 `[EUDR TRUTH INVARIANT: PASSED]` 화면이 뜰 때 진행합니다.
 
 **English:**
 > "Before a single cent moves, A.GRID's real-world truth oracle verifies satellite deforestation boundaries and legal coordinates in under 15 milliseconds."
@@ -102,7 +107,8 @@
 ---
 
 ### [2단계 - 3. 솔라나 메인넷 에스크로 정산 (0:32 ~ 0:48)]
-*(터미널 STEP 3: 파란색 `[TRANSACTION CONFIRMED ON SOLANA MAINNET]` 화면을 보며)*
+
+> 💡 **화면 연출**: 터미널 STEP 3: 파란색 `[TRANSACTION CONFIRMED ON SOLANA MAINNET]` 화면을 보며 진행합니다.
 
 **English:**
 > "Once the truth invariant passes, our Solana Anchor program executes atomic escrow settlement with 0.4-second finality directly to the supplier PDA. Zero escrow counterparty risk."
@@ -113,7 +119,8 @@
 ---
 
 ### [2단계 - 4. 기업 클린 인보이스 & 5년 보관 (0:48 ~ 1:05)]
-*(터미널 STEP 4: IFRS-15 Clean Invoice 및 CIDv1 증적 화면을 보며)*
+
+> 💡 **화면 연출**: 터미널 STEP 4: IFRS-15 Clean Invoice 및 CIDv1 증적 화면을 보며 진행합니다.
 
 **English:**
 > "We also issue IFRS-15 clean invoices and 5-year statutory audit archives, resolving GDPR and EUDR compliance for global enterprises."
@@ -128,9 +135,8 @@
 * **의미**: "결정적 코드 보안에서 글로벌 실물 경제 정산으로. A.GRID 2주차가 솔라나 메인넷에 라이브 가동 중입니다. 감사합니다."
 
 ---
----
 
-# 🏆 [3단계 (Week 3 - 최종 피날레)] 순수 비수탁 에스크로의 완성 (약 75초)
+## 🏆 [3단계 (Week 3 - 최종 피날레)] 순수 비수탁 에스크로의 완성 (약 75초)
 
 * **핵심 주제**: "자율 AI 에이전트를 위한 순수 비수탁 에스크로 결제 프로토콜 (Pure Non-Custodial Escrow Protocol for AI Agents on Solana)"
 * **화면 연출**: 3주간의 인프라 집약 ➔ 고속 DePIN 연속 스트리밍 ➔ 변조 시 즉시 슬래싱 ➔ 최종 우승 클로징
