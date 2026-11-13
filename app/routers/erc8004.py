@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from app.erc8004_registry import (
     DEFAULT_HUB_BASE_URL,
+    DEFAULT_POLYGON_AGENT_ID,
     ERC8004_DEPLOYMENTS,
     build_agrid_registration_json,
     build_register_calldata,
@@ -47,7 +48,7 @@ class ReputationProofRequest(BaseModel):
 @router.get("/.well-known/erc8004-registration.json")
 @router.get("/api/v1/erc8004/registration.json")
 def get_erc8004_registration(
-    agent_id: Optional[int] = Query(default=None, ge=0),
+    agent_id: Optional[int] = DEFAULT_POLYGON_AGENT_ID,
 ) -> Dict[str, Any]:
     """Serve A.GRID's canonical ERC-8004 agent registration JSON."""
     return build_agrid_registration_json(agent_id=agent_id)

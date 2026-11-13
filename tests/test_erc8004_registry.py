@@ -100,8 +100,9 @@ def test_query_identity_onchain_decodes_eth_call() -> None:
 
 
 def test_fastapi_erc8004_endpoints() -> None:
-    reg = get_erc8004_registration(agent_id=None)
+    reg = get_erc8004_registration()
     assert reg["x402Support"] is True
+    assert reg["registrations"][0]["agentId"] == 707
 
     deps = get_erc8004_deployments()
     assert (

@@ -46,6 +46,7 @@ Explore the full consumer and enterprise visual interface directly in your brows
 - **Dual-Mode Statutory Governance (`GDPR Art. 17(1)` vs. `17(3)(b)`)**: Mode A (`1,825-day` / 5-year immutable audit lock for `EUDR`, `MINERALS`, `TRADE`, `CONSTRUCTION` with `0s` `NIST-SP-800-88-Rev1` PII zeroization), Mode B (`0s` trade-secret purge), and Mode C (`IFRS-15 / US GAAP` `0%` kickback clean invoices).
 - **Continuous Threat Brain (`scripts/run_continuous_brain_trainer.py`)**: Autonomous background hardening of deterministic `<5ms` AST/injection defenses without runtime LLM latency.
 - **Week 2 Build Log & Demo Script**: [`docs/COLOSSEUM_WEEK2_BUILD_LOG.md`](docs/COLOSSEUM_WEEK2_BUILD_LOG.md)
+- **Polygon ERC-8004 Official Identity**: **Agent ID `#707`** on `IdentityRegistry` ([`0x8004A169...a432`](https://polygonscan.com/token/0x8004a169fb4a3325136eb29fa0ceb6d2e539a432?a=707) · [Tx](https://polygonscan.com/tx/0x5bbb9572c49b09ea70260f2cb0ae1c347f63be3ff4cf68300f7564b1712cb384))
 
 > **Zero-Trust Multi-Chain Settlement Across 4 Major Rails: Polygon · Base · Arbitrum · Solana**  
 > **Automated Test Suite:** 410 / 410 ALL PASSED (`pytest tests/`) · **Phase 1 Completion Report:** [`docs/PHASE1_COMPLETION_REPORT.md`](docs/PHASE1_COMPLETION_REPORT.md)

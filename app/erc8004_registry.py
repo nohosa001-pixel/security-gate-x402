@@ -19,11 +19,12 @@ from eth_utils import keccak
 from app.security_engine import audit_payload
 
 DEFAULT_HUB_BASE_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
+DEFAULT_POLYGON_AGENT_ID = 707
 
 ERC8004_DEPLOYMENTS: Dict[str, Dict[str, Any]] = {
     "polygon-mainnet": {
         "chain_id": 137,
-        "rpc_url": "https://polygon-rpc.com",
+        "rpc_url": "https://polygon-bor-rpc.publicnode.com",
         "IdentityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
         "ReputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
         "ValidationRegistry": None,
@@ -56,7 +57,10 @@ def _eth_call(rpc_url: str, to: str, data: str, timeout_s: float = 5.0) -> str:
     req = urllib.request.Request(
         rpc_url,
         data=body,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "A.GRID-ERC8004/1.0",
+        },
     )
     with urllib.request.urlopen(req, timeout=timeout_s) as resp:
         parsed = json.loads(resp.read().decode("utf-8"))
@@ -67,7 +71,7 @@ def _eth_call(rpc_url: str, to: str, data: str, timeout_s: float = 5.0) -> str:
 
 def build_agrid_registration_json(
     base_url: str = DEFAULT_HUB_BASE_URL,
-    agent_id: Optional[int] = None,
+    agent_id: Optional[int] = DEFAULT_POLYGON_AGENT_ID,
 ) -> Dict[str, Any]:
     """Generate the canonical ERC-8004 agent registration JSON for A.GRID."""
     base = base_url.rstrip("/")
