@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
+from app.erc8004_registry import DEFAULT_POLYGON_AGENT_ID, build_reputation_feedback_payload
 from app.escrow_engine import escrow_engine
 from app.security_engine import audit_payload
 
@@ -99,6 +100,9 @@ class AgentSpendControlPolicy:
     )
     require_security_gate_attestation: bool = True
     max_allowed_risk_score: float = 0.30
+    velocity_window_seconds: int = 60
+    max_tx_per_window: int = 10
+    velocity_window_limit_usdc: Optional[float] = None
     is_active: bool = True
     last_reset_timestamp: int = field(default_factory=lambda: int(time.time()))
 
@@ -141,6 +145,7 @@ class PolygonOMSSolanaAdapter:
         self.virtual_accounts: Dict[str, OMSVirtualAccount] = {}
         self.spend_policies: Dict[str, AgentSpendControlPolicy] = {}
         self.settlement_ledger: List[Dict[str, Any]] = []
+        self._velocity_history: Dict[str, List[tuple[float, float]]] = {}
         self._seed_default_accounts()
 
     def _seed_default_accounts(self) -> None:
@@ -391,6 +396,40 @@ class PolygonOMSSolanaAdapter:
                     "allowed_assets": policy.allowed_assets,
                     "message": f"Target asset '{target_asset}' is not whitelisted in Agent Spend Controls.",
                 }
+            # Sliding-window velocity limit (blocks rapid smurfing / splitting bursts)
+            now_mono = time.monotonic()
+            cutoff = now_mono - max(1, policy.velocity_window_seconds)
+            recent = [
+                entry for entry in self._velocity_history.get(sender_handle, []) if entry[0] >= cutoff
+            ]
+            self._velocity_history[sender_handle] = recent
+            if len(recent) >= policy.max_tx_per_window:
+                return {
+                    "verdict": "REJECTED_SPEND_POLICY",
+                    "oms_execution_status": "EXCEEDS_VELOCITY_LIMIT",
+                    "tx_count_in_window": len(recent),
+                    "max_tx_per_window": policy.max_tx_per_window,
+                    "velocity_window_seconds": policy.velocity_window_seconds,
+                    "message": (
+                        f"Velocity limit exceeded for '{sender_handle}': {len(recent)} transactions "
+                        f"within {policy.velocity_window_seconds}s (max {policy.max_tx_per_window})."
+                    ),
+                }
+            if policy.velocity_window_limit_usdc is not None:
+                window_spent = sum(entry[1] for entry in recent)
+                if (window_spent + effective_requested_usd) > policy.velocity_window_limit_usdc:
+                    return {
+                        "verdict": "REJECTED_SPEND_POLICY",
+                        "oms_execution_status": "EXCEEDS_VELOCITY_LIMIT",
+                        "window_spent_usdc": round(window_spent, 2),
+                        "velocity_window_limit_usdc": policy.velocity_window_limit_usdc,
+                        "velocity_window_seconds": policy.velocity_window_seconds,
+                        "message": (
+                            f"Velocity spend limit exceeded for '{sender_handle}': "
+                            f"${window_spent + effective_requested_usd:,.2f} within {policy.velocity_window_seconds}s "
+                            f"(max ${policy.velocity_window_limit_usdc:,.2f})."
+                        ),
+                    }
 
         # 3. ElizaOS Cognitive Brain CFR Milestone Evaluation
         job_id = int(time.time() * 1000) % 1_000_000
@@ -445,6 +484,7 @@ class PolygonOMSSolanaAdapter:
         # Update spend tracker & virtual account balances if present
         if policy:
             policy.current_daily_spent_usdc = round(policy.current_daily_spent_usdc + effective_usd, 2)
+            self._velocity_history.setdefault(sender_handle, []).append((time.monotonic(), effective_usd))
         if sender_handle in self.virtual_accounts:
             va_sender = self.virtual_accounts[sender_handle]
             va_sender.balance_usdc = round(max(0.0, va_sender.balance_usdc - effective_usd), 2)
@@ -462,6 +502,14 @@ class PolygonOMSSolanaAdapter:
         signature = "0x" + hmac.new(self._secret, attestation_payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
         total_latency_ms = round((time.perf_counter() - t0) * 1000, 3)
+
+        erc8004_score = max(0, min(100, int(round(quality_score * 100))))
+        erc8004_proof = build_reputation_feedback_payload(
+            agent_id=DEFAULT_POLYGON_AGENT_ID,
+            score=erc8004_score,
+            x402_tx_hash=proof_hash,
+            chain_id=target_chain_id,
+        )
 
         settlement_record = {
             "verdict": "PASSED",
@@ -508,6 +556,7 @@ class PolygonOMSSolanaAdapter:
                 "verifying_escrow_hub": "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d",
                 "solana_anchor_program": "AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC",
             },
+            "erc8004_reputation_proof": erc8004_proof,
             "inspection_latency_ms": total_latency_ms,
             "_agrid_viral_handshake": {
                 "protocol": "A.GRID-AP2/1.0-OMS-SOLANA",

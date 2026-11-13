@@ -135,3 +135,51 @@ def test_mcp_server_exposes_erc8004_tools() -> None:
     tool_names = {tool["name"] for tool in mcp_server.TOOLS}
     assert "erc8004_validate_payload" in tool_names
     assert "erc8004_build_reputation_proof" in tool_names
+
+
+def test_oms_settlement_embeds_erc8004_reputation_proof() -> None:
+    from app.polygon_oms_adapter import polygon_oms_solana_adapter
+
+    res = polygon_oms_solana_adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="maria.pol",
+        recipient_handle="diego.sol",
+        amount_usd=100.0,
+        quality_score=0.97,
+    )
+    assert res["verdict"] == "PASSED"
+    proof = res["erc8004_reputation_proof"]
+    assert proof["agentId"] == 707
+    assert proof["value"] == 97
+    assert proof["record"]["proofOfPayment"]["txHash"] == res["attestation"]["proof_hash"]
+
+
+def test_oms_velocity_limit_blocks_rapid_splitting() -> None:
+    from app.polygon_oms_adapter import AgentSpendControlPolicy, PolygonOMSSolanaAdapter
+
+    adapter = PolygonOMSSolanaAdapter()
+    adapter.spend_policies["burst.pol"] = AgentSpendControlPolicy(
+        agent_handle="burst.pol",
+        wallet_address="0x1111111111111111111111111111111111111111",
+        max_single_tx_usdc=1000.0,
+        daily_spend_limit_usdc=10000.0,
+        velocity_window_seconds=60,
+        max_tx_per_window=2,
+        velocity_window_limit_usdc=500.0,
+    )
+
+    r1 = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="burst.pol", recipient_handle="diego.sol", amount_usd=100.0
+    )
+    assert r1["verdict"] == "PASSED"
+
+    r2 = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="burst.pol", recipient_handle="diego.sol", amount_usd=100.0
+    )
+    assert r2["verdict"] == "PASSED"
+
+    # 3rd rapid transaction within 60s window exceeds max_tx_per_window=2
+    r3 = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="burst.pol", recipient_handle="diego.sol", amount_usd=50.0
+    )
+    assert r3["verdict"] == "REJECTED_SPEND_POLICY"
+    assert r3["oms_execution_status"] == "EXCEEDS_VELOCITY_LIMIT"

@@ -31,6 +31,7 @@ pypi: https://pypi.org/project/agent-security-gate-x402
 1. **Prompt Injection & Jailbreaks**: Evaluates tool calls and code execution deterministically in `<2.8ms` using Abstract Syntax Tree (AST) static inspection. **Runs 100% locally with zero external network calls.**
 2. **Exfiltration & Malicious Subprocess Calls**: Blocks `os.system`, `subprocess.Popen`, dynamic reflection (`__import__`), and unauthorized network egress.
 3. **Runaway Wallet Drains**: Enforces on-chain and local hard spend caps (e.g., max \$50/tx, \$200/day) with cryptographic state verification across Solana, Polygon, Base, and Arbitrum.
+4. **Polygon ERC-8004 Official Identity (`Agent ID #707`)**: Verified on-chain at `IdentityRegistry` (`0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`) with discovery manifest at `https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/.well-known/erc8004-registration.json` and Validation Oracle at `/api/v1/erc8004/validate`.
 
 ---
 
