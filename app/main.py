@@ -639,6 +639,67 @@ async def get_mcp_server_card():
     return JSONResponse({"error": "server-card.json not found"}, status_code=404)
 
 
+@app.get("/.well-known/agent.json", tags=["System"])
+@app.get("/.well-known/agent-card.json", tags=["System"])
+async def get_a2a_agent_card():
+    """Standard A2A Agent Card manifest for autonomous agent discovery crawlers."""
+    base_url = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
+    return JSONResponse(content={
+        "name": "A.GRID Security Gate & Universal Escrow",
+        "description": "The Control, Truth & Audit Layer Where Institutional Capital Meets Autonomous AI Agents. Sub-5ms AST pre-sign firewall, non-custodial Solana/EVM escrow, Polygon ERC-8004 Agent #707 verification, and IFRS-15 clean invoicing.",
+        "url": base_url,
+        "version": app.version,
+        "provider": {
+            "organization": "A.GRID Protocol",
+            "url": f"{base_url}/hub/",
+        },
+        "capabilities": {
+            "streaming": False,
+            "pushNotifications": False,
+            "stateTransitionHistory": True,
+        },
+        "defaultInputModes": ["application/json", "text/plain"],
+        "defaultOutputModes": ["application/json"],
+        "authentication": {
+            "schemes": ["x402", "eip712"],
+        },
+        "skills": [
+            {
+                "id": "pre_sign_security_audit",
+                "name": "Pre-Sign AST & Calldata Security Audit",
+                "description": "Deterministic <5ms inspection blocking prompt injection, credential exfiltration, and ERC-20 approve/permit bypasses.",
+                "tags": ["security", "ast", "firewall", "x402"],
+            },
+            {
+                "id": "universal_escrow_settlement",
+                "name": "Non-Custodial Multi-Chain Escrow",
+                "description": "Universal escrow and velocity spend controls across Solana, Polygon, Base, Arbitrum, and TRON with IFRS-15 clean invoicing.",
+                "tags": ["escrow", "solana", "polygon", "ifrs-15"],
+            },
+            {
+                "id": "erc8004_identity_validation",
+                "name": "ERC-8004 Agent Identity & Validation",
+                "description": "On-chain agent identity (#707 on Polygon Mainnet), reputation feedback, and validation responses.",
+                "tags": ["erc-8004", "identity", "reputation"],
+            },
+            {
+                "id": "real_world_truth_oracles",
+                "name": "Real-World Truth Oracles (EUDR, Minerals, Logistics)",
+                "description": "Deterministic verification for EU Deforestation Regulation (EUDR), OECD 3TG minerals, and maritime PoD.",
+                "tags": ["eudr", "minerals", "oracle", "compliance"],
+            },
+        ],
+        "protocols": {
+            "a2a": "0.2",
+            "x402": f"{base_url}/.well-known/x402.json",
+            "ap2": f"{base_url}/.well-known/ap2.json",
+            "mcp": f"{base_url}/.well-known/mcp/server-card.json",
+            "erc8004": f"{base_url}/.well-known/erc8004-registration.json",
+            "erc8004_agent_id": 707,
+        },
+    })
+
+
 @app.post("/", tags=["MCP"])
 @app.post("/mcp", tags=["MCP"])
 @app.post("/mcp/v1", tags=["MCP"])
