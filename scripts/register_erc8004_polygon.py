@@ -43,12 +43,20 @@ def main() -> int:
     print(json.dumps({"tx_spec": tx_spec, "services": reg_doc["services"]}, indent=2))
 
     if not args.broadcast:
-        print("\n[DRY-RUN] Re-run with --broadcast and EVM_PRIVATE_KEY set to mint on-chain.")
+        print("\n[DRY-RUN] Re-run with --broadcast and DEPLOYER_PRIVATE_KEY / EVM_PRIVATE_KEY set to mint on-chain.")
         return 0
 
-    priv_key = os.getenv("EVM_PRIVATE_KEY") or os.getenv("PRIVATE_KEY")
+    from dotenv import load_dotenv
+
+    load_dotenv(WORKSPACE_ROOT / ".env")
+    priv_key = (
+        os.getenv("EVM_PRIVATE_KEY")
+        or os.getenv("PRIVATE_KEY")
+        or os.getenv("DEPLOYER_PRIVATE_KEY")
+        or os.getenv("GATE_PRIVATE_KEY")
+    )
     if not priv_key:
-        print("[ERROR] EVM_PRIVATE_KEY or PRIVATE_KEY environment variable is required for --broadcast.")
+        print("[ERROR] EVM_PRIVATE_KEY, PRIVATE_KEY, or DEPLOYER_PRIVATE_KEY is required for --broadcast.")
         return 1
 
     from web3 import Web3

@@ -23,6 +23,10 @@ If an autonomous agent or bot programmatically interacts with this Service, the 
    The User acknowledges that prompt injection, adversarial evasion, LLM jailbreaking, and smart contract exploit vectors evolve continuously. The Service **DOES NOT** guarantee or warrant that all threats, malicious payloads, fabricated assertions, or zero-day vulnerabilities will be intercepted.
 3. **No Financial or Investment Advice:**  
    Verdicts (`PASSED`, `FLAGGED`, `BLOCKED`) and risk scores (0–100) are automated technical classifications. Under no circumstances do they constitute financial advice, investment counsel, solvency endorsements, or auditing certifications for any token, wallet, agent, or smart contract.
+4. **Non-Custodial Software & Regulatory Status:**  
+   The Service is strictly a non-custodial technical security oracle and software orchestrator. Neither A.GRID nor its operators act as a registered broker-dealer, investment adviser, bank, money transmitter, custodian, exchange, or Alternative Trading System (ATS), and the Service never holds, pools, or takes custody of client fiat or digital assets.
+5. **Independent Third-Party Rails & No Deposit Insurance:**  
+   Where fiat on/off-ramps or regulated payment rails are utilized, those services are provided solely by independent, appropriately licensed third-party providers and not by A.GRID. On-chain stablecoins and digital assets are not legal tender, are not backed by any government, and are not insured by the FDIC, SIPC, SIPA, or any deposit protection scheme.
 
 ---
 

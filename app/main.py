@@ -549,7 +549,9 @@ async def get_terms(format: Optional[str] = Query(None, description="Set to 'raw
             "no_100_percent_guarantee": "Security evaluations are deterministic heuristics. Zero-day exploits, novel evasions, and adversarial jailbreaks are not 100% guaranteed to be detected.",
             "no_financial_advice": "Verdicts (PASSED, FLAGGED, BLOCKED) are technical heuristics, not financial, investment, legal, or solvency advice.",
             "limitation_of_liability": "Strict aggregate liability cap of $50.00 USD or the total fees paid by caller in the past 30 days, whichever is greater.",
-            "blockchain_finality": "Transactions dispatched by agent wallets or smart contracts are irreversible. Client runtime holds final authority."
+            "blockchain_finality": "Transactions dispatched by agent wallets or smart contracts are irreversible. Client runtime holds final authority.",
+            "non_custodial_status": "A.GRID is a non-custodial technical software orchestrator and security oracle—not a registered broker-dealer, bank, custodian, exchange, or ATS—and never takes custody of client funds.",
+            "no_deposit_insurance": "Regulated fiat on/off-ramps, where used, are provided by independent licensed third-party providers. Digital assets are not covered by FDIC, SIPC, or SIPA."
         },
         liability_cap_usd=50.0,
         canonical_terms_sha256=_get_terms_sha256(),
