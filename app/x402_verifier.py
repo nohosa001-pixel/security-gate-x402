@@ -133,6 +133,18 @@ class X402Verifier:
             body["detail"] = custom_detail
 
         # x402 Foundation Standard & Autonomous Agent Self-Onboarding
+        evm_pay_to = (
+            os.getenv("GATE_PAY_TO_ADDRESS")
+            or os.getenv("SERVER_WALLET_ADDRESS")
+            or DEFAULT_PAY_TO
+        ).strip()
+        if not evm_pay_to or evm_pay_to == "0x1234567890123456789012345678901234567890":
+            evm_pay_to = "0xEbA2821B8E37eb5a231c074345c991Cb1F139920"
+        solana_pay_to = (
+            os.getenv("SOLANA_TREASURY_ADDRESS")
+            or "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT"
+        ).strip()
+
         body["x402Version"] = 1
         body["accepts"] = [
             {
@@ -142,7 +154,7 @@ class X402Verifier:
                 "maxAmountRequired": "2000",
                 "asset": SUPPORTED_CHAINS[137].usdc_address,
                 "resource": "/api/v1/inspect",
-                "payTo": challenge.pay_to,
+                "payTo": evm_pay_to,
                 "extra": {"name": "USDC", "version": "2"}
             },
             {
@@ -152,7 +164,7 @@ class X402Verifier:
                 "maxAmountRequired": "2000",
                 "asset": SUPPORTED_CHAINS[8453].usdc_address,
                 "resource": "/api/v1/inspect",
-                "payTo": challenge.pay_to,
+                "payTo": evm_pay_to,
                 "extra": {"name": "USDC", "version": "2"}
             },
             {
@@ -162,7 +174,7 @@ class X402Verifier:
                 "maxAmountRequired": "2000",
                 "asset": SUPPORTED_CHAINS[42161].usdc_address,
                 "resource": "/api/v1/inspect",
-                "payTo": challenge.pay_to,
+                "payTo": evm_pay_to,
                 "extra": {"name": "USDC", "version": "2"}
             },
             {
@@ -172,10 +184,7 @@ class X402Verifier:
                 "maxAmountRequired": "2000",
                 "asset": SUPPORTED_CHAINS[501].usdc_address,
                 "resource": "/api/v1/inspect",
-                "payTo": (
-                    os.getenv("SOLANA_TREASURY_ADDRESS")
-                    or "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT"
-                ).strip(),
+                "payTo": solana_pay_to,
                 "extra": {"name": "USDC", "decimals": 6}
             }
         ]
