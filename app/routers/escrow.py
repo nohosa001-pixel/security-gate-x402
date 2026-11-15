@@ -431,7 +431,7 @@ async def get_analytics_overview():
                 "attacker": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
                 "reason": "Simulated E-Seal Hardware Tampering during cold-chain transit",
                 "slashed_amount_usd": 2500.00,
-                "destination_vault": "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp",
+                "destination_vault": "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT",
                 "status": "FORFEITED_TO_TREASURY",
                 "chain": "Solana"
             }

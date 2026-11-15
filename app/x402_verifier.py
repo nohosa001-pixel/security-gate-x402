@@ -102,7 +102,7 @@ class X402Verifier:
         if int(target_chain.chain_id) == 501 and not pay_to:
             recipient = (
                 os.getenv("SOLANA_TREASURY_ADDRESS")
-                or "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp"
+                or "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT"
             ).strip()
 
         return PaymentDemand402(
@@ -174,7 +174,7 @@ class X402Verifier:
                 "resource": "/api/v1/inspect",
                 "payTo": (
                     os.getenv("SOLANA_TREASURY_ADDRESS")
-                    or "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp"
+                    or "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT"
                 ).strip(),
                 "extra": {"name": "USDC", "decimals": 6}
             }
