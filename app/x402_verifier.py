@@ -95,10 +95,15 @@ class X402Verifier:
         except ValueError:
             micro_units = MICRO_USDC_AMOUNT
         
-        # Multi-chain resolution: Polygon, Base, Arbitrum, etc.
+        # Multi-chain resolution: Polygon, Base, Arbitrum, Solana, etc.
         target_chain = find_chain(chain_id if chain_id is not None else POLYGON_CHAIN_ID)
         network_name = target_chain.network_slug or "polygon"
         usdc_contract = target_chain.usdc_address
+        if int(target_chain.chain_id) == 501 and not pay_to:
+            recipient = (
+                os.getenv("SOLANA_TREASURY_ADDRESS")
+                or "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp"
+            ).strip()
 
         return PaymentDemand402(
             error="Payment Required",
@@ -159,6 +164,19 @@ class X402Verifier:
                 "resource": "/api/v1/inspect",
                 "payTo": challenge.pay_to,
                 "extra": {"name": "USDC", "version": "2"}
+            },
+            {
+                "scheme": "exact",
+                "network": "solana",
+                "chain_id": 501,
+                "maxAmountRequired": "2000",
+                "asset": SUPPORTED_CHAINS[501].usdc_address,
+                "resource": "/api/v1/inspect",
+                "payTo": (
+                    os.getenv("SOLANA_TREASURY_ADDRESS")
+                    or "411ksMz9RHYVtVMe6RUUErzZYtrU9zzvkgzswKbqx9qp"
+                ).strip(),
+                "extra": {"name": "USDC", "decimals": 6}
             }
         ]
         body["_agentGuide"] = {

@@ -229,3 +229,60 @@ async def test_mcp_server_verify_polygon_oms_solana_payment():
     assert payload["target_chain"]["net_usd_value"] == 499.95
 
 
+def test_delayed_transfer_from_stale_allowance_across_24h_reset():
+    """u/0xfone regression: unconsumed >24h ERC-20 allowances must count toward 24h cap after window reset."""
+    adapter = PolygonOMSSolanaAdapter()
+    spender = "0x8ACafCEce0B1BFE140e75614b90FD1307b6f389d"
+    adapter.configure_agent_spend_policy(
+        agent_handle="allowance_agent.pol",
+        wallet_address="0x1111111111111111111111111111111111111111",
+        max_single_tx_usdc=5_000.0,
+        daily_spend_limit_usdc=25_000.0,
+    )
+
+    # Window 1: grant $5,000 ERC-20 allowance (unconsumed)
+    r_approve = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="allowance_agent.pol",
+        recipient_handle="diego.sol",
+        amount_usd=10.0,
+        erc20_allowance_usd=5_000.0,
+        approved_spender_address=spender,
+    )
+    assert r_approve["verdict"] == "PASSED"
+
+    # Simulate 24h window rollover: daily spent resets, but stale allowance remains live on-chain
+    adapter.reset_daily_spend_window("allowance_agent.pol")
+    policy = adapter.spend_policies["allowance_agent.pol"]
+    assert policy.current_daily_spent_usdc == 0.0
+    assert policy.total_outstanding_allowance_usdc == 5_000.0
+
+    # Window 2: 4 x $5,000 = $20,000 direct spends succeed ($20k + $5k stale = $25k)
+    for _ in range(4):
+        res = adapter.verify_and_orchestrate_oms_payment(
+            sender_handle="allowance_agent.pol",
+            recipient_handle="diego.sol",
+            amount_usd=5_000.0,
+        )
+        assert res["verdict"] == "PASSED"
+
+    # 5th $5,000 spend would push total 24h exposure (with stale transferFrom) to $30,000 > $25,000
+    blocked = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="allowance_agent.pol",
+        recipient_handle="diego.sol",
+        amount_usd=5_000.0,
+    )
+    assert blocked["verdict"] == "REJECTED_SPEND_POLICY"
+    assert blocked["oms_execution_status"] == "EXCEEDS_DAILY_SPEND_LIMIT"
+    assert blocked["outstanding_allowances_usdc"] == 5_000.0
+
+    # Once the stale allowance is revoked on-chain, the remaining $5,000 capacity is freed
+    adapter.revoke_erc20_allowance("allowance_agent.pol", spender)
+    unblocked = adapter.verify_and_orchestrate_oms_payment(
+        sender_handle="allowance_agent.pol",
+        recipient_handle="diego.sol",
+        amount_usd=5_000.0,
+    )
+    assert unblocked["verdict"] == "PASSED"
+
+
+

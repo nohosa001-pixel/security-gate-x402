@@ -105,6 +105,11 @@ class AgentSpendControlPolicy:
     velocity_window_limit_usdc: Optional[float] = None
     is_active: bool = True
     last_reset_timestamp: int = field(default_factory=lambda: int(time.time()))
+    outstanding_allowances_usdc: Dict[str, float] = field(default_factory=dict)
+
+    @property
+    def total_outstanding_allowance_usdc(self) -> float:
+        return round(sum(self.outstanding_allowances_usdc.values()), 2)
 
 
 class PolygonOMSSolanaAdapter:
@@ -246,6 +251,38 @@ class PolygonOMSSolanaAdapter:
         self.spend_policies[agent_handle] = policy
         return policy
 
+    def reset_daily_spend_window(self, agent_handle: str, now_ts: Optional[int] = None) -> None:
+        """Resets 24h executed spend while preserving unconsumed ERC-20/SPL allowances."""
+        policy = self.spend_policies.get(agent_handle)
+        if not policy:
+            raise ValueError(f"Unknown agent spend policy: {agent_handle}")
+        policy.current_daily_spent_usdc = 0.0
+        policy.last_reset_timestamp = now_ts if now_ts is not None else int(time.time())
+
+    def record_transfer_from_consumption(
+        self, agent_handle: str, spender_address: str, consumed_usdc: float
+    ) -> float:
+        """Consumes outstanding allowance when a delayed transferFrom() settles on-chain."""
+        if consumed_usdc < 0:
+            raise ValueError("Consumed amount must be non-negative")
+        policy = self.spend_policies.get(agent_handle)
+        if not policy:
+            raise ValueError(f"Unknown agent spend policy: {agent_handle}")
+        spender_key = spender_address.strip().lower()
+        remaining = max(0.0, round(policy.outstanding_allowances_usdc.get(spender_key, 0.0) - consumed_usdc, 2))
+        if remaining == 0.0:
+            policy.outstanding_allowances_usdc.pop(spender_key, None)
+        else:
+            policy.outstanding_allowances_usdc[spender_key] = remaining
+        policy.current_daily_spent_usdc = round(policy.current_daily_spent_usdc + consumed_usdc, 2)
+        return remaining
+
+    def revoke_erc20_allowance(self, agent_handle: str, spender_address: str) -> None:
+        """Clears an outstanding spender allowance after on-chain approve(spender, 0)."""
+        policy = self.spend_policies.get(agent_handle)
+        if policy:
+            policy.outstanding_allowances_usdc.pop(spender_address.strip().lower(), None)
+
     def process_fiat_payin(
         self,
         owner_handle: str,
@@ -368,16 +405,31 @@ class PolygonOMSSolanaAdapter:
                         f"(${policy.max_single_tx_usdc:,.2f})."
                     ),
                 }
-            if (policy.current_daily_spent_usdc + effective_requested_usd) > policy.daily_spend_limit_usdc:
+            existing_outstanding = policy.total_outstanding_allowance_usdc
+            if float(erc20_allowance_usd) > 0:
+                spender_key = (approved_spender_address or "__default_erc20_spender__").strip().lower()
+                prev_spender = policy.outstanding_allowances_usdc.get(spender_key, 0.0)
+                new_spender = max(prev_spender, float(erc20_allowance_usd))
+                projected_allowances = (existing_outstanding - prev_spender) + new_spender
+                projected_daily_exposure = policy.current_daily_spent_usdc + projected_allowances
+            else:
+                projected_daily_exposure = (
+                    policy.current_daily_spent_usdc + existing_outstanding + effective_requested_usd
+                )
+
+            if projected_daily_exposure > policy.daily_spend_limit_usdc:
                 return {
                     "verdict": "REJECTED_SPEND_POLICY",
                     "oms_execution_status": "EXCEEDS_DAILY_SPEND_LIMIT",
                     "requested_usd": effective_requested_usd,
                     "current_daily_spent_usdc": policy.current_daily_spent_usdc,
+                    "outstanding_allowances_usdc": existing_outstanding,
+                    "projected_daily_exposure_usdc": round(projected_daily_exposure, 2),
                     "daily_spend_limit_usdc": policy.daily_spend_limit_usdc,
                     "message": (
-                        f"Requested spend or ERC-20 allowance (${effective_requested_usd:,.2f}) would breach 24h team spend ceiling "
-                        f"(${policy.daily_spend_limit_usdc:,.2f})."
+                        f"Requested spend or ERC-20 allowance (${effective_requested_usd:,.2f}) plus "
+                        f"outstanding unconsumed allowances (${existing_outstanding:,.2f}) would breach "
+                        f"24h team spend ceiling (${policy.daily_spend_limit_usdc:,.2f})."
                     ),
                 }
             if target_chain_id not in policy.allowed_chains:
@@ -483,7 +535,14 @@ class PolygonOMSSolanaAdapter:
 
         # Update spend tracker & virtual account balances if present
         if policy:
-            policy.current_daily_spent_usdc = round(policy.current_daily_spent_usdc + effective_usd, 2)
+            if float(erc20_allowance_usd) > 0:
+                spender_key = (approved_spender_address or "__default_erc20_spender__").strip().lower()
+                prev_spender = policy.outstanding_allowances_usdc.get(spender_key, 0.0)
+                policy.outstanding_allowances_usdc[spender_key] = round(
+                    max(prev_spender, float(erc20_allowance_usd)), 2
+                )
+            else:
+                policy.current_daily_spent_usdc = round(policy.current_daily_spent_usdc + effective_usd, 2)
             self._velocity_history.setdefault(sender_handle, []).append((time.monotonic(), effective_usd))
         if sender_handle in self.virtual_accounts:
             va_sender = self.virtual_accounts[sender_handle]
