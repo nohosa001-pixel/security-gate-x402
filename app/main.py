@@ -63,6 +63,7 @@ from app.routers.extensions import router as extensions_router
 from app.routers.liquidity import router as liquidity_router
 from app.routers.oms import router as oms_router
 from app.routers.erc8004 import router as erc8004_router
+from app.routers.brain import router as brain_router
 
 app = FastAPI(
     title="The Sheriff of Agent Finance (x402 Security Gate)",
@@ -756,6 +757,7 @@ app.include_router(extensions_router)
 app.include_router(liquidity_router)
 app.include_router(oms_router)
 app.include_router(erc8004_router)
+app.include_router(brain_router)
 
 # MCP Tool Endpoints
 @app.get("/mcp/tools", tags=["MCP"])
