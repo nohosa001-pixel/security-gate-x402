@@ -56,7 +56,11 @@ def main() -> int:
         or os.getenv("GATE_PRIVATE_KEY")
     )
     if not priv_key:
-        print("[ERROR] EVM_PRIVATE_KEY, PRIVATE_KEY, or DEPLOYER_PRIVATE_KEY is required for --broadcast.")
+        bot_wallet_path = WORKSPACE_ROOT / "data" / "bot_wallet_evm.json"
+        if bot_wallet_path.exists():
+            priv_key = json.loads(bot_wallet_path.read_text(encoding="utf-8")).get("private_key")
+    if not priv_key:
+        print("[ERROR] EVM_PRIVATE_KEY, PRIVATE_KEY, or data/bot_wallet_evm.json is required for --broadcast.")
         return 1
 
     from web3 import Web3
@@ -75,14 +79,21 @@ def main() -> int:
         "value": 0,
         "data": tx_spec["data"],
         "nonce": w3.eth.get_transaction_count(account.address),
-        "gasPrice": w3.eth.gas_price,
+        "gasPrice": int(w3.eth.gas_price * 1.5),
     }
     tx["gas"] = int(w3.eth.estimate_gas(tx) * 1.2)
     signed = w3.eth.account.sign_transaction(tx, priv_key)
     tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
-    print(f"[SENT] tx_hash={tx_hash.hex()}")
+    print(f"[SENT] network={args.network} tx_hash=0x{tx_hash.hex()}")
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-    print(f"[CONFIRMED] status={receipt['status']} block={receipt['blockNumber']}")
+    minted_agent_id = None
+    transfer_topic = Web3.keccak(text="Transfer(address,address,uint256)").hex()
+    for log in receipt.get("logs", []):
+        topics = [t.hex() for t in log.get("topics", [])]
+        if len(topics) == 4 and topics[0].lower().endswith(transfer_topic.lower()[-64:]):
+            minted_agent_id = int(topics[3], 16)
+            break
+    print(f"[CONFIRMED] status={receipt['status']} block={receipt['blockNumber']} agent_id={minted_agent_id}")
     return 0 if receipt["status"] == 1 else 1
 
 

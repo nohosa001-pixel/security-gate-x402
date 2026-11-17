@@ -20,11 +20,28 @@ from app.security_engine import audit_payload
 
 DEFAULT_HUB_BASE_URL = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
 DEFAULT_POLYGON_AGENT_ID = 707
+DEFAULT_BASE_AGENT_ID = 1203885
+DEFAULT_ARBITRUM_AGENT_ID = 1679
+DEFAULT_SOLANA_AGENT_ASSET = "yrvkHggv4ScF5fUfBnKEtg4BkCL26qPKzHV445bRMU9"
 
 ERC8004_DEPLOYMENTS: Dict[str, Dict[str, Any]] = {
     "polygon-mainnet": {
         "chain_id": 137,
         "rpc_url": "https://polygon-bor-rpc.publicnode.com",
+        "IdentityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+        "ReputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+        "ValidationRegistry": None,
+    },
+    "base-mainnet": {
+        "chain_id": 8453,
+        "rpc_url": "https://base-rpc.publicnode.com",
+        "IdentityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+        "ReputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+        "ValidationRegistry": None,
+    },
+    "arbitrum-mainnet": {
+        "chain_id": 42161,
+        "rpc_url": "https://arb1.arbitrum.io/rpc",
         "IdentityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
         "ReputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
         "ValidationRegistry": None,
@@ -77,11 +94,25 @@ def build_agrid_registration_json(
     base = base_url.rstrip("/")
     registrations: List[Dict[str, Any]] = []
     if agent_id is not None:
-        registrations.append(
-            {
-                "agentId": agent_id,
-                "agentRegistry": f"eip155:137:{ERC8004_DEPLOYMENTS['polygon-mainnet']['IdentityRegistry']}",
-            }
+        registrations.extend(
+            [
+                {
+                    "agentId": agent_id,
+                    "agentRegistry": f"eip155:137:{ERC8004_DEPLOYMENTS['polygon-mainnet']['IdentityRegistry']}",
+                },
+                {
+                    "agentId": DEFAULT_BASE_AGENT_ID,
+                    "agentRegistry": f"eip155:8453:{ERC8004_DEPLOYMENTS['base-mainnet']['IdentityRegistry']}",
+                },
+                {
+                    "agentId": DEFAULT_ARBITRUM_AGENT_ID,
+                    "agentRegistry": f"eip155:42161:{ERC8004_DEPLOYMENTS['arbitrum-mainnet']['IdentityRegistry']}",
+                },
+                {
+                    "agentId": DEFAULT_SOLANA_AGENT_ASSET,
+                    "agentRegistry": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp:8oo4dC4JvBLwy5tGgiH3WwK4B9PWxL9Z4XjA2jzkQMbQ",
+                },
+            ]
         )
 
     return {
