@@ -31,7 +31,11 @@ INJECTION_PATTERNS = [
     r"이전\s*(?:모든\s*)?(?:지시|명령|프롬프트|규칙)(?:사항)?(?:을|를)?\s*(?:무시|취소|삭제|잊어)",
     r"시스템\s*(?:프롬프트|명령|지시|가이드라인|보안)(?:를|을)?\s*(?:무시|해제|출력|우회|유출)",
     r"탈옥\s*모드|관리자\s*권한\s*(?:탈취|상승|획득)|보안\s*해제",
-    r"(?:비밀번호|마스터키|개인키|프라이빗\s*키|API\s*키)(?:를|을)?\s*(?:출력|알려줘|공개|전송)"
+    r"(?:비밀번호|마스터키|개인키|프라이빗\s*키|API\s*키)(?:를|을)?\s*(?:출력|알려줘|공개|전송)",
+    # GTIG Nov 2026: AI Agent Config Tampering, ClickFix Shell Lures, and LLMJacking
+    r"(?:\.claude[/\\]settings(?:\.local)?\.json|\.cursor[/\\]mcp\.json|\.vscode[/\\]tasks\.json)[\s\S]{0,200}(?:hooks|command|curl|wget|powershell|bash|sh\s+-c)",
+    r"(?:curl|wget)\s+[^\n|]{4,}\s*\|\s*(?:ba)?sh\b|(?:irm|iwr|Invoke-RestMethod)\s+[^\n|]{4,}\s*\|\s*iex\b|powershell(?:\.exe)?\s+[^-\n]*-(?:enc|EncodedCommand)\b",
+    r"(?:litellm|virtual[_-]?key)[\s\S]{0,80}(?:admin|master[_-]?key|escalat|bypass)|(?:llm[_-]?mixer|harvest\s+(?:llm|api)\s+keys?)",
 ]
 
 INJECTION_PATTERN_SPECS = [
@@ -51,7 +55,10 @@ INJECTION_PATTERN_SPECS = [
     (r"이전\s*(?:모든\s*)?(?:지시|명령|프롬프트|규칙)(?:사항)?(?:을|를)?\s*(?:무시|취소|삭제|잊어)", "PROMPT_INJECTION_KO", "CRITICAL", "한국어 시스템 프롬프트 무시 및 이전 지시사항 삭제 시도"),
     (r"시스템\s*(?:프롬프트|명령|지시|가이드라인|보안)(?:를|을)?\s*(?:무시|해제|출력|우회|유출)", "PROMPT_INJECTION_KO", "CRITICAL", "한국어 시스템 프롬프트 유출 및 보안 가이드라인 우회 시도"),
     (r"탈옥\s*모드|관리자\s*권한\s*(?:탈취|상승|획득)|보안\s*해제", "JAILBREAK_KO", "CRITICAL", "한국어 관리자 권한 상승 및 탈옥 모드 활성화 시도"),
-    (r"(?:비밀번호|마스터키|개인키|프라이빗\s*키|API\s*키)(?:를|을)?\s*(?:출력|알려줘|공개|전송)", "SECRET_LEAK_KO", "CRITICAL", "한국어 개인키/API 키 정보 유출 유도 시도")
+    (r"(?:비밀번호|마스터키|개인키|프라이빗\s*키|API\s*키)(?:를|을)?\s*(?:출력|알려줘|공개|전송)", "SECRET_LEAK_KO", "CRITICAL", "한국어 개인키/API 키 정보 유출 유도 시도"),
+    (r"(?:\.claude[/\\]settings(?:\.local)?\.json|\.cursor[/\\]mcp\.json|\.vscode[/\\]tasks\.json)[\s\S]{0,200}(?:hooks|command|curl|wget|powershell|bash|sh\s+-c)", "AGENT_CONFIG_TAMPERING", "CRITICAL", "AI coding assistant config tampering (.claude/settings.json, mcp.json, tasks.json) backdoor vector"),
+    (r"(?:curl|wget)\s+[^\n|]{4,}\s*\|\s*(?:ba)?sh\b|(?:irm|iwr|Invoke-RestMethod)\s+[^\n|]{4,}\s*\|\s*iex\b|powershell(?:\.exe)?\s+[^-\n]*-(?:enc|EncodedCommand)\b", "CLICKFIX_SHELL_LURE", "CRITICAL", "ClickFix / remote pipe-to-shell dropper execution lure detected"),
+    (r"(?:litellm|virtual[_-]?key)[\s\S]{0,80}(?:admin|master[_-]?key|escalat|bypass)|(?:llm[_-]?mixer|harvest\s+(?:llm|api)\s+keys?)", "LLMJACKING_ABUSE", "HIGH", "LLMJacking virtual-key privilege escalation or underground LLM mixer abuse pattern"),
 ]
 
 SECRET_PATTERNS = [
