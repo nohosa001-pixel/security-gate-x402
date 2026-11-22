@@ -65,5 +65,11 @@
 - `logistics_issue_pod_attestation`: EIP-712 `ProofOfDelivery` signature issuance for instant autonomous settlement on `LogisticsPoDEscrow.sol`.
 - `audit_and_sign_exploit_indemnity`: Forensic on-chain transaction log investigation and EIP-712 `ExploitClaimVerdict` signing for autonomous indemnity payout on `AgenticShieldPool.sol`.
 
+## A.GRID Sibling Oracles
+- Earth Physical Infrastructure Risk Hub (`geo-oracle-x402`): https://geo-oracle-x402-7qxtp3324q-du.a.run.app/llms.txt
+- EUDR Deforestation & TRACES-NT Compliance: https://eudragent.com/llms.txt
+- Critical Minerals & Battery Passport Oracle: https://minerals-oracle-x402-7qxtp3324q-du.a.run.app/llms.txt
+- CleanWeb Agent (RAG Scraping & Search): https://x402-cleanweb-agent-7qxtp3324q-du.a.run.app/llms.txt
+
 
 
