@@ -80,6 +80,11 @@ class AgentComplianceEngine:
                     "requirement": "Provable cryptographic erasure of ephemeral session keys under GDPR Art. 17(1), with automatic 5-year statutory audit preservation under GDPR Art. 17(3)(b) for regulated sectors (EUDR, Minerals, Customs Trade, Construction).",
                     "status": "PASS",
                     "mechanism": "NIST-SP-800-88-Rev1 Ephemeral Key Zeroization + GDPR Art. 17(3)(b) 5-Year Statutory Audit Vault (IETF CIDv1 Portable Content Addressing & W3C Trace-Context Observability)."
+                },
+                "iosco_fr_06_26_tokenization_governance": {
+                    "requirement": "IOSCO Tokenization of Financial Assets (FR/06/26, Nov 2026): Alignment between on-chain and off-chain records, oracle & smart-contract governance, operational/cyber resilience, and multi-chain settlement transparency.",
+                    "status": "PASS" if is_compliant else "FAIL",
+                    "mechanism": "EIP-712 / ERC-7683 Oracle Attestations + SecurityGateOMSPolicy.sol deterministic pre-sign verification + Polygon/Solana USDC DvP settlement rails."
                 }
             },
             "oracle_trust_calibration": credit_report.get("oracle_trust_calibration"),

@@ -27,3 +27,4 @@ def test_brain_status_and_cycle_endpoints(tmp_path, monkeypatch):
     assert c_data["status"] == "success"
     assert c_data["executed_cycles"] == 2
     assert c_data["brain_status"]["total_cycles_completed"] == 3
+

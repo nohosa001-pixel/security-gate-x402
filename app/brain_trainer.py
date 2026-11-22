@@ -21,6 +21,7 @@ from app.cleanweb_sanitizer import cleanweb_sensory_brain
 from app.credit_rating_engine import credit_engine
 from app.escrow_engine import escrow_engine
 from app.security_engine import audit_payload
+from app.sim_memory import SelfImprovementMemory
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_DATA_DIR = REPO_ROOT / "data"
@@ -55,6 +56,11 @@ class SecurityGateBrainTrainer:
         self.state_file = resolved_dir / "brain_learning_state.json"
         self.heartbeat_file = resolved_dir / "brain_learning_heartbeat.json"
         self.state = self._load_or_init_state()
+        self.sim = SelfImprovementMemory(
+            storage_path=resolved_dir / "sim_memory.json",
+            domain="security_gate_5domain",
+            seed_model=os.getenv("GEMINI_MODEL", "gemini-decision-1"),
+        )
 
     def _load_or_init_state(self) -> Dict[str, Any]:
         if self.state_file.exists():
@@ -198,6 +204,22 @@ class SecurityGateBrainTrainer:
         self.state["domain_metrics"]["cleanweb"]["brier_score"] = cw_brier
         self._save_state(self.state)
 
+        # Record structured CRSI Self-Improvement Memory (SIM) entry
+        passed_domains = sum([bool(sec_pass), cfr_decision == "RELEASE", cw_compression > 0.5, not eudr_risk, not shock_flag])
+        self.sim.record_attempt(
+            root_cause="multi_domain_shadow_calibration_and_injection_shield",
+            round_num=cycle_num,
+            what=f"5-domain shadow cycle calibration (alpha={alpha}, cw_comp={cw_compression}, eudr={eudr_verdict})",
+            files="app/brain_trainer.py,app/security_engine.py,app/decisions_shield.py",
+            predicted=["prompt_injection_block", "cfr_milestone_release", "cleanweb_compression", "eudr_ndvi_check", "minerals_spread_guard"],
+            fixed=["prompt_injection_block"] if sec_pass else [],
+            missed=[] if sec_pass else ["prompt_injection_block"],
+            passed=passed_domains,
+            total=5,
+            accepted=True,
+            model_name=os.getenv("GEMINI_MODEL", "gemini-decision-1"),
+        )
+
         result = {
             "cycle": cycle_num,
             "current_day": current_day,
@@ -231,6 +253,7 @@ class SecurityGateBrainTrainer:
             "brier_score": self.state.get("brier_score"),
             "domain_metrics": self.state.get("domain_metrics"),
             "last_cycle": self.state.get("last_cycle"),
+            "self_improvement_memory": self.sim.get_summary(),
             "security_gate_integration": "ACTIVE_SUB_MILLISEC_SHIELD",
             "pull_sync_ready": True,
         }

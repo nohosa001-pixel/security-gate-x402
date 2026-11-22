@@ -761,6 +761,12 @@ async def run_server():
 
 
 def main():
+    from thin_mcp_proxy import is_thin_client_mode, main as thin_main
+
+    if is_thin_client_mode():
+        thin_main()
+        return
+
     if len(sys.argv) > 1 and sys.argv[1] in ("init", "audit", "--help", "-h", "--wallet", "-w", "--force", "-f"):
         from app.cli import main as cli_main
         cli_main()

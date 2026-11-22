@@ -42,8 +42,8 @@ A.GRID concludes its Colosseum Eternal Sprint with **Phase 3: Pure Non-Custodial
 ### 2. Native Bridge-Free Multi-Chain Escrow Settlement
 - Eliminates cross-chain bridge hack vulnerabilities: assets remain anchored in native chain vaults (Solana Mainnet, Polygon, Base, Arbitrum), unlocked purely via cryptographic attestation digests.
 
-### 3. Polygon ERC-8004 On-Chain Agent Identity (`Agent ID #707`) & Velocity Limits
-- Registered A.GRID's official on-chain agent identity on **Polygon Mainnet ERC-8004** (`Agent ID #707`, owner `0xa854c28b30abb5f527523360305e82d1ecf061db`) with live bidirectional verification and `erc8004_reputation_proof` embedded in OMS settlements.
+### 3. Solana Mainnet On-Chain Agent Identity & Sliding-Window Velocity Limits
+- Anchored A.GRID's official on-chain agent identity and execution attestation directly on **Solana Mainnet** (`AGR3W3R9pKxnuZGYrpaggfkbMKVrjoniLaGvi1voBFSC` & `AGRAtNxF474xZFin5iZaxBKE2fKNKPih7qYPEm3mu9oN`, mirrored across ERC-8004 `Agent ID #707` for EVM interoperability).
 - Added sliding-window velocity controls (`EXCEEDS_VELOCITY_LIMIT`) to `AgentSpendControlPolicy`, plus multi-rail routing across **Solana (`501`)**, **Polygon (`137`)**, **Base (`8453`)**, **Arbitrum (`42161`)**, and **TRON (`728126428`)**.
 
 ### 4. Production Stress-Testing & Verification
@@ -62,7 +62,7 @@ A.GRID concludes its Colosseum Eternal Sprint with **Phase 3: Pure Non-Custodial
 | **00:00 - 00:15** | **Title Card / Rapid Agent Montage**<br>AI agents transacting, Solana network activity, satellite mapping. | *"In 2026, autonomous AI agents are taking over global commerce. They book compute, trade commodities, and hire other agents. But until now, they lacked a safe, non-custodial escrow protocol to settle payments."* |
 | **00:15 - 00:35** | **Live Hub & Multi-Phase Architecture**<br>Showing A.GRID Hub: 2.8ms AST guard, Solana Anchor PDA spend caps, and real-world EUDR/Minerals truth oracles. | *"A.GRID built that pure escrow protocol on Solana. First: a 2.8-millisecond AST pre-sign guard. Second: real-world truth oracles that verify satellite deforestation and supply-chain IoT before escrow releases."* |
 | **00:35 - 00:55** | **Live Micro-Streaming & Slashing**<br>Real-time telemetry stream. Simulated compute fraud trigger: instant 0.4s freeze and collateral slashing on Solana Mainnet (`AGR3W3R9...`). | *"Third: continuous micro-streaming with instant slashing for compute fraud. And complete institutional compliance—IFRS-15 clean invoicing and statutory 5-year audit vaults that global enterprises demand."* |
-| **00:55 - 01:15** | **Ecosystem Traction & On-Chain Identity**<br>Displaying live Polygon ERC-8004 `Agent ID #707`, ElizaOS plugin, sliding-window velocity controls, and live Solana Mainnet contracts. | *"A.GRID isn't a theoretical demo. With verified on-chain identity via ERC-8004 Agent 707, sliding-window velocity limits, and live Solana Mainnet contracts, we condition every dollar on deterministic mathematical truth."* |
+| **00:55 - 01:15** | **Ecosystem Traction & On-Chain Identity**<br>Displaying live Solana Mainnet Agent PDA Identity (`AGR3W3R9...`, `AGRAtNxF...`), ElizaOS plugin, sliding-window velocity controls, and live Solana Mainnet contracts. | *"A.GRID isn't a theoretical demo. With verified on-chain identity on Solana Mainnet, sliding-window velocity limits, and live Anchor escrow contracts, we condition every dollar on deterministic mathematical truth."* |
 | **01:15 - 01:25** | **Grand Finale Call to Action**<br>A.GRID logo, Solana Mainnet Program IDs, Colosseum Eternal portal link. | *"Solana is the fastest rail on earth. A.GRID is the universal escrow protocol for autonomous agents. We are A.GRID. Thank you."* |
 
 ---
@@ -81,9 +81,9 @@ A.GRID concludes its Colosseum Eternal Sprint with **Phase 3: Pure Non-Custodial
    > "Third: continuous micro-streaming with instant slashing for compute fraud. And complete institutional compliance—IFRS-15 clean invoicing and statutory 5-year audit vaults that global enterprises demand."
    * **발음:** "서드: 컨티뉴어스 마이크로-스트리밍 위드 인스턴트 슬래싱 포 컴퓨트 프로드. 앤드 컴플릿 인스티튜셔널 컴플라이언스—아이에프알에스-피프틴 클린 인보이싱 앤드 스타튜토리 파이브-이어 오딧 볼츠 댓 글로벌 엔터프라이지즈 디맨드."
 
-4. **(0:55~0:75) — ERC-8004 Agent #707 & 프로덕션 검증**
-   > "A.GRID isn't a theoretical demo. With verified on-chain identity via ERC-8004 Agent 707, sliding-window velocity limits, and live Solana Mainnet contracts, we condition every dollar on deterministic mathematical truth."
-   * **발음:** "에이그리드 이즌트 어 씨오레티컬 데모. 위드 베리파이드 온-체인 아이덴티티 비아 이알씨-에잇오오포 에이전트 세븐-오-세븐, 슬라이딩-윈도우 벨로서티 리미츠, 앤드 라이브 솔라나 메인넷 컨트랙츠, 위 컨디션 에브리 달러 온 디터미니스틱 매쓰매티컬 트루스."
+4. **(0:55~0:75) — 솔라나 온체인 신원 보증 & 프로덕션 검증**
+   > "A.GRID isn't a theoretical demo. With verified on-chain identity on Solana Mainnet, sliding-window velocity limits, and live Anchor escrow contracts, we condition every dollar on deterministic mathematical truth."
+   * **발음:** "에이그리드 이즌트 어 씨오레티컬 데모. 위드 베리파이드 온-체인 아이덴티티 온 솔라나 메인넷, 슬라이딩-윈도우 벨로서티 리미츠, 앤드 라이브 앵커 에스크로 컨트랙츠, 위 컨디션 에브리 달러 온 디터미니스틱 매쓰매티컬 트루스."
 
 5. **(0:75~0:85) — 클로징**
    > "Solana is the fastest rail on earth. A.GRID is the universal escrow protocol for autonomous agents. We are A.GRID. Thank you."
@@ -95,17 +95,17 @@ A.GRID concludes its Colosseum Eternal Sprint with **Phase 3: Pure Non-Custodial
 
 - ✅ **Phase 1 (Week 1)**: Core Solana Anchor Engine & Sub-3ms AST Pre-Sign Guard.
 - ✅ **Phase 2 (Week 2)**: Real-World Invariant Oracles (EUDR, Minerals), `SecurityGateOMSPolicy.sol` Approve/Permit Defense & IFRS-15 Enterprise Clean Invoicing.
-- 🚀 **Phase 3 (Week 3 - Grand Finale)**: High-Velocity Micro-Streaming, Polygon ERC-8004 `Agent ID #707` On-Chain Identity, Sliding-Window Velocity Limits & Multi-Rail OMS (`Solana`, `Polygon`, `Base`, `Arbitrum`, `TRON`).
+- 🚀 **Phase 3 (Week 3 - Grand Finale)**: High-Velocity Micro-Streaming, Solana Mainnet On-Chain Agent Identity, Sliding-Window Velocity Limits & Multi-Rail OMS (`Solana`, `Polygon`, `Base`, `Arbitrum`, `TRON`).
 
 ---
 
 ## 📣 Week 3 Colosseum / Reddit Update Post Draft
 
-**Title:** `[Week 3 Finale] A.GRID: Non-Custodial Escrow, ERC-8004 Agent #707 Identity & Sub-Second Slashing for Autonomous AI Agents`
+**Title:** `[Week 3 Finale] A.GRID: Non-Custodial Escrow, Solana On-Chain Agent Identity & Sub-Second Slashing for Autonomous AI Agents`
 
 Over the past 3 weeks of Colosseum Eternal, we shipped **A.GRID** from a sub-3ms deterministic AST pre-sign guard into a full-stack settlement and compliance clearinghouse for autonomous agents:
 
-- **On-Chain Agent Identity & Reputation:** Registered official **Polygon Mainnet ERC-8004 `Agent ID #707`** and embedded live reputation proofs into OMS settlements.
+- **Solana On-Chain Agent Identity & Reputation:** Anchored verified on-chain agent identity and reputation proofs directly on **Solana Mainnet** (`AGR3W3R9...`, `AGRAtNxF...`) with cross-chain EVM interoperability.
 - **Sliding-Window Velocity Controls & Multi-Rail Routing:** Enforced single-tx, daily, and sliding-window velocity spend caps across **Solana (`501`)**, **Polygon (`137`)**, **Base (`8453`)**, **Arbitrum (`42161`)**, and **TRON (`728126428`)**.
 - **Deterministic Truth Oracles & Institutional Compliance:** Satellite EUDR verification, 0s NIST 800-88 PII purge, 5-year statutory audit locks, and zero-kickback `IFRS-15` clean invoicing.
 

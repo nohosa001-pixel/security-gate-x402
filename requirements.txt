@@ -10,3 +10,4 @@ cryptography>=42.0.0
 python-dotenv>=1.0.1
 mcp>=1.0.0
 web3>=6.15.0
+google-genai>=3.5.0

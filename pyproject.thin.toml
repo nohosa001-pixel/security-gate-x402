@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-security-gate-x402"
+version = "3.0.0"
+description = "Cloud-Native Thin MCP & HTTP Client for Security Gate x402 (<5ms Prompt Injection, AST Code Safety, ERC-20 Drain Guard, and EIP-712/Solana Attestation Gateway)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "Security Gate Team", email = "developer@security-gate-x402.com" }
+]
+keywords = [
+  "ai-agents",
+  "security",
+  "guardrails",
+  "mcp",
+  "x402",
+  "polygon",
+  "solana",
+  "thin-client"
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Topic :: Security",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+dependencies = [
+  "httpx>=0.27.0",
+  "mcp>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app"
+Documentation = "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/docs"
+Repository = "https://github.com/nohosa001-pixel/security-gate-x402"
+
+[project.scripts]
+agent-security-gate-x402 = "thin_mcp_proxy:main"
+agent-security-gate = "thin_mcp_proxy:main"
+security-gate-mcp = "thin_mcp_proxy:main"
+x402-security-agent = "thin_mcp_proxy:main"
+
+[tool.setuptools]
+py-modules = ["thin_mcp_proxy"]

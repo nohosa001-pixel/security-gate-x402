@@ -419,3 +419,35 @@ async def audit_shell_command_endpoint(
     return result
 
 
+from pydantic import BaseModel as _BaseModel
+
+
+class SemanticDecisionRequest(_BaseModel):
+    text: Optional[str] = None
+    file_uri: Optional[str] = None
+    mime_type: Optional[str] = None
+
+
+@router.post("/api/v1/gate/semantic-decide", tags=["Security Gate"])
+async def semantic_decide_payload(
+    req: SemanticDecisionRequest,
+    request: Request,
+    auth_check = Depends(require_x402_payment)
+):
+    """
+    AI Semantic Security Shield powered by Gemini Decisions API (gemini-decision-1).
+    Evaluates subtle prompt injection, social engineering, and multimodal PDFs/images
+    in ~150-250ms with zero output tokens.
+    """
+    if auth_check is not None:
+        return auth_check
+
+    from app.decisions_shield import semantic_decisions_shield
+    return semantic_decisions_shield.evaluate_payload(
+        text=req.text,
+        file_uri=req.file_uri,
+        mime_type=req.mime_type,
+    )
+
+
+

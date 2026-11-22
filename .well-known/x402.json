@@ -50,6 +50,13 @@
       "latency": "<3ms",
       "features": ["AST parsing", "Prompt injection defense", "Credential DLP", "NLI Hallucination check"]
     },
+    "semanticDecisionsShield": {
+      "endpoint": "/api/v1/gate/semantic-decide",
+      "method": "POST",
+      "model": "gemini-decision-1",
+      "latency": "~150-250ms",
+      "features": ["Semantic prompt injection detection", "Social engineering shield", "Multimodal PDF/image threat triage", "0 output tokens"]
+    },
     "onchainAttestation": {
       "endpoint": "/api/v1/gate/attestation/onchain",
       "method": "POST",

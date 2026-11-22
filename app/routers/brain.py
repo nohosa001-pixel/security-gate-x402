@@ -26,3 +26,4 @@ async def run_brain_cycle(
         "latest_result": results[-1],
         "brain_status": _brain_trainer.get_status_summary(),
     }
+
