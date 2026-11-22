@@ -453,7 +453,16 @@ async def health():
     }
 
 
-@app.get("/metrics", response_class=PlainTextResponse, tags=["Monitoring"])
+from app.routers.common import verify_private_metrics_access
+
+
+@app.get(
+    "/metrics",
+    response_class=PlainTextResponse,
+    tags=["Monitoring"],
+    dependencies=[Depends(verify_private_metrics_access)],
+    include_in_schema=False,
+)
 async def prometheus_metrics():
     """Returns Prometheus standard plain text metrics for APM monitoring."""
     uptime = time.time() - _SERVER_START_TIME

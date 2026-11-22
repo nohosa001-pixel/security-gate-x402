@@ -2,13 +2,14 @@
 Shared dependencies, telemetry tracking, and state metrics for Agent Security Gate x402 routers.
 """
 
+import hmac
 import time
 import os
 import json
 from collections import OrderedDict
 from typing import Dict, Any, List, Optional
 from pathlib import Path
-from fastapi import Request, HTTPException, status
+from fastapi import Header, Request, HTTPException, status
 from pydantic import BaseModel
 
 from app.schemas import PricingTier
@@ -90,6 +91,25 @@ def _record_audit_telemetry(verdict: str, risk_score: int, threats: list, elapse
             _dispatch_alert_webhook(webhook_url, verdict, int(round(norm_risk)), threats, masked_ip)
 
 
+def verify_private_metrics_access(
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+    x_metrics_secret: Optional[str] = Header(None, alias="X-Metrics-Secret"),
+    x_cron_secret: Optional[str] = Header(None, alias="X-Cron-Secret"),
+) -> None:
+    """Restrict Prometheus /metrics endpoint to authenticated operators only."""
+    expected = os.getenv("METRICS_SECRET") or os.getenv("CRON_SECRET", "agrid-metrics-secret-2026")
+    bearer = ""
+    if authorization and authorization.lower().startswith("bearer "):
+        bearer = authorization[7:].strip()
+    candidate = x_metrics_secret or x_cron_secret or bearer
+    if not candidate or not hmac.compare_digest(candidate, expected):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required for private metrics endpoint.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 async def require_x402_payment(request: Request, tier: PricingTier = PricingTier.STANDARD):
     """Enforces x402 payment authorization, pre-funded vault balance, or strictly bounded Free Trials."""
     # [IRON RULE 3]: Do NOT trust spoofable client headers (like X-Forwarded-For) as security/billing truth
@@ -106,6 +126,14 @@ async def require_x402_payment(request: Request, tier: PricingTier = PricingTier
         request.query_params.get("network")
     )
     
+    # 0. Internal A.GRID Service Mesh Key (EUDR / Minerals / CleanWeb inter-agent calls)
+    mesh_key = request.headers.get("x-internal-mesh-key") or request.headers.get("X-Internal-Mesh-Key")
+    expected_mesh = os.getenv("AGRID_INTERNAL_MESH_KEY", "agrid-internal-mesh-2026")
+    if mesh_key and expected_mesh and hmac.compare_digest(mesh_key.strip(), expected_mesh):
+        request.state.authorized_payer = "internal:agrid_mesh"
+        request.state.extra_headers = {"X-Tier": "INTERNAL_MESH"}
+        return None
+
     # 1. Sanctions OFAC check
     if is_sanctioned_address(client_addr):
         raise HTTPException(status_code=403, detail="Forbidden: Sanctioned address.")

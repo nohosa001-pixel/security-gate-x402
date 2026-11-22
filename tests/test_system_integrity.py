@@ -18,8 +18,10 @@ def test_core_legacy_endpoints():
     assert r.status_code == 200
     assert r.json().get("status") in ["healthy", "ok"]
 
-    # Metrics
-    r = client.get("/metrics")
+    # Metrics (private)
+    assert client.get("/metrics").status_code == 401
+    secret = __import__("os").getenv("METRICS_SECRET") or __import__("os").getenv("CRON_SECRET", "agrid-metrics-secret-2026")
+    r = client.get("/metrics", headers={"X-Metrics-Secret": secret})
     assert r.status_code == 200
 
     # Gate challenge (x402 protocol)

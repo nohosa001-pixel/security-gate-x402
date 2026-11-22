@@ -27,7 +27,9 @@ def test_health_endpoint_subsystems(client):
 
 
 def test_prometheus_metrics_endpoint(client):
-    response = client.get("/metrics")
+    assert client.get("/metrics").status_code == 401
+    secret = __import__("os").getenv("METRICS_SECRET") or __import__("os").getenv("CRON_SECRET", "agrid-metrics-secret-2026")
+    response = client.get("/metrics", headers={"X-Metrics-Secret": secret})
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/plain")
     content = response.text
@@ -58,7 +60,8 @@ def test_metrics_telemetry_recording(client):
     assert resp_attack.json()["audit"]["verdict"] in ["BLOCKED", "BLOCK", "FLAGGED"]
 
     # Check that /metrics reflected the calls
-    resp_metrics = client.get("/metrics")
+    secret = __import__("os").getenv("METRICS_SECRET") or __import__("os").getenv("CRON_SECRET", "agrid-metrics-secret-2026")
+    resp_metrics = client.get("/metrics", headers={"X-Metrics-Secret": secret})
     assert resp_metrics.status_code == 200
     content = resp_metrics.text
     assert 'security_gate_inspections_total{' in content
