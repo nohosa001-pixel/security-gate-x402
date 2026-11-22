@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Google Cloud Run Deployment Script (PowerShell) for agent-security-gate-x402
 # ==============================================================================
 $ErrorActionPreference = "Stop"
@@ -70,7 +70,7 @@ gcloud run deploy $SERVICE_NAME `
   --cpu 1 `
   --min-instances 0 `
   --max-instances 100 `
-  --set-env-vars "ENV=$SERVER_ENV,ENVIRONMENT=production,SERVER_WALLET_ADDRESS=$SERVER_WALLET,GATE_PAY_TO_ADDRESS=$SERVER_WALLET,SOLANA_WALLET_ADDRESS=$($env:SOLANA_WALLET_ADDRESS),GATE_PRIVATE_KEY=$GATE_KEY,GEMINI_API_KEY=$($env:GEMINI_API_KEY),NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
+  --set-env-vars "ENV=$SERVER_ENV,ENVIRONMENT=production,SERVER_WALLET_ADDRESS=$SERVER_WALLET,GATE_PAY_TO_ADDRESS=$SERVER_WALLET,SOLANA_WALLET_ADDRESS=$($env:SOLANA_WALLET_ADDRESS),GATE_PRIVATE_KEY=$GATE_KEY,GEMINI_API_KEY=$($env:GEMINI_API_KEY),AGRID_INTERNAL_MESH_KEY=$($env:AGRID_INTERNAL_MESH_KEY),METRICS_SECRET=$($env:METRICS_SECRET),NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
   --project $PROJECT_ID `
   --quiet
 
