@@ -85,7 +85,10 @@ async def settle_escrow_task(req: M2MEscrowSettleRequest):
 
 
 @router.post("/api/v1/escrow/universal/settle", tags=["Universal Truth Escrow"])
-async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
+async def settle_universal_escrow_endpoint(
+    req: UniversalEscrowSettleRequest,
+    auth_check = Depends(require_x402_payment),
+):
     """
     Executes / prepares atomic Direct Split settlement on UniversalEscrowCore.sol.
     Disburses funds directly to laborers, suppliers, and researchers bypassing general contractors.
@@ -95,6 +98,9 @@ async def settle_universal_escrow_endpoint(req: UniversalEscrowSettleRequest):
     - Recipient address format, non-zero, and blacklist checks
     - Synchronization with Credit Rating Engine & Sovereign RWA Treasury
     """
+    if auth_check is not None:
+        return auth_check
+
     import time
     from fastapi import HTTPException
     from app.credit_rating_engine import credit_engine
