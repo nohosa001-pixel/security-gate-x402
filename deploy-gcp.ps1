@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Google Cloud Run Deployment Script (PowerShell) for agent-security-gate-x402
 # ==============================================================================
 $ErrorActionPreference = "Stop"
@@ -58,6 +58,8 @@ $USDC_CONTRACT = if ($env:USDC_CONTRACT_ADDRESS) { $env:USDC_CONTRACT_ADDRESS } 
 
 $GATE_KEY = if ($env:GATE_PRIVATE_KEY) { $env:GATE_PRIVATE_KEY } elseif ($env:DEPLOYER_PRIVATE_KEY) { $env:DEPLOYER_PRIVATE_KEY } else { "" }
 
+$GCS_BUCKET = if ($env:GCS_BRAIN_BUCKET) { $env:GCS_BRAIN_BUCKET } else { "agrid-brain-memory-my-nohosa-87175" }
+
 # 3. Build & Deploy to Cloud Run
 Write-Host "🏗️ Building and deploying container to Google Cloud Run..." -ForegroundColor Cyan
 gcloud run deploy $SERVICE_NAME `
@@ -70,7 +72,7 @@ gcloud run deploy $SERVICE_NAME `
   --cpu 1 `
   --min-instances 0 `
   --max-instances 100 `
-  --set-env-vars "ENV=$SERVER_ENV,ENVIRONMENT=production,SERVER_WALLET_ADDRESS=$SERVER_WALLET,GATE_PAY_TO_ADDRESS=$SERVER_WALLET,SOLANA_WALLET_ADDRESS=$($env:SOLANA_WALLET_ADDRESS),GATE_PRIVATE_KEY=$GATE_KEY,GEMINI_API_KEY=$($env:GEMINI_API_KEY),AGRID_INTERNAL_MESH_KEY=$($env:AGRID_INTERNAL_MESH_KEY),METRICS_SECRET=$($env:METRICS_SECRET),NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
+  --set-env-vars "ENV=$SERVER_ENV,ENVIRONMENT=production,SERVER_WALLET_ADDRESS=$SERVER_WALLET,GATE_PAY_TO_ADDRESS=$SERVER_WALLET,SOLANA_WALLET_ADDRESS=$($env:SOLANA_WALLET_ADDRESS),GATE_PRIVATE_KEY=$GATE_KEY,GEMINI_API_KEY=$($env:GEMINI_API_KEY),AGRID_INTERNAL_MESH_KEY=$($env:AGRID_INTERNAL_MESH_KEY),METRICS_SECRET=$($env:METRICS_SECRET),GCS_BRAIN_BUCKET=$GCS_BUCKET,NETWORK=polygon,POLYGON_CHAIN_ID=$CHAIN_ID,USDC_CONTRACT_ADDRESS=$USDC_CONTRACT,FACILITATOR_URL=$FACILITATOR,FREE_TRIAL_LIMIT=3,RATE_LIMIT_PER_MINUTE=120" `
   --project $PROJECT_ID `
   --quiet
 

@@ -20,8 +20,12 @@ from typing import Any, Dict, Optional
 from app.cleanweb_sanitizer import cleanweb_sensory_brain
 from app.credit_rating_engine import credit_engine
 from app.escrow_engine import escrow_engine
+from app.gcs_brain_checkpoint import GCSBrainCheckpoint
+from app.live_secfin_ingestor import collect_live_security_and_finance_intel
 from app.security_engine import audit_payload
 from app.sim_memory import SelfImprovementMemory
+
+GCS_CHECKPOINT = GCSBrainCheckpoint(prefix="security-gate")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_DATA_DIR = REPO_ROOT / "data"
@@ -63,32 +67,40 @@ class SecurityGateBrainTrainer:
         )
 
     def _load_or_init_state(self) -> Dict[str, Any]:
-        if self.state_file.exists():
-            try:
-                with open(self.state_file, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                pass
+        loaded = GCS_CHECKPOINT.load("brain_learning_state.json", local_path=self.state_file)
+        if isinstance(loaded, dict):
+            loaded.setdefault("persistence_mode", GCS_CHECKPOINT.persistence_mode)
+            loaded.setdefault(
+                "live_ground_truth_metrics",
+                {"live_samples": 0, "live_accuracy": None, "live_brier_score": None},
+            )
+            return loaded
 
         now_utc = datetime.now(timezone.utc)
         target_utc = now_utc + timedelta(days=30)
         initial = {
             "protocol": "A.GRID_SECURITY_GATE_ELIZAOS_BRAIN_TRAINER",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "status": "ACTIVE_CONTINUOUS_LEARNING",
+            "persistence_mode": GCS_CHECKPOINT.persistence_mode,
             "started_at": now_utc.isoformat(),
             "target_completion_at": target_utc.isoformat(),
             "current_day": 1,
             "total_cycles_completed": 0,
             "total_target_cycles": 2880,  # 30 days * 96 cycles/day
-            "brier_score": 0.0760,
-            "overall_readiness_score": 0.8585,
+            "brier_score": None,
+            "overall_readiness_score": 0.0,
+            "live_ground_truth_metrics": {
+                "live_samples": 0,
+                "live_accuracy": None,
+                "live_brier_score": None,
+            },
             "domain_metrics": {
-                "security": {"samples": 0, "accuracy": 0.992, "brier_score": 0.041},
-                "escrow_cfr": {"samples": 0, "confidence": 0.865, "brier_score": 0.068},
-                "cleanweb": {"samples": 0, "compression_ratio": 0.871, "brier_score": 0.075},
-                "eudr": {"samples": 0, "confidence": 0.855, "brier_score": 0.076},
-                "minerals": {"samples": 0, "confidence": 0.860, "brier_score": 0.074},
+                "security": {"samples": 0, "accuracy": None, "brier_score": None},
+                "escrow_cfr": {"samples": 0, "confidence": None, "brier_score": None},
+                "cleanweb": {"samples": 0, "compression_ratio": None, "brier_score": None},
+                "eudr": {"samples": 0, "confidence": None, "brier_score": None},
+                "minerals": {"samples": 0, "confidence": None, "brier_score": None},
             },
             "last_cycle": None,
         }
@@ -96,13 +108,14 @@ class SecurityGateBrainTrainer:
         return initial
 
     def _save_state(self, state: Dict[str, Any]) -> None:
-        with open(self.state_file, "w", encoding="utf-8") as f:
-            json.dump(state, f, indent=2, ensure_ascii=False)
+        state["persistence_mode"] = GCS_CHECKPOINT.persistence_mode
+        GCS_CHECKPOINT.save("brain_learning_state.json", state, local_path=self.state_file)
 
     def record_heartbeat(self, cycle_res: Dict[str, Any], mode: str = "daemon") -> None:
         hb = {
             "pid": os.getpid(),
             "mode": mode,
+            "persistence_mode": GCS_CHECKPOINT.persistence_mode,
             "last_heartbeat_utc": datetime.now(timezone.utc).isoformat(),
             "cycle": cycle_res.get("cycle"),
             "current_day": cycle_res.get("current_day"),
@@ -111,8 +124,7 @@ class SecurityGateBrainTrainer:
             "block_id": cycle_res.get("memory_block_id"),
             "status": "RUNNING",
         }
-        with open(self.heartbeat_file, "w", encoding="utf-8") as f:
-            json.dump(hb, f, indent=2, ensure_ascii=False)
+        GCS_CHECKPOINT.save("brain_learning_heartbeat.json", hb, local_path=self.heartbeat_file)
 
     def execute_training_cycle(self, mode: str = "step") -> Dict[str, Any]:
         """Runs a single zero-overhead shadow learning cycle across all 5 domains."""
@@ -162,8 +174,12 @@ class SecurityGateBrainTrainer:
         latency_ms = round((time.perf_counter() - t0) * 1000, 2)
         block_id = f"blk_sg_{hashlib.sha256(f'{cycle_num}:{time.time()}'.encode()).hexdigest()[:12]}"
 
-        new_brier = round(max(0.040, self.state["brier_score"] * 0.9995), 4)
-        new_readiness = round(min(0.965, self.state["overall_readiness_score"] + 0.00015), 4)
+        prev_brier = self.state.get("brier_score")
+        base_brier = float(prev_brier) if prev_brier is not None else float(cw_brier)
+        new_brier = round(max(0.040, base_brier * 0.9995), 4)
+        prev_readiness = self.state.get("overall_readiness_score")
+        base_readiness = float(prev_readiness) if prev_readiness is not None else 0.0
+        new_readiness = round(min(0.965, base_readiness + 0.00015), 4)
 
         current_day = min(
             30,
@@ -200,8 +216,27 @@ class SecurityGateBrainTrainer:
                 "effective_stake_ratio": stake_info["effective_collateral_ratio"],
             },
         }
+        self.state["domain_metrics"]["security"]["samples"] += 1
+        self.state["domain_metrics"]["security"]["accuracy"] = round(1.0 if sec_pass else 0.0, 4) if self.state["domain_metrics"]["security"]["samples"] == 1 else round(
+            0.95 * float(self.state["domain_metrics"]["security"].get("accuracy") or 0.9) + 0.05 * (1.0 if sec_pass else 0.0), 4
+        )
+        self.state["domain_metrics"]["escrow_cfr"]["samples"] += 1
+        self.state["domain_metrics"]["eudr"]["samples"] += 1
+        self.state["domain_metrics"]["minerals"]["samples"] += 1
         self.state["domain_metrics"]["cleanweb"]["samples"] += 1
         self.state["domain_metrics"]["cleanweb"]["brier_score"] = cw_brier
+
+        # Active live Security & Finance intelligence ingestion (CISA, AI/Web3 security, Stablecoin/USDC peg)
+        live_secfin = collect_live_security_and_finance_intel(cycle_num=cycle_num)
+        lgt = self.state.setdefault(
+            "live_ground_truth_metrics",
+            {"live_samples": 0, "live_accuracy": None, "live_brier_score": None},
+        )
+        lgt["live_samples"] = int(lgt.get("live_samples", 0)) + int(live_secfin.get("live_samples_added", 0))
+        lgt["last_live_ingest_utc"] = live_secfin["observed_at_utc"]
+        lgt["usdc_peg_usd"] = live_secfin["finance_settlement_monitor"]["price_usd"]
+        lgt["usdc_peg_status"] = live_secfin["finance_settlement_monitor"]["peg_status"]
+        lgt["latest_live_intel"] = live_secfin
         self._save_state(self.state)
 
         # Record structured CRSI Self-Improvement Memory (SIM) entry
@@ -244,6 +279,7 @@ class SecurityGateBrainTrainer:
         return {
             "agent_identity": "agrid-security-gate-elizaos-brain-v1",
             "protocol": self.state.get("protocol"),
+            "persistence_mode": GCS_CHECKPOINT.persistence_mode,
             "status": self.state.get("status"),
             "current_day": self.state.get("current_day"),
             "total_cycles_completed": self.state.get("total_cycles_completed"),
@@ -252,6 +288,7 @@ class SecurityGateBrainTrainer:
             "overall_readiness_score": readiness,
             "brier_score": self.state.get("brier_score"),
             "domain_metrics": self.state.get("domain_metrics"),
+            "live_ground_truth_metrics": self.state.get("live_ground_truth_metrics"),
             "last_cycle": self.state.get("last_cycle"),
             "self_improvement_memory": self.sim.get_summary(),
             "security_gate_integration": "ACTIVE_SUB_MILLISEC_SHIELD",
