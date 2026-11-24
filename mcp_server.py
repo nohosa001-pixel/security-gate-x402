@@ -354,6 +354,21 @@ TOOLS.extend([
             },
             "required": ["agent_id", "score", "x402_tx_hash"]
         }
+    },
+    {
+        "name": "verify_counterparty_kyw_solvency",
+        "description": "Unified Pre-Settlement Tollgate: screens counterparty wallet for OFAC/mixer risk, verifies live on-chain USDC solvency across Base/Polygon/Arbitrum/ETH/Solana, checks CRS credit grade, and optionally runs <3ms Pre-Sign Security Gate audit.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "counterparty_address": {"type": "string", "description": "Target EVM (0x...) or Solana wallet address"},
+                "chain_id": {"type": "integer", "default": 8453, "description": "8453 (Base), 137 (Polygon), 42161 (Arbitrum), 1 (ETH), 501 (Solana)"},
+                "required_amount_usdc": {"type": "number", "default": 0.0, "description": "Minimum USDC required for settlement"},
+                "escrow_job_id": {"type": "string", "description": "Optional escrow job ID"},
+                "payload_to_audit": {"type": "string", "description": "Optional prompt/code payload for combined <3ms Pre-Sign audit"}
+            },
+            "required": ["counterparty_address"]
+        }
     }
 ])
 
@@ -695,6 +710,21 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 score=int(tool_args.get("score", 100)),
                 x402_tx_hash=str(tool_args.get("x402_tx_hash", "")),
                 chain_id=int(tool_args.get("chain_id", 137)),
+            )
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+            }
+
+        elif tool_name == "verify_counterparty_kyw_solvency":
+            from app.kyw_solvency_oracle import verify_counterparty_kyw
+            res = verify_counterparty_kyw(
+                counterparty_address=str(tool_args.get("counterparty_address", "")),
+                chain_id=int(tool_args.get("chain_id", 8453)),
+                required_amount_usdc=float(tool_args.get("required_amount_usdc", 0.0)),
+                escrow_job_id=tool_args.get("escrow_job_id"),
+                payload_to_audit=tool_args.get("payload_to_audit"),
             )
             return {
                 "jsonrpc": "2.0",
