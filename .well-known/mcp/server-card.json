@@ -1,9 +1,9 @@
 {
   "serverInfo": {
     "name": "security-gate-x402",
-    "version": "1.9.0"
+    "version": "2.2.1"
   },
-  "description": "Zero-trust safety & settlement rail for autonomous AI agents. Sub-3ms deterministic guardrails, secret leak defense, bounded Safe{Wallet} controls, 5-sector truth oracle mesh (with 33% bundle discount), and on-chain Proof-of-Safety attestations via x402 on Base, Polygon, Arbitrum, and Solana ($0.00025 ~ $0.001).",
+  "description": "Zero-trust Pre-Settlement Customs & Verification Tollgate for autonomous AI agents. Sub-3ms deterministic guardrails, secret leak defense, bounded Safe{Wallet} & Polygon OMS controls, Counterparty KYW & 5-chain USDC Solvency Oracle, and on-chain Proof-of-Safety attestations via x402 on Base, Polygon, Arbitrum, and Solana ($0.002 ~ $0.02).",
   "homepage": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
   "repository": "https://github.com/nohosa001-pixel/security-gate-x402",
   "tools": [
@@ -120,6 +120,34 @@
           }
         },
         "required": ["job_id", "deliverable", "ground_truth_spec"]
+      }
+    },
+    {
+      "name": "verify_counterparty_kyw_solvency",
+      "description": "Unified Pre-Settlement Tollgate ($0.02 USDC via x402): screens counterparty wallet for OFAC/mixer risk, verifies live on-chain USDC & gas solvency across Base (8453), Polygon (137), Arbitrum (42161), Ethereum (1), and Solana (501), checks CRS credit grade, and optionally runs <3ms Pre-Sign Security Gate audit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "counterparty_address": {
+            "type": "string",
+            "description": "Target EVM (0x...) or Solana wallet address."
+          },
+          "chain_id": {
+            "type": "integer",
+            "default": 8453,
+            "description": "8453 (Base), 137 (Polygon), 42161 (Arbitrum), 1 (Ethereum), 501 (Solana)."
+          },
+          "required_amount_usdc": {
+            "type": "number",
+            "default": 0.0,
+            "description": "Minimum USDC required for settlement solvency verification."
+          },
+          "payload_to_audit": {
+            "type": "string",
+            "description": "Optional prompt/code payload for combined <3ms Pre-Sign Security Gate audit."
+          }
+        },
+        "required": ["counterparty_address"]
       }
     }
   ]

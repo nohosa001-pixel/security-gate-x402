@@ -4,7 +4,8 @@
   "name": "Security-Gate-x402 Sovereign Settlement & Oracle Mesh",
   "description": "Deterministic micro-oracle, sub-3ms prompt injection guard, Safe{Wallet} transaction gatekeeper, and autonomous multi-chain escrow clearinghouse.",
   "homepage": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app",
-  "payee": "0xA185B43fDD19619f99952AAed6eabf1029bF36a1",
+  "payee": "0xEbA2821B8E37eb5a231c074345c991Cb1F139920",
+  "solanaPayee": "G7doJyFj1tw2mTpApCoyeCPqA3QzyuuKwKNAZvzLErsT",
   "supportedChains": [
     {
       "network": "base",
@@ -56,6 +57,18 @@
       "model": "gemini-decision-1",
       "latency": "~150-250ms",
       "features": ["Semantic prompt injection detection", "Social engineering shield", "Multimodal PDF/image threat triage", "0 output tokens"]
+    },
+    "counterpartyKywSolvencyOracle": {
+      "endpoint": "/api/v1/kyw/verify",
+      "method": "POST",
+      "priceUsdc": 0.02,
+      "supportedChains": [8453, 137, 42161, 1, 501],
+      "features": [
+        "OFAC & mixer wallet screening (EVM & Solana)",
+        "Live on-chain USDC & native gas solvency check (Base, Polygon, Arbitrum, Ethereum, Solana)",
+        "In-process Agent Credit Rating (CRS) & ERC-8004 lookup",
+        "Optional combined <3ms Pre-Sign Security Gate audit + SHA-256 proof_hash"
+      ]
     },
     "onchainAttestation": {
       "endpoint": "/api/v1/gate/attestation/onchain",

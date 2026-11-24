@@ -682,6 +682,12 @@ async def get_a2a_agent_card():
                 "tags": ["security", "ast", "firewall", "x402"],
             },
             {
+                "id": "counterparty_kyw_solvency",
+                "name": "Counterparty KYW & Multi-Chain USDC Solvency Tollgate",
+                "description": "Pre-settlement wallet screening (OFAC/mixer), live on-chain USDC & gas solvency checks across Base, Polygon, Arbitrum, Ethereum, and Solana, plus CRS credit rating and combined <3ms Pre-Sign audit ($0.02 USDC via x402).",
+                "tags": ["kyw", "solvency", "ofac", "usdc", "solana", "polygon", "base", "x402"],
+            },
+            {
                 "id": "universal_escrow_settlement",
                 "name": "Non-Custodial Multi-Chain Escrow",
                 "description": "Universal escrow and velocity spend controls across Solana, Polygon, Base, Arbitrum, and TRON with IFRS-15 clean invoicing.",

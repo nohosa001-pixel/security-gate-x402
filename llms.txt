@@ -49,6 +49,10 @@
 - **POST `/api/v1/oms/spend-controls`**: Configure custom agent session spend policies and whitelisted chains.
 - **POST `/api/v1/oms/virtual-account/payin`**: Match regulated fiat deposits (ACH/Wire/Card) to Solana/Polygon USDC embedded wallets.
 
+### 8. Counterparty KYW & Multi-Chain USDC Solvency Tollgate (`$0.02 USDC` via x402)
+- **POST `/api/v1/kyw/verify`**: Unified pre-settlement customs & verification check combining OFAC/mixer wallet screening (EVM & Solana), live on-chain USDC & native gas solvency (`Base 8453`, `Polygon 137`, `Arbitrum 42161`, `Ethereum 1`, `Solana 501`), in-process CRS credit rating, and optional `<3ms` Pre-Sign Security Gate audit with SHA-256 `proof_hash`.
+- **GET `/api/v1/kyw/stats`**: Public KYW & Solvency Oracle telemetry and supported chains.
+
 ---
 
 ## ⚡ MCP Tool Names for Autonomous Agents
@@ -64,6 +68,7 @@
 - `logistics_audit_telemetry`: Environmental sensor logs (temperature, humidity) Merkle root computation and SLA compliance audit.
 - `logistics_issue_pod_attestation`: EIP-712 `ProofOfDelivery` signature issuance for instant autonomous settlement on `LogisticsPoDEscrow.sol`.
 - `audit_and_sign_exploit_indemnity`: Forensic on-chain transaction log investigation and EIP-712 `ExploitClaimVerdict` signing for autonomous indemnity payout on `AgenticShieldPool.sol`.
+- `verify_counterparty_kyw_solvency`: Unified Pre-Settlement Tollgate combining OFAC/mixer screening, live 5-chain USDC solvency verification, CRS credit check, and optional `<3ms` Pre-Sign Security Gate audit (`$0.02 USDC` via x402).
 
 ## A.GRID Sibling Oracles
 - Earth Physical Infrastructure Risk Hub (`geo-oracle-x402`): https://geo-oracle-x402-7qxtp3324q-du.a.run.app/llms.txt
