@@ -6,7 +6,7 @@
 [![ERC Proposal](https://img.shields.io/badge/ERC%20Proposal-Ethereum%20Magicians-627EEA?style=for-the-badge&logo=ethereum&logoColor=white)](https://ethereum-magicians.org/t/erc-ai-agent-proof-of-safety-attestation-transaction-guard-standard-iagenttransactionguard/29658)
 [![Gnosis Safe App](https://img.shields.io/badge/Gnosis%20Safe-App%20Store%20Live-12ff80?style=for-the-badge&logo=gnosis&logoColor=black)](https://app.safe.global/share/safe-app?appUrl=https%3A%2F%2Fagent-security-gate-x402-212942243360.asia-northeast3.run.app&chain=matic)
 [![Prometheus Metrics](https://img.shields.io/badge/Prometheus-Metrics%20Live-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/metrics)
-[![Glama.ai](https://img.shields.io/badge/Glama.ai-Approved-00ffcc?style=for-the-badge&logo=anthropic&logoColor=black)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
+[![nohosa001-pixel/security-gate-x402 MCP server](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402/badges/score.svg)](https://glama.ai/mcp/servers/nohosa001-pixel/security-gate-x402)
 [![Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Live_24%2F7-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/)
 [![Polygon Network](https://img.shields.io/badge/Polygon_USDC-x402_Settlement-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology)
 [![Solana Mainnet](https://img.shields.io/badge/Solana_Mainnet-SPL_USDC_13_Contracts-14F195?style=for-the-badge&logo=solana&logoColor=black)](contracts/solana/SOLANA_VERIFICATION_GUIDE.md)
