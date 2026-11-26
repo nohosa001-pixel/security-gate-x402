@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "gateway": {
+      "url": "https://agent-security-gate-x402-212942243360.asia-northeast3.run.app/mcp"
+    }
+  }
+}
