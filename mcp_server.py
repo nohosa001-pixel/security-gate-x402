@@ -21,9 +21,33 @@ from app.polygon_oms_adapter import polygon_oms_solana_adapter
 
 MCP_SERVER_INFO = {
     "name": "agent-security-gate-x402",
-    "version": "2.2.0",
-    "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, factual hallucination inspection micro-oracle, uncollateralized lending, and malpractice insurance for autonomous agents with EIP-191/EIP-712 attestations."
+    "version": "2.3.0",
+    "description": "Ultra-low latency (<10ms) deterministic security, prompt injection, secret key leak, dangerous AST code, factual hallucination inspection micro-oracle, and 5-chain KYW/USDC solvency oracle with MCP Apps interactive UI."
 }
+
+MCP_APP_URI = "ui://agrid/verdict-card.html"
+MCP_APP_MIME = "text/html;profile=mcp-app"
+_INLINE_UI_META = {"ui": {"resourceUri": MCP_APP_URI}}
+_PANE_UI_META = {
+    "ui": {"resourceUri": MCP_APP_URI},
+    "com.google.antigravity/ui": {
+        "entrypoints": [
+            {"type": "aux_pane", "title": "A.GRID Security Gate"},
+            {"type": "global", "title": "A.GRID Security Gate"},
+        ]
+    },
+}
+
+
+def _load_mcp_app_html() -> str:
+    override = os.environ.get("AGRID_MCP_APP_HTML")
+    html_path = override if override else os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "app", "static", "mcp_app_verdict.html"
+    )
+    if os.path.exists(html_path):
+        with open(html_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<!DOCTYPE html><html><body><h3>A.GRID Security Gate MCP App</h3></body></html>"
 
 TOOLS = [
     {
@@ -357,7 +381,9 @@ TOOLS.extend([
     },
     {
         "name": "verify_counterparty_kyw_solvency",
+        "title": "Verify Counterparty KYW & Solvency",
         "description": "Unified Pre-Settlement Tollgate: screens counterparty wallet for OFAC/mixer risk, verifies live on-chain USDC solvency across Base/Polygon/Arbitrum/ETH/Solana, checks CRS credit grade, and optionally runs <3ms Pre-Sign Security Gate audit.",
+        "_meta": _INLINE_UI_META,
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -369,8 +395,23 @@ TOOLS.extend([
             },
             "required": ["counterparty_address"]
         }
+    },
+    {
+        "name": "open_agrid_security_dashboard",
+        "title": "A.GRID Security Gate",
+        "description": "Open the interactive A.GRID Pre-Settlement Security Gate & KYW/Solvency dashboard showing live gateway status, Solana Mainnet Anchor programs, 30-min threat brain telemetry, and USDC peg health.",
+        "_meta": _PANE_UI_META,
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
     }
 ])
+
+for _t in TOOLS:
+    if _t.get("name") in ("inspect_agent_output", "verify_agent_output", "inspect_code_ast_safety"):
+        _t.setdefault("_meta", _INLINE_UI_META)
 
 
 
@@ -387,7 +428,8 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "result": {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {
-                    "tools": {}
+                    "tools": {},
+                    "resources": {}
                 },
                 "serverInfo": MCP_SERVER_INFO
             }
@@ -395,6 +437,45 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     elif method == "notifications/initialized":
         return None
+
+    elif method == "resources/list":
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "resources": [
+                    {
+                        "uri": MCP_APP_URI,
+                        "name": "A.GRID Security & KYW Verdict Card",
+                        "description": "Interactive MCP App UI for pre-settlement security audits, AST inspection, 5-chain KYW/USDC solvency verdicts, and live gateway telemetry.",
+                        "mimeType": MCP_APP_MIME,
+                        "_meta": {"ui": {"prefersBorder": False}},
+                    }
+                ]
+            },
+        }
+
+    elif method == "resources/read":
+        uri = params.get("uri")
+        if uri == MCP_APP_URI:
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "contents": [
+                        {
+                            "uri": MCP_APP_URI,
+                            "mimeType": MCP_APP_MIME,
+                            "text": _load_mcp_app_html(),
+                        }
+                    ]
+                },
+            }
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": -32602, "message": f"Resource not found: {uri}"},
+        }
 
     elif method == "tools/list":
         return {
@@ -449,7 +530,8 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                             "type": "text",
                             "text": json.dumps(inspection_report, indent=2, ensure_ascii=False)
                         }
-                    ]
+                    ],
+                    "structuredContent": inspection_report,
                 }
             }
 
@@ -465,7 +547,8 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                             "type": "text",
                             "text": json.dumps(ast_result, indent=2, ensure_ascii=False)
                         }
-                    ]
+                    ],
+                    "structuredContent": ast_result,
                 }
             }
 
@@ -729,7 +812,35 @@ async def handle_rpc_request(req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             return {
                 "jsonrpc": "2.0",
                 "id": req_id,
-                "result": {"content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}]}
+                "result": {
+                    "content": [{"type": "text", "text": json.dumps(res, indent=2, ensure_ascii=False)}],
+                    "structuredContent": res,
+                }
+            }
+
+        elif tool_name == "open_agrid_security_dashboard":
+            from app.kyw_solvency_oracle import get_kyw_stats
+            try:
+                from app.brain_trainer import brain_trainer
+                brain_summary = brain_trainer.get_status_summary()
+            except Exception:
+                brain_summary = {}
+            dash = {
+                "view": "dashboard",
+                "status": "ONLINE",
+                "version": MCP_SERVER_INFO["version"],
+                "tool_count": len(TOOLS),
+                "kyw_stats": get_kyw_stats(),
+                "brain_status": brain_summary,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [{"type": "text", "text": json.dumps(dash, indent=2, ensure_ascii=False)}],
+                    "structuredContent": dash,
+                }
             }
 
         else:

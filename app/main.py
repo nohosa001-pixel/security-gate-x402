@@ -725,11 +725,14 @@ async def mcp_jsonrpc_root_handler(request: Request):
     try:
         body = await request.json()
         
-        # Enforce payment authorization strictly when invoking tools/call
+        # Enforce payment authorization strictly when invoking paid tools/call
+        # Read-only MCP App dashboard entrypoint is free so Antigravity side-pane / sidebar opens cleanly with {}
         if isinstance(body, dict) and body.get("method") == "tools/call":
-            auth_check = await require_x402_payment(request)
-            if auth_check is not None:
-                return auth_check
+            called_tool = (body.get("params") or {}).get("name")
+            if called_tool != "open_agrid_security_dashboard":
+                auth_check = await require_x402_payment(request)
+                if auth_check is not None:
+                    return auth_check
 
         import mcp_server
         resp = await mcp_server.handle_rpc_request(body)

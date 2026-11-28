@@ -74,3 +74,6 @@ specs/AGENT_NATIVE_VAULT_BLUEPRINT.md
 
 # NPM Pack Tarballs
 *.tgz
+
+# Local Media / Pitch Videos
+*.mp4

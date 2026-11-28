@@ -2,8 +2,8 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "agrid-security-gate",
   "displayName": "A.GRID Security Gate",
-  "version": "1.0.0",
-  "description": "Pre-settlement security gate and 5-chain counterparty KYW/USDC solvency oracle for autonomous AI agents via MCP and x402.",
+  "version": "1.1.0",
+  "description": "Pre-settlement security gate and 5-chain counterparty KYW/USDC solvency oracle for autonomous AI agents via MCP, MCP Apps interactive UI, and x402.",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "Audit this prompt and Python snippet for injection or credential exfiltration",
